@@ -1,0 +1,1310 @@
+:root {
+  /* Core palette - "postmark" system: warm paper + ink, indigo as the primary
+     accent (deliberately not the cream+terracotta combo that's become an
+     obvious AI-design tell), oxblood "wax" as a sparing secondary accent. */
+  --ink: #241F1B;
+  --paper: #F7F3EC;
+  --paper-tint: #EFE8D8;
+  --card: #FDFBF7;
+  --muted: #6B6255;
+  --accent: #2B3A67;
+  --wax: #8C2F39;
+  --border: #D9D0C1;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Source Serif 4', serif;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: 'Fraunces', serif;
+  font-weight: 500;
+}
+
+/* ---------- Full-width band layout ----------
+   A .band spans the true edge of the browser and carries a background
+   color; an .inner inside it holds the actual max-width, centered content.
+   This is what replaces the old single `.site { max-width }` wrapper that
+   made every page look like a narrow island floating in empty space on a
+   wide screen - header/footer/section backgrounds now reach the real edges,
+   while text itself still stays a readable width. */
+.band {
+  width: 100%;
+}
+
+.inner {
+  max-width: 1360px;
+  margin: 0 auto;
+  padding: 0 3rem;
+}
+
+.site {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-band {
+  background: var(--ink);
+  border-bottom: 1px solid rgba(247, 243, 236, 0.08);
+}
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  padding: 1.35rem 0;
+}
+
+.brand {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--paper);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+/* Primary nav sits between the brand and account area, and is allowed to
+   take up the real middle of the bar instead of being crammed to one side */
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex: 1;
+  justify-content: center;
+}
+
+.primary-nav a {
+  color: rgba(247, 243, 236, 0.62);
+  text-decoration: none;
+  padding-bottom: 4px;
+  border-bottom: 1px solid transparent;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.primary-nav a:hover {
+  color: var(--paper);
+}
+
+.primary-nav a.active {
+  color: var(--paper);
+  border-bottom-color: var(--wax);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.nav-cta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  background: var(--paper);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 3px;
+  transition: background 0.15s ease;
+}
+
+.nav-cta:hover {
+  background: var(--wax);
+  color: var(--paper);
+}
+
+/* Account dropdown */
+.account-menu {
+  position: relative;
+}
+
+.account-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid rgba(247, 243, 236, 0.2);
+  border-radius: 20px;
+  padding: 0.35rem 0.85rem 0.35rem 0.35rem;
+  cursor: pointer;
+  color: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.account-trigger:hover {
+  border-color: rgba(247, 243, 236, 0.45);
+}
+
+.account-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--paper);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 0.75rem;
+}
+
+.account-chevron {
+  color: rgba(247, 243, 236, 0.5);
+  font-size: 0.6rem;
+}
+
+.account-dropdown {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(36, 31, 27, 0.18);
+  min-width: 200px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.account-dropdown a,
+.account-dropdown button {
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.55rem 0.6rem;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.account-dropdown a:hover,
+.account-dropdown button:hover {
+  background: var(--paper-tint);
+}
+
+.dropdown-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0.4rem 0.6rem 0.2rem;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 0.4rem 0.2rem;
+}
+
+.main-band {
+  background: var(--paper);
+  flex: 1;
+}
+
+.site-main {
+  padding: 3.5rem 3rem;
+}
+
+.footer-band {
+  background: var(--ink);
+}
+
+.site-footer {
+  padding: 2rem 0;
+  color: rgba(247, 243, 236, 0.5);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+}
+
+/* ---------- Postmark badge ----------
+   The signature element carried across posts, letters, and books - a
+   circular date stamp. Defined here in the shared shell pass so it's ready
+   to drop into individual pages in the next pass without another full
+   stylesheet replacement. */
+.postmark {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  flex-shrink: 0;
+  transform: rotate(-4deg);
+}
+
+.postmark .day {
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.postmark .month {
+  font-size: 0.52rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Entry row - postmark badge beside title/excerpt, used across post,
+   letter, and community listings so they all share one visual language */
+.entries {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.entry {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.entry:first-child {
+  padding-top: 0;
+}
+
+.entry-body {
+  flex: 1;
+}
+
+.kicker {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--wax);
+  margin: 0 0 0.4rem;
+}
+
+.entry-body h2 {
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+
+.entry-body h2 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.entry-body h2 a:hover {
+  color: var(--accent);
+}
+
+.entry-body p {
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Detail page header - postmark beside the title instead of plain text meta */
+.detail-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+}
+
+.detail-header h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2.2rem;
+  line-height: 1.1;
+}
+
+/* ---------- Existing content styles ----------
+   Structural rules below are unchanged from before; they now inherit the
+   new palette/type automatically through the CSS variables above. A
+   dedicated pass on each page (postmark badges, media layout, card
+   treatments) comes next - this shell pass alone already shifts the whole
+   site's look since nearly everything references these variables. */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-list-item {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.post-list-item h2 {
+  margin: 0 0 0.25rem;
+}
+
+.post-list-item a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.post-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.back-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-block;
+  margin-bottom: 1.5rem;
+}
+
+.post-body {
+  /* pre-wrap kept intentionally: older posts written before the rich editor
+     existed are plain text with real line breaks, and need this to display
+     correctly. It's harmless for new HTML content from the editor too,
+     since Tiptap's output has no meaningful whitespace between tags, and
+     block elements like <p>/<h2> still get their own margins regardless. */
+  white-space: pre-wrap;
+  margin-top: 1.5rem;
+}
+
+.auth-form {
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.auth-form label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.auth-form input {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.auth-form button {
+  margin-top: 1rem;
+  padding: 0.6rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.form-error {
+  color: var(--wax);
+  font-size: 0.85rem;
+}
+
+.reaction-buttons {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.reaction-buttons button {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--card);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.reaction-buttons button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.reaction-buttons .reaction-active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.comments {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0;
+}
+
+.comment {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.comment-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.comment-body {
+  margin: 0;
+  font-family: 'Source Serif 4', serif;
+}
+
+.comment-replies {
+  list-style: none;
+  padding-left: 1.5rem;
+  margin-top: 1rem;
+  border-left: 2px solid var(--border);
+}
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 480px;
+}
+
+.comment-form label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.comment-form input,
+.comment-form textarea {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.comment-form button {
+  margin-top: 0.75rem;
+  padding: 0.6rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+.comment-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.comment-feedback {
+  font-size: 0.85rem;
+  color: var(--accent);
+}
+
+.admin-comments {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.moderation-list {
+  list-style: none;
+  padding: 0;
+}
+
+.moderation-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.moderation-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.moderation-actions button {
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  background: var(--accent);
+  color: white;
+}
+
+.moderation-actions .reject-button {
+  background: var(--wax);
+}
+
+.author-bio {
+  font-style: italic;
+  color: var(--muted);
+  max-width: 500px;
+}
+
+.user-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  margin-top: 1.5rem;
+}
+
+.user-table th,
+.user-table td {
+  text-align: left;
+  padding: 0.6rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.user-table select {
+  padding: 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.composer {
+  max-width: 760px;
+}
+
+/* Author view / Reader view tabs - mirrors .primary-nav's active-underline
+   pattern used in the site header, so the composer's chrome reads as part
+   of the same design language rather than a bolted-on widget. */
+.composer-tabs {
+  display: flex;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.25rem;
+}
+
+.composer-tabs button {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0 0 0.65rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.composer-tabs button:hover {
+  color: var(--ink);
+}
+
+.composer-tabs button.active {
+  color: var(--ink);
+  border-bottom-color: var(--wax);
+}
+
+.composer-preview {
+  max-width: 100%;
+}
+
+.preview-excerpt {
+  border-left: 3px solid var(--accent);
+  margin: 1rem 0 1.5rem;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.post-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 640px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.post-form label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-top: 0.75rem;
+}
+
+.post-form input,
+.post-form select,
+.post-form textarea {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font: inherit;
+}
+
+.post-form textarea {
+  font-family: 'Source Serif 4', serif;
+  line-height: 1.6;
+}
+
+/* ---------- Rich text editor / "Content Studio" (composer) ----------
+   Built on Quill. The outer .rich-editor-studio wraps three pieces: a
+   toolbar row (ambient audio, speech proofread, canvas theme, zen mode),
+   a callout quick-insert bar, then the Quill instance itself, then a
+   live word-count/goal footer. Quill's own toolbar (.ql-toolbar) is
+   restyled below to match the site rather than its default look. */
+
+.rich-editor-studio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.studio-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.studio-toolbar-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--border);
+  margin: 0 0.1rem;
+}
+
+.studio-toolbar-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+.studio-pill {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  background: var(--paper-tint);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.studio-pill:hover {
+  border-color: var(--accent);
+}
+
+.studio-pill-active {
+  background: var(--accent);
+  color: var(--paper);
+  border-color: var(--accent);
+}
+
+@keyframes audioPulse {
+  0%, 100% { opacity: 0.75; }
+  50% { opacity: 1; }
+}
+
+.audio-active {
+  animation: audioPulse 2s infinite ease-in-out;
+}
+
+.canvas-swatch-group {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+/* Each swatch is a literal sample of its canvas's own background, so the
+   button always reflects the theme it switches to - "paper" is exactly
+   var(--paper), "ink" is exactly var(--ink), etc. A thin inner ring keeps
+   the paper swatch visible against the light toolbar background. */
+.canvas-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 0 0 2px var(--card);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.canvas-swatch:hover {
+  transform: scale(1.08);
+}
+
+.canvas-swatch-paper { background: var(--paper); }
+.canvas-swatch-ink { background: var(--ink); }
+.canvas-swatch-sepia { background: #fbf0d9; }
+
+.canvas-swatch-active {
+  box-shadow: inset 0 0 0 2px var(--card), 0 0 0 2px var(--card), 0 0 0 3.5px var(--accent);
+}
+
+/* Callout quick-insert bar */
+.callout-quickbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--paper-tint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+}
+
+.callout-quickbar-label {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.callout-chip {
+  border: 1px solid var(--border);
+  background: var(--card);
+  border-radius: 4px;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.callout-chip:hover {
+  background: var(--paper);
+}
+
+.callout-chip-tip { border-color: #2f6d4c; color: #2f6d4c; }
+.callout-chip-warning { border-color: var(--wax); color: var(--wax); }
+.callout-chip-stat { border-color: var(--accent); color: var(--accent); }
+
+/* Callout blocks rendered inside the editor / published content */
+.callout-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1.1rem;
+  border-radius: 6px;
+  margin: 1rem 0;
+  font-family: 'Source Serif 4', serif;
+}
+
+.callout-tip {
+  background: rgba(47, 109, 76, 0.08);
+  border: 1px solid rgba(47, 109, 76, 0.35);
+  color: #21492f;
+}
+
+.callout-warning {
+  background: rgba(140, 47, 57, 0.08);
+  border: 1px solid rgba(140, 47, 57, 0.35);
+  color: var(--wax);
+}
+
+.callout-stat {
+  background: rgba(43, 58, 103, 0.08);
+  border: 1px solid rgba(43, 58, 103, 0.35);
+  color: var(--accent);
+  text-align: center;
+  justify-content: center;
+}
+
+.callout-stat-figure {
+  font-size: 1.8rem;
+  font-weight: 600;
+  font-family: 'Fraunces', serif;
+}
+
+/* Quill container + toolbar, restyled to match the site instead of Quill's
+   default "snow" look */
+/* Deliberately NOT `overflow: hidden` here - the floating media toolbar
+   (.media-float-toolbar) is a positioned child of this element, and its
+   `top` is negative (it floats above the clicked image). overflow:hidden
+   would clip it out of view entirely instead of just rounding corners, so
+   the rounding happens on the toolbar/editor pieces individually instead. */
+.rich-editor {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card);
+}
+
+.rich-editor .ql-toolbar.ql-snow {
+  background: var(--paper-tint);
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.rich-editor .ql-toolbar .ql-stroke { stroke: var(--muted); }
+.rich-editor .ql-toolbar .ql-fill { fill: var(--muted); }
+.rich-editor .ql-toolbar .ql-picker { color: var(--muted); }
+
+.rich-editor .ql-toolbar button:hover .ql-stroke,
+.rich-editor .ql-toolbar button.ql-active .ql-stroke { stroke: var(--accent); }
+.rich-editor .ql-toolbar button:hover .ql-fill,
+.rich-editor .ql-toolbar button.ql-active .ql-fill { fill: var(--accent); }
+.rich-editor .ql-toolbar button.ql-active,
+.rich-editor .ql-toolbar .ql-picker-label.ql-active { color: var(--accent); }
+
+.rich-editor .ql-container.ql-snow {
+  border: none;
+  border-bottom-left-radius: 6px;
+  border-bottom-right-radius: 6px;
+  overflow: hidden;
+  font-family: 'Source Serif 4', serif;
+  font-size: 1rem;
+}
+
+.editor-content {
+  min-height: 260px;
+}
+
+.editor-content .ql-editor {
+  min-height: 260px;
+  padding: 1rem 1.25rem;
+  line-height: 1.7;
+}
+
+.editor-content .ql-editor.ql-blank::before {
+  color: var(--muted);
+  font-style: normal;
+}
+
+/* Canvas themes - the writing surface's own background, independent of the
+   page chrome around it */
+.editor-content.canvas-paper .ql-editor { background: var(--card); color: var(--ink); }
+.editor-content.canvas-ink .ql-editor { background: var(--ink); color: var(--paper); }
+.editor-content.canvas-sepia .ql-editor { background: #fbf0d9; color: #432818; }
+
+.editor-content img,
+.editor-content iframe {
+  max-width: 100%;
+  border-radius: 4px;
+  transition: outline 0.15s ease;
+}
+
+.editor-content iframe {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+  border: none;
+}
+
+.media-align-left { display: block; margin-right: auto !important; margin-left: 0 !important; }
+.media-align-center { display: block; margin-left: auto !important; margin-right: auto !important; }
+.media-align-right { display: block; margin-left: auto !important; margin-right: 0 !important; }
+.media-float-left { float: left !important; margin-right: 1.25rem !important; margin-bottom: 0.75rem !important; }
+.media-float-right { float: right !important; margin-left: 1.25rem !important; margin-bottom: 0.75rem !important; }
+.media-selected { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* Floating media resize/align toolbar - appears when an image or video in
+   the editor is clicked */
+.media-float-toolbar {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  box-shadow: 0 6px 18px rgba(36, 31, 27, 0.35);
+}
+
+.media-float-toolbar button {
+  background: rgba(247, 243, 236, 0.1);
+  border: 1px solid rgba(247, 243, 236, 0.2);
+  color: var(--paper);
+  border-radius: 3px;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+}
+
+.media-float-toolbar button:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.media-float-label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  font-size: 0.6rem;
+}
+
+.media-float-divider {
+  width: 1px;
+  align-self: stretch;
+  background: rgba(247, 243, 236, 0.25);
+  margin: 0 0.15rem;
+}
+
+.media-float-delete {
+  background: var(--wax) !important;
+  border-color: var(--wax) !important;
+  font-weight: bold;
+}
+
+/* Live stats + word-goal footer */
+.studio-stats {
+  padding: 0.6rem 0.85rem;
+  background: var(--paper-tint);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.studio-stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.studio-stats-row strong {
+  color: var(--ink);
+}
+
+.studio-stats-goal input {
+  width: 3.5rem;
+  font: inherit;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--card);
+}
+
+.studio-progress {
+  width: 100%;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.studio-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.25s ease;
+}
+
+/* Zen focus - the editor expands to fill the viewport; the surrounding
+   form fields (title, excerpt, etc. in PostForm/LetterForm) are simply
+   scrolled past above it rather than hidden, since RichTextEditor doesn't
+   own those fields. */
+.rich-editor-studio.zen-active {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--paper);
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.rich-editor-studio.zen-active .rich-editor,
+.rich-editor-studio.zen-active .studio-toolbar,
+.rich-editor-studio.zen-active .callout-quickbar,
+.rich-editor-studio.zen-active .studio-stats {
+  max-width: 760px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Rendered rich content (post/letter detail pages) - mirrors the editor's
+   own styling so what you wrote is what readers see */
+.rich-content h2 {
+  font-size: 1.6rem;
+  margin: 2rem 0 0.75rem;
+}
+
+.rich-content h3 {
+  font-size: 1.3rem;
+  margin: 1.75rem 0 0.6rem;
+}
+
+.rich-content p {
+  margin: 0 0 1.1rem;
+}
+
+.rich-content ul,
+.rich-content ol {
+  margin: 0 0 1.1rem;
+  padding-left: 1.5rem;
+}
+
+.rich-content blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.rich-content img {
+  max-width: 100%;
+  border-radius: 2px;
+  margin: 1.5rem 0;
+}
+
+.rich-content iframe {
+  max-width: 100%;
+  margin: 1.5rem 0;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+  border: none;
+}
+
+.rich-content a {
+  color: var(--accent);
+}
+
+.post-form button {
+  margin-top: 1.25rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+.post-form button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.book-card {
+  color: var(--ink);
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.book-card h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 0.95rem;
+  margin: 0.5rem 0 0.15rem;
+}
+
+.book-cover {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+.book-cover-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.5rem;
+  background: var(--paper-tint);
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-family: 'Fraunces', serif;
+}
+
+.book-detail-layout {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1.5rem;
+  align-items: flex-start;
+}
+
+.book-cover-large {
+  width: 220px;
+  flex-shrink: 0;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+}
+
+.about-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.about-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.portfolio-item {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.portfolio-item img {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+
+.portfolio-item h3 {
+  font-family: 'Fraunces', serif;
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+}
+
+.portfolio-item a {
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+/* Responsive polish - phone/small tablet breakpoint */
+@media (max-width: 640px) {
+  .inner {
+    padding: 0 1.25rem;
+  }
+
+  .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 0;
+  }
+
+  .primary-nav {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.1rem;
+    width: 100%;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .account-dropdown {
+    right: auto;
+    left: 0;
+  }
+
+  .site-main {
+    padding: 1.75rem 1.25rem;
+  }
+
+  .book-detail-layout {
+    flex-direction: column;
+  }
+
+  .book-cover-large {
+    width: 160px;
+  }
+
+  .about-header {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .book-grid {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 1rem;
+  }
+
+  .portfolio-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .post-form,
+  .auth-form,
+  .comment-form {
+    max-width: 100%;
+  }
+
+  .user-table {
+    font-size: 0.8rem;
+  }
+
+  .user-table th,
+  .user-table td {
+    padding: 0.4rem 0.3rem;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Visible keyboard focus - important for accessibility, easy to lose track of */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
