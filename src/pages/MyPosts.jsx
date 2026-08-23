@@ -31,7 +31,7 @@ export default function MyPosts() {
     <div>
       <h1>My posts</h1>
       <p>
-        <Link to="/write">Write a new post</Link>
+        <Link to="/write/post">Write a new post</Link>
       </p>
 
       {status === 'loading' && <p>Loading…</p>}

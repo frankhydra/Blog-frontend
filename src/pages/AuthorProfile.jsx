@@ -51,6 +51,26 @@ export default function AuthorProfile() {
           );
         })}
       </ul>
+
+      {author.portfolio && author.portfolio.length > 0 && (
+        <>
+          <h2 style={{ marginTop: '2.5rem' }}>Portfolio</h2>
+          <div className="portfolio-grid">
+            {author.portfolio.map((item) => (
+              <div key={item.id} className="portfolio-item">
+                {item.image_url && <img src={item.image_url} alt={item.title} />}
+                <h3>{item.title}</h3>
+                {item.description && <p>{item.description}</p>}
+                {item.link && (
+                  <a href={item.link} target="_blank" rel="noreferrer">
+                    View &rarr;
+                  </a>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

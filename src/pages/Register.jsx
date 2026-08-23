@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { MailIcon, UserIcon } from '../components/AuthIcons';
+import PasswordField from '../components/PasswordField';
 
 export default function Register() {
   const { register } = useAuth();
@@ -36,59 +38,74 @@ export default function Register() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="auth-form">
-      <h1>Create an account</h1>
-      <p className="post-meta">
-        New accounts start as a contributor. The site admin can promote you
-        to author once you're ready to publish publicly.
-      </p>
+    <div className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-card">
+        <p className="kicker">Account</p>
+        <h1>Create an account</h1>
+        <p className="auth-subtitle">
+          New accounts start as a contributor. The site admin can promote you
+          to author once you're ready to publish publicly.
+        </p>
 
-      <label htmlFor="name">Name</label>
-      <input
-        id="name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
+        <div className="auth-field">
+          <label htmlFor="name">Name</label>
+          <div className="auth-input-wrap">
+            <UserIcon className="auth-input-icon" />
+            <input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="name"
+              required
+            />
+          </div>
+        </div>
 
-      <label htmlFor="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
+        <div className="auth-field">
+          <label htmlFor="email">Email</label>
+          <div className="auth-input-wrap">
+            <MailIcon className="auth-input-icon" />
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+            />
+          </div>
+        </div>
 
-      <label htmlFor="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        minLength={8}
-        required
-      />
+        <PasswordField
+          id="password"
+          label="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          autoComplete="new-password"
+          minLength={8}
+          required
+        />
 
-      <label htmlFor="password_confirmation">Confirm password</label>
-      <input
-        id="password_confirmation"
-        type="password"
-        value={passwordConfirmation}
-        onChange={(e) => setPasswordConfirmation(e.target.value)}
-        minLength={8}
-        required
-      />
+        <PasswordField
+          id="password_confirmation"
+          label="Confirm password"
+          value={passwordConfirmation}
+          onChange={(e) => setPasswordConfirmation(e.target.value)}
+          autoComplete="new-password"
+          minLength={8}
+          required
+        />
 
-      {error && <p className="form-error">{error}</p>}
+        {error && <p className="form-error">{error}</p>}
 
-      <button type="submit" disabled={submitting}>
-        {submitting ? 'Creating account…' : 'Create account'}
-      </button>
+        <button type="submit" className="auth-submit" disabled={submitting}>
+          {submitting ? 'Creating account…' : 'Create account'}
+        </button>
 
-      <p className="post-meta">
-        Already have an account? <Link to="/login">Log in</Link>
-      </p>
-    </form>
+        <p className="auth-switch">
+          Already have an account? <Link to="/login">Log in</Link>
+        </p>
+      </form>
+    </div>
   );
 }

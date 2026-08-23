@@ -4,7 +4,12 @@ import { useAuth } from '../context/AuthContext';
 
 const BLANK = { title: '', description: '', image_url: '', link: '', sort_order: 0 };
 
-export default function AdminPortfolio() {
+// Every logged-in user manages their own portfolio here - it always loads
+// and writes to "my" items only, never anyone else's. The site owner's
+// items are what show by default on the About page; everyone else's items
+// show on their own /authors/:id profile, linked from the About page's
+// "Other bloggers" section.
+export default function MyPortfolio() {
   const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -14,14 +19,14 @@ export default function AdminPortfolio() {
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user || user.role !== 'admin') return;
+    if (!user) return;
     load();
   }, [authLoading, user]);
 
   function load() {
     setStatus('loading');
     apiClient
-      .get('/portfolio')
+      .get('/portfolio/mine')
       .then((res) => {
         setItems(res.data);
         setStatus('ready');
@@ -66,7 +71,7 @@ export default function AdminPortfolio() {
       cancelEdit();
       load();
     } catch {
-      // Leave the form as-is so the admin can retry
+      // Leave the form as-is so the user can retry
     } finally {
       setSubmitting(false);
     }
@@ -79,11 +84,14 @@ export default function AdminPortfolio() {
   }
 
   if (authLoading) return <p>Loading…</p>;
-  if (!user || user.role !== 'admin') return <p>You don't have access to this page.</p>;
+  if (!user) return <p>You need to log in to manage your portfolio.</p>;
 
   return (
     <div>
-      <h1>Manage portfolio</h1>
+      <h1>Your portfolio</h1>
+      <p className="post-meta">
+        These show on your profile page, and on the About page if you're the site owner.
+      </p>
 
       <form onSubmit={handleSubmit} className="post-form">
         <h2>{editingId ? 'Edit item' : 'Add item'}</h2>
@@ -138,7 +146,7 @@ export default function AdminPortfolio() {
         </div>
       </form>
 
-      <h2>Current items</h2>
+      <h2>Your items</h2>
       {status === 'loading' && <p>Loading…</p>}
       {status === 'ready' && items.length === 0 && <p>Nothing added yet.</p>}
 

@@ -29,7 +29,7 @@ export default function Letters() {
 
       {user?.role === 'admin' && (
         <p className="post-meta">
-          <Link to="/write-letter">Write a new letter</Link>
+          <Link to="/write/letter">Write a new letter</Link>
         </p>
       )}
 

@@ -36,95 +36,150 @@ export default function RichTextEditor({ content, onChange }) {
   // Init Quill once. Deliberately not re-running on `content` changes -
   // this is an uncontrolled editor (like the Tiptap version was), so the
   // parent form only reads via onChange rather than pushing content back in.
+  //
+  // Quill instance creation is guarded by quillRef so React 18/19
+  // StrictMode's dev-only double-invoke (mount -> cleanup -> mount again)
+  // doesn't create two Quill instances on the same DOM node. But listener
+  // registration happens OUTSIDE that guard, on every invoke - it has to,
+  // because StrictMode's cleanup between the two mounts removes the click
+  // listener, and if re-attaching it were also gated behind "only if no
+  // Quill instance yet", the second mount would skip re-adding it entirely,
+  // leaving the editor permanently without a working click listener even
+  // though the Quill instance itself looks fine. That was the actual bug
+  // behind media clicks silently doing nothing.
   useEffect(() => {
-    if (!containerRef.current || quillRef.current) return;
+    if (!containerRef.current) return;
 
-    const quill = new Quill(containerRef.current, {
-      theme: 'snow',
-      placeholder: 'Write your post or letter here…',
-      modules: {
-        toolbar: {
-          container: [
-            [{ header: [2, 3, false] }],
-            ['bold', 'italic', 'underline', 'strike'],
-            [{ list: 'ordered' }, { list: 'bullet' }],
-            ['blockquote', 'code-block'],
-            ['link', 'image', 'video'],
-            ['clean'],
-          ],
-          handlers: {
-            image() {
-              const range = this.quill.getSelection(true);
-              pendingImageIndexRef.current = range ? range.index : 0;
-              fileInputRef.current?.click();
-            },
-            video() {
-              const range = this.quill.getSelection(true);
-              const index = range ? range.index : 0;
-              const url = window.prompt('YouTube video URL:');
-              if (!url) return;
-              const embedUrl = toYoutubeEmbedUrl(url);
-              if (!embedUrl) {
-                alert("That doesn't look like a YouTube link.");
-                return;
-              }
-              this.quill.insertEmbed(index, 'video', embedUrl, 'user');
-              this.quill.setSelection(index + 1);
+    if (!quillRef.current) {
+      const quill = new Quill(containerRef.current, {
+        theme: 'snow',
+        placeholder: 'Write your post or letter here…',
+        modules: {
+          toolbar: {
+            container: [
+              [{ header: [2, 3, false] }],
+              ['bold', 'italic', 'underline', 'strike'],
+              [{ list: 'ordered' }, { list: 'bullet' }],
+              ['blockquote', 'code-block'],
+              ['link', 'image', 'video'],
+              ['clean'],
+            ],
+            handlers: {
+              image() {
+                const range = this.quill.getSelection(true);
+                pendingImageIndexRef.current = range ? range.index : 0;
+                fileInputRef.current?.click();
+              },
+              video() {
+                const range = this.quill.getSelection(true);
+                const index = range ? range.index : 0;
+                const url = window.prompt('YouTube video URL:');
+                if (!url) return;
+                const embedUrl = toYoutubeEmbedUrl(url);
+                if (!embedUrl) {
+                  alert("That doesn't look like a YouTube link.");
+                  return;
+                }
+                this.quill.insertEmbed(index, 'video', embedUrl, 'user');
+                this.quill.setSelection(index + 1);
+              },
             },
           },
         },
-      },
-    });
+      });
 
-    quillRef.current = quill;
+      quillRef.current = quill;
 
-    // Load existing content (editing a post/letter) by writing straight into
-    // the DOM rather than through Quill's HTML->Delta parser. The parser
-    // only understands the attributes it was built for, so it would silently
-    // drop the width/style and media-align-*/media-float-* classes that our
-    // own floating toolbar wrote on a previous save. quill.update() then
-    // tells Quill to resync its internal model to match what's now in the
-    // DOM, so normal editing (typing, formatting elsewhere) still works.
-    if (content) {
-      quill.root.innerHTML = content;
-      quill.update(Quill.sources.SILENT);
+      // Load existing content (editing a post/letter) by writing straight
+      // into the DOM rather than through Quill's HTML->Delta parser. The
+      // parser only understands the attributes it was built for, so it
+      // would silently drop the width/style and media-align-*/media-float-*
+      // classes our own floating toolbar wrote on a previous save.
+      // quill.update() then tells Quill to resync its internal model to
+      // match what's now in the DOM, so normal editing still works.
+      if (content) {
+        quill.root.innerHTML = content;
+        quill.update(Quill.sources.SILENT);
+      }
     }
 
-    quill.on('text-change', () => {
+    const quill = quillRef.current;
+    const root = quill.root;
+
+    function handleTextChange() {
       const nextHtml = quill.root.innerHTML;
       setHtml(nextHtml);
       onChange(nextHtml);
-    });
+    }
+    quill.on('text-change', handleTextChange);
 
-    // Click-to-select media + floating resize/align toolbar.
-    const root = quill.root;
+    // Click-to-select media + floating resize/align toolbar. Images are
+    // plain DOM nodes and receive clicks normally. Video embeds are
+    // cross-origin <iframe>s though - once a YouTube player has loaded
+    // inside one, clicks landing on the player go to YouTube's own page,
+    // not this document, so a plain click listener on quill.root never
+    // sees them. Each iframe gets a thin transparent overlay sibling to
+    // catch clicks for selection purposes; it only intercepts the click,
+    // everything else about the iframe is untouched.
+    function ensureVideoOverlays() {
+      root.querySelectorAll('iframe').forEach((iframe) => {
+        if (iframe.nextElementSibling?.classList?.contains('media-click-catcher')) return;
+        const overlay = document.createElement('div');
+        overlay.className = 'media-click-catcher';
+        overlay.style.position = 'absolute';
+        overlay.style.inset = '0';
+        iframe.style.position = iframe.style.position || 'relative';
+        iframe.insertAdjacentElement('afterend', overlay);
+        const wrapper = document.createElement('span');
+        wrapper.style.position = 'relative';
+        wrapper.style.display = 'block';
+        iframe.parentNode.insertBefore(wrapper, iframe);
+        wrapper.appendChild(iframe);
+        wrapper.appendChild(overlay);
+      });
+    }
+    ensureVideoOverlays();
+    quill.on('text-change', ensureVideoOverlays);
+
+    function selectMedia(target) {
+      root.querySelectorAll('.media-selected').forEach((el) => el.classList.remove('media-selected'));
+      target.classList.add('media-selected');
+
+      // Position against .rich-editor (editorWrapRef), the actual
+      // `position: relative` ancestor the floating toolbar is placed in -
+      // NOT containerRef, which after Quill initializes points at the
+      // inner .ql-container and sits lower (below Quill's own toolbar),
+      // throwing the math off by that toolbar's height.
+      const rect = target.getBoundingClientRect();
+      const parentRect = editorWrapRef.current.getBoundingClientRect();
+
+      setSelectedMedia(target);
+      setToolbarPos({
+        top: rect.top - parentRect.top - 48,
+        left: Math.max(10, rect.left - parentRect.left + rect.width / 2 - 160),
+      });
+    }
+
     function handleMediaClick(e) {
-      const target = e.target;
-      if (target.tagName === 'IMG' || target.tagName === 'IFRAME') {
-        root.querySelectorAll('.media-selected').forEach((el) => el.classList.remove('media-selected'));
-        target.classList.add('media-selected');
-
-        // Position against .rich-editor (editorWrapRef), the actual
-        // `position: relative` ancestor the floating toolbar is placed in -
-        // NOT containerRef, which after Quill initializes points at the
-        // inner .ql-container and sits lower (below Quill's own toolbar),
-        // throwing the math off by that toolbar's height.
-        const rect = target.getBoundingClientRect();
-        const parentRect = editorWrapRef.current.getBoundingClientRect();
-
-        setSelectedMedia(target);
-        setToolbarPos({
-          top: rect.top - parentRect.top - 48,
-          left: Math.max(10, rect.left - parentRect.left + rect.width / 2 - 160),
-        });
-      } else {
-        root.querySelectorAll('.media-selected').forEach((el) => el.classList.remove('media-selected'));
-        setSelectedMedia(null);
+      const target = e.target.closest('img, iframe, .media-click-catcher');
+      if (target?.classList?.contains('media-click-catcher')) {
+        selectMedia(target.previousElementSibling);
+        return;
       }
+      if (target && (target.tagName === 'IMG' || target.tagName === 'IFRAME')) {
+        selectMedia(target);
+        return;
+      }
+      root.querySelectorAll('.media-selected').forEach((el) => el.classList.remove('media-selected'));
+      setSelectedMedia(null);
     }
     root.addEventListener('click', handleMediaClick);
 
-    return () => root.removeEventListener('click', handleMediaClick);
+    return () => {
+      quill.off('text-change', handleTextChange);
+      quill.off('text-change', ensureVideoOverlays);
+      root.removeEventListener('click', handleMediaClick);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

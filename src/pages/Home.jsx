@@ -11,10 +11,12 @@ export default function Home() {
   usePageMeta(null, "Franklin Nchukwi's personal blog - writing on the things I'm building and thinking about.");
 
   useEffect(() => {
-    // scope=primary shows only the site owner's posts - the "main blog".
-    // Other authors' posts live under /community instead.
+    // scope=home shows your own posts, but blends in community posts once
+    // you've gone 24h without publishing - see PostController@index for the
+    // actual rule. Each post still carries its real author either way, so
+    // community posts get badged below rather than looking like yours.
     apiClient
-      .get('/posts', { params: { scope: 'primary' } })
+      .get('/posts', { params: { scope: 'home' } })
       .then((res) => {
         setPosts(res.data.data); // Laravel's paginator nests results in .data
         setStatus('ready');
@@ -30,11 +32,13 @@ export default function Home() {
     <ul className="entries">
       {posts.map((post) => {
         const { day, month } = formatPostmark(post.published_at);
+        const isCommunityPost = post.author?.role !== 'admin';
         return (
           <li key={post.id} className="entry">
             <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
             <div className="entry-body">
               <p className="kicker">
+                {isCommunityPost && <span className="kicker-badge">Community</span>}
                 {post.category ? post.category.name : 'Blog'}
               </p>
               <h2>

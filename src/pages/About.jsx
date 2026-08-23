@@ -9,7 +9,7 @@ export default function About() {
   const [data, setData] = useState(null);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('About', "Who I am, what I do, and the projects I've worked on.");
+  usePageMeta('About', "Who I am, what I do, and the other bloggers on this platform.");
 
   useEffect(() => {
     apiClient
@@ -24,7 +24,8 @@ export default function About() {
   if (status === 'loading') return <p>Loading…</p>;
   if (status === 'error') return <p>Couldn't load this page.</p>;
 
-  const { owner, portfolio } = data;
+  const { owner, portfolio, other_authors: otherAuthors } = data;
+  const isOwner = owner && user?.id === owner.id;
 
   return (
     <div className="about-page">
@@ -39,10 +40,10 @@ export default function About() {
         </div>
       )}
 
-      {user?.role === 'admin' && (
+      {isOwner && (
         <p className="post-meta">
           <Link to="/edit-profile">Edit your bio</Link> ·{' '}
-          <Link to="/admin/portfolio">Manage portfolio</Link>
+          <Link to="/my-portfolio">Manage your portfolio</Link>
         </p>
       )}
 
@@ -64,6 +65,56 @@ export default function About() {
           </div>
         ))}
       </div>
+
+      {otherAuthors && otherAuthors.length > 0 && (
+        <>
+          <p className="kicker" style={{ marginTop: '3.5rem' }}>More voices</p>
+          <h2 style={{ marginTop: 0 }}>Other bloggers on this platform</h2>
+          <p className="post-meta">
+            Fellow writers publishing here — click through for their full profile and portfolio.
+          </p>
+
+          <div className="author-cards">
+            {otherAuthors.map((author) => (
+              <Link to={`/authors/${author.id}`} key={author.id} className="author-card">
+                <div className="author-card-head">
+                  {author.avatar ? (
+                    <img src={author.avatar} alt={author.name} className="author-card-avatar" />
+                  ) : (
+                    <span className="author-card-avatar author-card-avatar-fallback">
+                      {author.name.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                  <div>
+                    <h3>{author.name}</h3>
+                    <span className="author-card-meta">
+                      {author.posts_count} {author.posts_count === 1 ? 'post' : 'posts'}
+                    </span>
+                  </div>
+                </div>
+
+                {author.bio && <p className="author-card-bio">{author.bio}</p>}
+
+                {author.portfolio_preview.length > 0 && (
+                  <div className="author-card-portfolio">
+                    {author.portfolio_preview.map((item) => (
+                      item.image_url ? (
+                        <img key={item.id} src={item.image_url} alt={item.title} />
+                      ) : (
+                        <span key={item.id} className="author-card-portfolio-placeholder">
+                          {item.title}
+                        </span>
+                      )
+                    ))}
+                  </div>
+                )}
+
+                <span className="author-card-cta">View profile &rarr;</span>
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

@@ -8,6 +8,16 @@ export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
+  // The backend serves /sitemap.xml at its own root (not under /api) - derive
+  // that from the same VITE_API_URL the api client already uses, rather than
+  // hardcoding a second URL that could drift out of sync with it.
+  const apiBase = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
+  const sitemapUrl = `${apiBase.replace(/\/api\/?$/, '')}/sitemap.xml`;
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   // Close the account dropdown on outside click, so it behaves like a
   // real menu rather than staying stuck open.
   useEffect(() => {
@@ -35,7 +45,7 @@ export default function Layout() {
 
             <nav className="primary-nav">
               <NavLink to="/" end>Blog</NavLink>
-              <NavLink to="/community">Community</NavLink>
+              <NavLink to="/community">Community Blogs</NavLink>
               <NavLink to="/letters">Letters</NavLink>
               <NavLink to="/books">Books</NavLink>
               <NavLink to="/about">About</NavLink>
@@ -59,14 +69,15 @@ export default function Layout() {
                     {menuOpen && (
                       <div className="account-dropdown">
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
+                        <Link to="/my-portfolio" onClick={() => setMenuOpen(false)}>My portfolio</Link>
                         <Link to="/edit-profile" onClick={() => setMenuOpen(false)}>Edit profile</Link>
                         {user.role === 'admin' && (
                           <>
                             <div className="dropdown-divider" />
                             <p className="dropdown-label">Admin</p>
+                            <Link to="/write/letter" onClick={() => setMenuOpen(false)}>Write a letter</Link>
                             <Link to="/admin/comments" onClick={() => setMenuOpen(false)}>Moderate comments</Link>
                             <Link to="/admin/users" onClick={() => setMenuOpen(false)}>Manage authors</Link>
-                            <Link to="/admin/portfolio" onClick={() => setMenuOpen(false)}>Manage portfolio</Link>
                           </>
                         )}
                         <div className="dropdown-divider" />
@@ -93,7 +104,47 @@ export default function Layout() {
       <div className="band footer-band">
         <div className="inner">
           <footer className="site-footer">
-            <p>&copy; {new Date().getFullYear()} Franklin Nchukwi</p>
+            <div className="footer-grid">
+              <div className="footer-brand">
+                <Link to="/" className="footer-brand-name">Franklin Nchukwi</Link>
+                <p className="footer-tagline">Writing on code, craft, and the occasional letter.</p>
+              </div>
+
+              <div className="footer-col">
+                <p className="footer-col-title">Explore</p>
+                <NavLink to="/" end>Blog</NavLink>
+                <NavLink to="/community">Community Blogs</NavLink>
+                <NavLink to="/letters">Letters</NavLink>
+                <NavLink to="/books">Books</NavLink>
+                <NavLink to="/about">About</NavLink>
+              </div>
+
+              <div className="footer-col">
+                <p className="footer-col-title">Account</p>
+                {user ? (
+                  <>
+                    <Link to="/write">Write a post</Link>
+                    {user.role === 'admin' && <Link to="/write/letter">Write a letter</Link>}
+                    <Link to="/my-posts">My posts</Link>
+                    <Link to="/my-portfolio">My portfolio</Link>
+                    <Link to="/edit-profile">Edit profile</Link>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login">Log in</Link>
+                    <Link to="/register">Create an account</Link>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="footer-bottom">
+              <p>&copy; {new Date().getFullYear()} Franklin Nchukwi</p>
+              <div className="footer-bottom-links">
+                <a href={sitemapUrl} target="_blank" rel="noreferrer">Sitemap</a>
+                <button type="button" onClick={scrollToTop} className="back-to-top">Back to top ↑</button>
+              </div>
+            </div>
           </footer>
         </div>
       </div>

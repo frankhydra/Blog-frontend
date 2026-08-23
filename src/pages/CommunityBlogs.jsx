@@ -8,7 +8,7 @@ export default function CommunityBlogs() {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Community', 'Posts from other writers on the platform.');
+  usePageMeta('Community Blogs', 'Posts from other writers on the platform.');
 
   useEffect(() => {
     apiClient
@@ -25,7 +25,7 @@ export default function CommunityBlogs() {
 
   return (
     <div>
-      <p className="kicker">Community</p>
+      <p className="kicker">Community Blogs</p>
       <h1>Other writers on the platform</h1>
 
       {posts.length === 0 && <p>No community posts yet.</p>}

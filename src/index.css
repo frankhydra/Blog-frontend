@@ -234,10 +234,107 @@ h1, h2, h3 {
 }
 
 .site-footer {
-  padding: 2rem 0;
-  color: rgba(247, 243, 236, 0.5);
+  padding: 3rem 0 1.75rem;
   font-family: 'IBM Plex Mono', monospace;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 2.5rem;
+  padding-bottom: 2.25rem;
+  border-bottom: 1px solid rgba(247, 243, 236, 0.1);
+}
+
+.footer-brand-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--paper);
+  text-decoration: none;
+}
+
+.footer-tagline {
+  margin: 0.6rem 0 0;
+  max-width: 30ch;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: rgba(247, 243, 236, 0.45);
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.footer-col-title {
+  margin: 0 0 0.15rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(247, 243, 236, 0.4);
+}
+
+.footer-col a {
+  font-size: 0.78rem;
+  color: rgba(247, 243, 236, 0.65);
+  text-decoration: none;
+  width: fit-content;
+  transition: color 0.15s ease;
+}
+
+.footer-col a:hover,
+.footer-col a.active {
+  color: var(--paper);
+}
+
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.5rem;
   font-size: 0.72rem;
+  color: rgba(247, 243, 236, 0.5);
+}
+
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.footer-bottom-links a {
+  color: rgba(247, 243, 236, 0.5);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footer-bottom-links a:hover {
+  color: var(--paper);
+}
+
+.back-to-top {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: rgba(247, 243, 236, 0.5);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.back-to-top:hover {
+  color: var(--paper);
+}
+
+@media (max-width: 640px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
 }
 
 /* ---------- Postmark badge ----------
@@ -302,6 +399,20 @@ h1, h2, h3 {
   letter-spacing: 0.08em;
   color: var(--wax);
   margin: 0 0 0.4rem;
+}
+
+/* Marks a post on the main Blog feed as someone else's, not the site
+   owner's - shows up when a community post gets blended into Home after
+   24h without a new owner post (see PostController@index, scope=home). */
+.kicker-badge {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--paper);
+  font-size: 0.62rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+  letter-spacing: 0.04em;
 }
 
 .entry-body h2 {
@@ -390,8 +501,181 @@ h1, h2, h3 {
   margin-top: 1.5rem;
 }
 
+/* ---------- Auth pages (login / register) ----------
+   A centered card matching the site's existing card language (same
+   border-radius, border, and drop shadow as .account-dropdown) rather
+   than a bare label-stack form - the "modern" ask, without departing
+   from the postmark palette/fonts already used everywhere else. */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 2.5rem 1rem 4rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(36, 31, 27, 0.1);
+  padding: 2.25rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.6rem;
+}
+
+.auth-subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.auth-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1.1rem;
+}
+
+.auth-field label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+/* Icon-in-input pattern: the icon is an absolutely-positioned sibling of
+   the input rather than a background-image, so it can inherit currentColor
+   and shift color on focus along with the border. */
+.auth-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 0.85rem;
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.auth-input-wrap input {
+  width: 100%;
+  padding: 0.7rem 0.9rem 0.7rem 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--ink);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-input-wrap input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(43, 58, 103, 0.12);
+}
+
+.auth-input-wrap:focus-within .auth-input-icon {
+  color: var(--accent);
+}
+
+/* Password fields get a right-side icon too (the toggle), so their input
+   needs padding on both sides */
+.auth-field:has(.auth-input-toggle) .auth-input-wrap input {
+  padding-right: 2.5rem;
+}
+
+.auth-input-toggle {
+  position: absolute;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.auth-input-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+.auth-input-toggle:hover {
+  color: var(--ink);
+  background: var(--paper-tint);
+}
+
+.auth-submit {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.auth-submit:hover {
+  background: #232f54;
+}
+
+.auth-submit:active {
+  transform: translateY(1px);
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+}
+
+.auth-switch {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.form-error {
+  color: var(--wax);
+  font-size: 0.85rem;
+  margin: -0.4rem 0 1rem;
+}
+
+/* Kept for EditProfile.jsx, which still uses the older flat label/input
+   layout rather than the auth-card pattern above (redesigning that page's
+   markup wasn't part of this pass, so its existing plain style stays put). */
 .auth-form {
-  max-width: 320px;
+  max-width: 400px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -404,7 +688,8 @@ h1, h2, h3 {
   margin-top: 0.5rem;
 }
 
-.auth-form input {
+.auth-form input,
+.auth-form textarea {
   padding: 0.5rem;
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -419,11 +704,6 @@ h1, h2, h3 {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-}
-
-.form-error {
-  color: var(--wax);
-  font-size: 0.85rem;
 }
 
 .reaction-buttons {
@@ -596,6 +876,7 @@ h1, h2, h3 {
 
 .composer {
   max-width: 760px;
+  margin: 0 auto;
 }
 
 /* Author view / Reader view tabs - mirrors .primary-nav's active-underline
@@ -648,6 +929,7 @@ h1, h2, h3 {
   flex-direction: column;
   gap: 0.5rem;
   max-width: 640px;
+  margin: 0 auto;
   font-family: 'IBM Plex Mono', monospace;
 }
 
@@ -1101,7 +1383,12 @@ h1, h2, h3 {
   color: var(--accent);
 }
 
-.post-form button {
+/* Scoped to type="submit" specifically (not every <button>) - RichTextEditor
+   now renders a lot of its own buttons (toolbar pills, canvas swatches,
+   callout chips) inside this same <form>, and a blanket `.post-form button`
+   rule was painting all of them the same accent-blue as the real submit
+   button, including squashing the swatches' border-radius. */
+.post-form button[type="submit"] {
   margin-top: 1.25rem;
   padding: 0.6rem 1.5rem;
   background: var(--accent);
@@ -1112,9 +1399,24 @@ h1, h2, h3 {
   align-self: flex-start;
 }
 
-.post-form button:disabled {
+.post-form button[type="submit"]:disabled {
   opacity: 0.6;
   cursor: default;
+}
+
+/* Cancel button in AdminPortfolio's edit form - had no styling of its own
+   before, it was only accidentally catching the (now-removed) blanket
+   `.post-form button` rule. Giving it a real, secondary look here instead
+   of leaving it to fall back to an unstyled button. */
+.post-form .link-button {
+  margin-top: 1.25rem;
+  padding: 0.6rem 1.5rem;
+  background: var(--paper-tint);
+  color: var(--ink);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  cursor: pointer;
+  align-self: flex-start;
 }
 
 .book-grid {
@@ -1218,6 +1520,118 @@ h1, h2, h3 {
   font-size: 0.85rem;
 }
 
+/* "Other bloggers" directory on the About page */
+.author-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.author-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.author-card:hover,
+.author-card:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 24px rgba(36, 31, 27, 0.08);
+}
+
+.author-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.author-card-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.author-card-avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--paper-tint);
+  color: var(--accent);
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem;
+}
+
+.author-card-head h3 {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+}
+
+.author-card-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+}
+
+.author-card-bio {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.author-card-portfolio {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.author-card-portfolio img,
+.author-card-portfolio-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.author-card-portfolio-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--muted);
+  background: var(--paper-tint);
+}
+
+.author-card-cta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin-top: auto;
+}
+
 /* Responsive polish - phone/small tablet breakpoint */
 @media (max-width: 640px) {
   .inner {
@@ -1275,6 +1689,10 @@ h1, h2, h3 {
     grid-template-columns: 1fr;
   }
 
+  .author-cards {
+    grid-template-columns: 1fr;
+  }
+
   .post-form,
   .auth-form,
   .comment-form {
@@ -1307,4 +1725,108 @@ textarea:focus-visible,
 select:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* ---------- Write chooser page ---------- */
+.write-choice {
+  padding: 2.5rem 0 1rem;
+  text-align: center;
+}
+
+.write-choice h1 {
+  font-size: 2.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.write-choice-sub {
+  color: var(--muted);
+  margin-bottom: 3rem;
+  font-size: 1.05rem;
+}
+
+.write-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .write-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.write-choice-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 2.75rem 2rem 2.25rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.write-choice-card:hover,
+.write-choice-card:focus-visible {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 28px rgba(36, 31, 27, 0.1);
+}
+
+.write-choice-card-letter:hover,
+.write-choice-card-letter:focus-visible {
+  border-color: var(--wax);
+}
+
+.write-choice-icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--paper-tint);
+  color: var(--accent);
+}
+
+.write-choice-card-letter .write-choice-icon {
+  color: var(--wax);
+}
+
+.write-choice-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+.write-choice-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.write-choice-desc {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.write-choice-cta {
+  margin-top: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.write-choice-card-letter .write-choice-cta {
+  color: var(--wax);
 }
