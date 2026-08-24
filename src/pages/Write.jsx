@@ -2,9 +2,9 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 
-// Landing page for the "Write" nav action. Admins get a choice between a
-// blog post and a letter; everyone else only has posts, so we skip the
-// choice screen entirely and send them straight to the post editor.
+// Landing page for the "Write" nav action. Admins and authors get a choice
+// between a blog post and a letter; contributors only have posts, so we
+// skip the choice screen entirely and send them straight to the editor.
 export default function Write() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -12,7 +12,7 @@ export default function Write() {
 
   if (loading) return <p>Loading…</p>;
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== 'admin') return <Navigate to="/write/post" replace />;
+  if (user.role === 'contributor') return <Navigate to="/write/post" replace />;
 
   return (
     <div className="write-choice">

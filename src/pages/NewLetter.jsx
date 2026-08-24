@@ -24,7 +24,9 @@ export default function NewLetter() {
   }
 
   if (authLoading) return <p>Loading…</p>;
-  if (!user || user.role !== 'admin') return <p>Only the site admin can write letters.</p>;
+  if (!user || !['admin', 'author'].includes(user.role)) {
+    return <p>Only authors and the site admin can write letters.</p>;
+  }
 
   return (
     <div>

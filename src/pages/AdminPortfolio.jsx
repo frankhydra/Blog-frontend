@@ -1,34 +1,27 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import PortfolioOnePager from '../components/PortfolioOnePager';
 
 const BLANK = { title: '', description: '', image_url: '', link: '', sort_order: 0 };
 
-// Every logged-in user manages their own portfolio here. New items start
-// as drafts - nothing shows on the public /portfolio page or your author
-// profile until you explicitly publish it. The Preview tab renders your
-// items through the exact same component the public page uses, so what
-// you see is what visitors will eventually see once published.
-export default function MyPortfolio() {
+export default function AdminPortfolio() {
   const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState('loading');
   const [form, setForm] = useState(BLANK);
   const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
-  const [view, setView] = useState('editor'); // 'editor' | 'preview'
 
   useEffect(() => {
     if (authLoading) return;
-    if (!user) return;
+    if (!user || user.role !== 'admin') return;
     load();
   }, [authLoading, user]);
 
   function load() {
     setStatus('loading');
     apiClient
-      .get('/portfolio/mine')
+      .get('/portfolio')
       .then((res) => {
         setItems(res.data);
         setStatus('ready');
@@ -52,7 +45,7 @@ export default function MyPortfolio() {
     setForm(BLANK);
   }
 
-  async function handleSubmit(e, publishNow) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
     try {
@@ -65,29 +58,17 @@ export default function MyPortfolio() {
       };
 
       if (editingId) {
-        if (publishNow !== null) payload.status = publishNow ? 'published' : 'draft';
         await apiClient.put(`/portfolio/${editingId}`, payload);
       } else {
-        payload.status = publishNow ? 'published' : 'draft';
         await apiClient.post('/portfolio', payload);
       }
 
       cancelEdit();
       load();
     } catch {
-      // Leave the form as-is so the user can retry
+      // Leave the form as-is so the admin can retry
     } finally {
       setSubmitting(false);
-    }
-  }
-
-  async function toggleStatus(item) {
-    const nextStatus = item.status === 'published' ? 'draft' : 'published';
-    setItems((prev) => prev.map((i) => (i.id === item.id ? { ...i, status: nextStatus } : i)));
-    try {
-      await apiClient.put(`/portfolio/${item.id}`, { status: nextStatus });
-    } catch {
-      load(); // roll back to the server's version if the update failed
     }
   }
 
@@ -98,42 +79,13 @@ export default function MyPortfolio() {
   }
 
   if (authLoading) return <p>Loading…</p>;
-  if (!user) return <p>You need to log in to manage your portfolio.</p>;
-
-  if (view === 'preview') {
-    return (
-      <div>
-        <div className="one-pager-preview-toolbar">
-          <button type="button" onClick={() => setView('editor')} className="link-button">
-            &larr; Back to editor
-          </button>
-        </div>
-        <PortfolioOnePager
-          person={{ name: user.name, bio: user.bio, avatar: user.avatar, role: user.role }}
-          items={items}
-          previewMode
-        />
-      </div>
-    );
-  }
+  if (!user || user.role !== 'admin') return <p>You don't have access to this page.</p>;
 
   return (
     <div>
-      <div className="my-portfolio-head">
-        <div>
-          <h1>Your portfolio</h1>
-          <p className="post-meta">
-            Published items show on your author profile, and at the top of the
-            Portfolio page when you're the featured writer. Drafts stay
-            private to you until you publish them.
-          </p>
-        </div>
-        <button type="button" onClick={() => setView('preview')} className="nav-cta">
-          Preview
-        </button>
-      </div>
+      <h1>Manage portfolio</h1>
 
-      <form onSubmit={(e) => handleSubmit(e, editingId ? null : false)} className="post-form">
+      <form onSubmit={handleSubmit} className="post-form">
         <h2>{editingId ? 'Edit item' : 'Add item'}</h2>
 
         <label htmlFor="title">Title</label>
@@ -174,24 +126,10 @@ export default function MyPortfolio() {
           onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
         />
 
-        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          {editingId ? (
-            <button type="submit" disabled={submitting}>Save changes</button>
-          ) : (
-            <>
-              <button type="submit" disabled={submitting} onClick={(e) => handleSubmit(e, false)}>
-                Save as draft
-              </button>
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={(e) => handleSubmit(e, true)}
-                className="nav-cta"
-              >
-                Save & publish
-              </button>
-            </>
-          )}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button type="submit" disabled={submitting}>
+            {editingId ? 'Save changes' : 'Add item'}
+          </button>
           {editingId && (
             <button type="button" onClick={cancelEdit} className="link-button">
               Cancel
@@ -200,21 +138,15 @@ export default function MyPortfolio() {
         </div>
       </form>
 
-      <h2>Your items</h2>
+      <h2>Current items</h2>
       {status === 'loading' && <p>Loading…</p>}
       {status === 'ready' && items.length === 0 && <p>Nothing added yet.</p>}
 
       <ul className="moderation-list">
         {items.map((item) => (
           <li key={item.id} className="moderation-item">
-            <strong>{item.title}</strong>{' '}
-            <span className={`status-pill ${item.status === 'published' ? 'status-pill-published' : 'status-pill-draft'}`}>
-              {item.status === 'published' ? 'Published' : 'Draft'}
-            </span>
+            <strong>{item.title}</strong> <span className="post-meta">(order: {item.sort_order})</span>
             <div className="moderation-actions">
-              <button onClick={() => toggleStatus(item)}>
-                {item.status === 'published' ? 'Unpublish' : 'Publish'}
-              </button>
               <button onClick={() => startEdit(item)}>Edit</button>
               <button onClick={() => handleDelete(item)} className="reject-button">Delete</button>
             </div>

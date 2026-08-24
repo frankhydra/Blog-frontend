@@ -18,7 +18,7 @@ export default function EditProfile() {
     setError('');
     try {
       await apiClient.patch('/profile', { name, bio: bio || null, avatar: avatar || null });
-      navigate('/about');
+      navigate('/my-portfolio');
     } catch {
       setError('Something went wrong saving your profile.');
     } finally {

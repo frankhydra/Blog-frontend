@@ -27,7 +27,7 @@ export default function Letters() {
       <p className="kicker">Letters</p>
       <h1>Public letters, archived as they're sent</h1>
 
-      {user?.role === 'admin' && (
+      {user && ['admin', 'author'].includes(user.role) && (
         <p className="post-meta">
           <Link to="/write/letter">Write a new letter</Link>
         </p>

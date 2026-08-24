@@ -48,6 +48,7 @@ export default function Layout() {
               <NavLink to="/community">Community Blogs</NavLink>
               <NavLink to="/letters">Letters</NavLink>
               <NavLink to="/books">Books</NavLink>
+              <NavLink to="/portfolio">Portfolio</NavLink>
               <NavLink to="/about">About</NavLink>
             </nav>
 
@@ -70,13 +71,17 @@ export default function Layout() {
                       <div className="account-dropdown">
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
                         <Link to="/my-portfolio" onClick={() => setMenuOpen(false)}>My portfolio</Link>
+                        <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
                         <Link to="/edit-profile" onClick={() => setMenuOpen(false)}>Edit profile</Link>
+                        {['admin', 'author'].includes(user.role) && (
+                          <Link to="/write/letter" onClick={() => setMenuOpen(false)}>Write a letter</Link>
+                        )}
                         {user.role === 'admin' && (
                           <>
                             <div className="dropdown-divider" />
                             <p className="dropdown-label">Admin</p>
-                            <Link to="/write/letter" onClick={() => setMenuOpen(false)}>Write a letter</Link>
                             <Link to="/admin/comments" onClick={() => setMenuOpen(false)}>Moderate comments</Link>
+                            <Link to="/admin/campaigns" onClick={() => setMenuOpen(false)}>Moderate campaigns</Link>
                             <Link to="/admin/users" onClick={() => setMenuOpen(false)}>Manage authors</Link>
                           </>
                         )}
@@ -116,6 +121,7 @@ export default function Layout() {
                 <NavLink to="/community">Community Blogs</NavLink>
                 <NavLink to="/letters">Letters</NavLink>
                 <NavLink to="/books">Books</NavLink>
+                <NavLink to="/portfolio">Portfolio</NavLink>
                 <NavLink to="/about">About</NavLink>
               </div>
 
@@ -124,9 +130,10 @@ export default function Layout() {
                 {user ? (
                   <>
                     <Link to="/write">Write a post</Link>
-                    {user.role === 'admin' && <Link to="/write/letter">Write a letter</Link>}
+                    {['admin', 'author'].includes(user.role) && <Link to="/write/letter">Write a letter</Link>}
                     <Link to="/my-posts">My posts</Link>
                     <Link to="/my-portfolio">My portfolio</Link>
+                    <Link to="/request-campaign">Request a campaign</Link>
                     <Link to="/edit-profile">Edit profile</Link>
                   </>
                 ) : (

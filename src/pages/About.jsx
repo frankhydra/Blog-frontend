@@ -1,120 +1,50 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import apiClient from '../api/client';
-import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 
+// This page is intentionally static - it explains what the site is and why
+// it exists, not any one person's profile. Individual profiles and
+// portfolios live on the Portfolio tab instead. If this copy needs to
+// become editable from the admin panel later, this is the file to wire up
+// to a site-content endpoint.
 export default function About() {
-  const { user } = useAuth();
-  const [data, setData] = useState(null);
-  const [status, setStatus] = useState('loading');
-
-  usePageMeta('About', "Who I am, what I do, and the other bloggers on this platform.");
-
-  useEffect(() => {
-    apiClient
-      .get('/about')
-      .then((res) => {
-        setData(res.data);
-        setStatus('ready');
-      })
-      .catch(() => setStatus('error'));
-  }, []);
-
-  if (status === 'loading') return <p>Loading…</p>;
-  if (status === 'error') return <p>Couldn't load this page.</p>;
-
-  const { owner, portfolio, other_authors: otherAuthors } = data;
-  const isOwner = owner && user?.id === owner.id;
+  usePageMeta('About', 'What this site is, who it is for, and why it exists.');
 
   return (
     <div className="about-page">
-      {owner && (
-        <div className="about-header">
-          {owner.avatar && <img src={owner.avatar} alt={owner.name} className="about-avatar" />}
-          <div>
-            <p className="kicker">Who I am</p>
-            <h1>{owner.name}</h1>
-            {owner.bio && <p>{owner.bio}</p>}
-          </div>
-        </div>
-      )}
+      <p className="kicker">About this site</p>
+      <h1>A place to write, in public</h1>
 
-      {isOwner && (
-        <p className="post-meta">
-          <Link to="/edit-profile">Edit your bio</Link> ·{' '}
-          <Link to="/my-portfolio">Manage your portfolio</Link>
-        </p>
-      )}
+      <p>
+        This started as one person's personal blog — a spot to write about
+        code, craft, and the occasional letter. It has since grown into
+        something a little bigger: a small platform where other writers
+        can publish their own posts and letters too, alongside their own
+        portfolio of work.
+      </p>
 
-      <p className="kicker" style={{ marginTop: '2.5rem' }}>What I've made</p>
-      <h2 style={{ marginTop: 0 }}>Portfolio</h2>
-      {portfolio.length === 0 && <p>Nothing added to the portfolio yet.</p>}
+      <p>
+        The idea is simple. Long-form writing shouldn't need a big
+        audience to be worth doing, and the internet is better with more
+        people publishing their own thinking instead of just reacting to
+        everyone else's. So this site keeps a few things intentionally
+        old-fashioned: posts are dated like postmarks, letters read like
+        letters, and every writer here has a real profile behind their
+        name, not just a byline.
+      </p>
 
-      <div className="portfolio-grid">
-        {portfolio.map((item) => (
-          <div key={item.id} className="portfolio-item">
-            {item.image_url && <img src={item.image_url} alt={item.title} />}
-            <h3>{item.title}</h3>
-            {item.description && <p>{item.description}</p>}
-            {item.link && (
-              <a href={item.link} target="_blank" rel="noreferrer">
-                View &rarr;
-              </a>
-            )}
-          </div>
-        ))}
-      </div>
+      <h2>Who writes here</h2>
+      <p>
+        Anyone can create an account. <strong>Authors</strong> can publish
+        both blog posts and letters and appear in the public directory.{' '}
+        <strong>Contributors</strong> can publish blog posts, and can be
+        promoted to author once they're ready to publish more widely. The
+        site admin reviews and manages both.
+      </p>
 
-      {otherAuthors && otherAuthors.length > 0 && (
-        <>
-          <p className="kicker" style={{ marginTop: '3.5rem' }}>More voices</p>
-          <h2 style={{ marginTop: 0 }}>Other bloggers on this platform</h2>
-          <p className="post-meta">
-            Fellow writers publishing here — click through for their full profile and portfolio.
-          </p>
-
-          <div className="author-cards">
-            {otherAuthors.map((author) => (
-              <Link to={`/authors/${author.id}`} key={author.id} className="author-card">
-                <div className="author-card-head">
-                  {author.avatar ? (
-                    <img src={author.avatar} alt={author.name} className="author-card-avatar" />
-                  ) : (
-                    <span className="author-card-avatar author-card-avatar-fallback">
-                      {author.name.charAt(0).toUpperCase()}
-                    </span>
-                  )}
-                  <div>
-                    <h3>{author.name}</h3>
-                    <span className="author-card-meta">
-                      {author.posts_count} {author.posts_count === 1 ? 'post' : 'posts'}
-                    </span>
-                  </div>
-                </div>
-
-                {author.bio && <p className="author-card-bio">{author.bio}</p>}
-
-                {author.portfolio_preview.length > 0 && (
-                  <div className="author-card-portfolio">
-                    {author.portfolio_preview.map((item) => (
-                      item.image_url ? (
-                        <img key={item.id} src={item.image_url} alt={item.title} />
-                      ) : (
-                        <span key={item.id} className="author-card-portfolio-placeholder">
-                          {item.title}
-                        </span>
-                      )
-                    ))}
-                  </div>
-                )}
-
-                <span className="author-card-cta">View profile &rarr;</span>
-              </Link>
-            ))}
-          </div>
-        </>
-      )}
+      <p className="post-meta">
+        Curious who's actually behind the writing?{' '}
+        <Link to="/portfolio">See the Portfolio directory &rarr;</Link>
+      </p>
     </div>
   );
 }

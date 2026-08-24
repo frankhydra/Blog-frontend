@@ -21,8 +21,11 @@ import BookDetail from './pages/BookDetail';
 import NewBook from './pages/NewBook';
 import EditBook from './pages/EditBook';
 import About from './pages/About';
+import Portfolios from './pages/Portfolios';
 import EditProfile from './pages/EditProfile';
 import MyPortfolio from './pages/MyPortfolio';
+import RequestCampaign from './pages/RequestCampaign';
+import AdminCampaigns from './pages/AdminCampaigns';
 
 export default function App() {
   return (
@@ -45,6 +48,7 @@ export default function App() {
         <Route path="books/:slug/edit" element={<EditBook />} />
         <Route path="add-book" element={<NewBook />} />
         <Route path="about" element={<About />} />
+        <Route path="portfolio" element={<Portfolios />} />
         <Route path="edit-profile" element={<EditProfile />} />
         <Route path="my-portfolio" element={<MyPortfolio />} />
         <Route path="login" element={<Login />} />
@@ -53,6 +57,8 @@ export default function App() {
         <Route path="community" element={<CommunityBlogs />} />
         <Route path="authors/:id" element={<AuthorProfile />} />
         <Route path="admin/users" element={<AdminUsers />} />
+        <Route path="request-campaign" element={<RequestCampaign />} />
+        <Route path="admin/campaigns" element={<AdminCampaigns />} />
       </Route>
     </Routes>
   );

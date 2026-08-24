@@ -39,7 +39,7 @@ export default function LetterDetail() {
         <div>
           <p className="kicker">✉ Letter</p>
           <h1>{letter.title}</h1>
-          {user?.role === 'admin' && (
+          {user && (user.role === 'admin' || user.id === letter.author?.id) && (
             <p className="post-meta">
               <Link to={`/letters/${letter.slug}/edit`}>Edit</Link>
             </p>

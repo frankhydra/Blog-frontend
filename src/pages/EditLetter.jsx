@@ -38,7 +38,9 @@ export default function EditLetter() {
 
   if (authLoading || status === 'loading') return <p>Loading…</p>;
   if (status === 'error') return <p>That letter couldn't be found.</p>;
-  if (!user || user.role !== 'admin') return <p>Only the site admin can edit letters.</p>;
+
+  const canEdit = user && (user.role === 'admin' || user.id === letter?.author?.id);
+  if (!canEdit) return <p>You can only edit your own letters.</p>;
 
   return (
     <div>

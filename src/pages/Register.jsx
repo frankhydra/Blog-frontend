@@ -11,6 +11,7 @@ export default function Register() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const [role, setRole] = useState('contributor');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -25,7 +26,7 @@ export default function Register() {
 
     setSubmitting(true);
     try {
-      await register(name, email, password, passwordConfirmation);
+      await register(name, email, password, passwordConfirmation, role);
       navigate('/');
     } catch (err) {
       // Laravel validation errors (e.g. "email already taken") come back
@@ -43,9 +44,38 @@ export default function Register() {
         <p className="kicker">Account</p>
         <h1>Create an account</h1>
         <p className="auth-subtitle">
-          New accounts start as a contributor. The site admin can promote you
-          to author once you're ready to publish publicly.
+          Choose how you'd like to publish. The site admin can change this
+          later, including promoting you to admin.
         </p>
+
+        <div className="auth-field">
+          <span className="auth-field-legend">I want to join as</span>
+          <div className="role-choice">
+            <label className={`role-choice-option ${role === 'author' ? 'role-choice-option-active' : ''}`}>
+              <input
+                type="radio"
+                name="role"
+                value="author"
+                checked={role === 'author'}
+                onChange={() => setRole('author')}
+              />
+              <span className="role-choice-title">Author</span>
+              <span className="role-choice-desc">Write blog posts and letters.</span>
+            </label>
+
+            <label className={`role-choice-option ${role === 'contributor' ? 'role-choice-option-active' : ''}`}>
+              <input
+                type="radio"
+                name="role"
+                value="contributor"
+                checked={role === 'contributor'}
+                onChange={() => setRole('contributor')}
+              />
+              <span className="role-choice-title">Contributor</span>
+              <span className="role-choice-desc">Write blog posts only.</span>
+            </label>
+          </div>
+        </div>
 
         <div className="auth-field">
           <label htmlFor="name">Name</label>
