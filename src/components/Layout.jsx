@@ -44,7 +44,8 @@ export default function Layout() {
             <Link to="/" className="brand">Franklin Nchukwi</Link>
 
             <nav className="primary-nav">
-              <NavLink to="/" end>Blog</NavLink>
+              <NavLink to="/" end>Home</NavLink>
+              <NavLink to="/blog">Owner's Blog</NavLink>
               <NavLink to="/community">Community Blogs</NavLink>
               <NavLink to="/letters">Letters</NavLink>
               <NavLink to="/books">Books</NavLink>
@@ -117,7 +118,8 @@ export default function Layout() {
 
               <div className="footer-col">
                 <p className="footer-col-title">Explore</p>
-                <NavLink to="/" end>Blog</NavLink>
+                <NavLink to="/" end>Home</NavLink>
+                <NavLink to="/blog">Owner's Blog</NavLink>
                 <NavLink to="/community">Community Blogs</NavLink>
                 <NavLink to="/letters">Letters</NavLink>
                 <NavLink to="/books">Books</NavLink>

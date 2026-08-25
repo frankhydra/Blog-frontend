@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
+import CountdownTimer from '../components/CountdownTimer';
 
 // The landing page. Leads with what the platform *is* (multi-author blog +
-// letters + books), then a campaign spotlight if anything's been approved,
-// then a taste of each content type, then the author directory - each
-// section links deeper into the site rather than trying to hold everything
-// itself. Every fetch fails independently so one slow/broken endpoint
-// doesn't blank the whole page.
+// letters + books), then a taste of each content type, then the author
+// directory - each section links deeper into the site rather than trying
+// to hold everything itself. Every fetch fails independently so one
+// slow/broken endpoint doesn't blank the whole page.
 export default function Home() {
+  const navigate = useNavigate();
   const [posts, setPosts] = useState(null);
   const [letters, setLetters] = useState(null);
   const [books, setBooks] = useState(null);
@@ -29,7 +30,7 @@ export default function Home() {
       .catch(() => setLetters([]));
 
     apiClient.get('/books')
-      .then((res) => setBooks((res.data.data ?? res.data).slice(0, 3)))
+      .then((res) => setBooks((res.data.data ?? res.data).slice(0, 6)))
       .catch(() => setBooks([]));
 
     apiClient.get('/authors')
@@ -53,41 +54,14 @@ export default function Home() {
         </p>
         <div className="hero-actions">
           <Link to="/community" className="nav-cta">Read the blog</Link>
-          <Link to="/register" className="text-link">Start writing here &rarr;</Link>
+          <Link to="/register" className="text-link">Start writing here</Link>
         </div>
       </section>
-
-      {campaigns === null ? null : campaigns.length > 0 && (
-        <section className="landing-section spotlight-section">
-          <p className="kicker">In the spotlight</p>
-          <div className="spotlight-grid">
-            {campaigns.map((c) => (
-              <a
-                key={c.id}
-                href={c.link_url || (c.book ? `/books/${c.book.slug}` : '#')}
-                className="spotlight-card"
-                target={c.link_url ? '_blank' : undefined}
-                rel={c.link_url ? 'noreferrer' : undefined}
-              >
-                {c.image_url && <img src={c.image_url} alt="" className="spotlight-card-image" />}
-                <div className="spotlight-card-body">
-                  <h3>{c.title}</h3>
-                  <p>{c.description}</p>
-                  <span className="post-meta">
-                    By {c.user?.name}
-                    {c.launch_date && ` · ${new Date(c.launch_date).toLocaleDateString()}`}
-                  </span>
-                </div>
-              </a>
-            ))}
-          </div>
-        </section>
-      )}
 
       <section className="landing-section">
         <div className="landing-section-head">
           <h2>Latest from the blog</h2>
-          <Link to="/community" className="text-link">See all &rarr;</Link>
+          <Link to="/community" className="text-link">See all</Link>
         </div>
 
         {posts === null && <p>Loading…</p>}
@@ -98,18 +72,27 @@ export default function Home() {
               const { day, month } = formatPostmark(post.published_at);
               const isCommunityPost = post.author?.role !== 'admin';
               return (
-                <li key={post.id} className="entry">
+                <li
+                  key={post.id}
+                  className="entry"
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => navigate(`/posts/${post.slug}`)}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/posts/${post.slug}`)}
+                >
                   <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
                   <div className="entry-body">
                     <p className="kicker">
-                      {isCommunityPost && <span className="kicker-badge">Community</span>}
+                      <span className={`kicker-badge ${isCommunityPost ? '' : 'kicker-badge-owner'}`}>
+                        {isCommunityPost ? 'Community' : 'Owner'}
+                      </span>
                       {post.category ? post.category.name : 'Blog'}
                     </p>
                     <h3>
-                      <Link to={`/posts/${post.slug}`}>{post.title}</Link>
+                      <Link to={`/posts/${post.slug}`} onClick={(e) => e.stopPropagation()}>{post.title}</Link>
                     </h3>
                     <p className="post-meta">
-                      By <Link to={`/authors/${post.author.id}`}>{post.author.name}</Link>
+                      By <Link to={`/authors/${post.author.id}`} onClick={(e) => e.stopPropagation()}>{post.author.name}</Link>
                     </p>
                     {post.excerpt && <p>{post.excerpt}</p>}
                   </div>
@@ -120,21 +103,69 @@ export default function Home() {
         )}
       </section>
 
+      {campaigns === null ? null : campaigns.length > 0 && (
+        <section className="landing-section spotlight-section">
+          <div className="landing-section-head">
+            <p className="kicker" style={{ margin: 0 }}>In the spotlight</p>
+            <Link to="/campaigns" className="text-link">Discover more</Link>
+          </div>
+          <div className="spotlight-grid">
+            {campaigns.map((c, i) => (
+              <div
+                key={c.id}
+                className={`spotlight-card spotlight-theme-${i % 3}`}
+                role="link"
+                tabIndex={0}
+                onClick={() => navigate(`/campaigns/${c.id}`)}
+                onKeyDown={(e) => e.key === 'Enter' && navigate(`/campaigns/${c.id}`)}
+              >
+                {c.image_url && <img src={c.image_url} alt="" className="spotlight-card-image" />}
+                <div className="spotlight-card-body">
+                  <h3>{c.title}</h3>
+                  <p>{c.description}</p>
+                  <span className="post-meta">By {c.user?.name}</span>
+                  <div className="spotlight-card-countdown">
+                    <CountdownTimer launchDate={c.launch_date} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="spotlight-block-caption">Upcoming events</p>
+        </section>
+      )}
+
       {letters?.length > 0 && (
         <section className="landing-section">
           <div className="landing-section-head">
             <h2>From the letters archive</h2>
-            <Link to="/letters" className="text-link">See all &rarr;</Link>
+            <Link to="/letters" className="text-link">See all</Link>
           </div>
           <ul className="entries">
             {letters.map((letter) => {
               const { day, month } = formatPostmark(letter.published_at);
+              const isCommunityLetter = letter.author?.role !== 'admin';
               return (
-                <li key={letter.id} className="entry">
+                <li
+                  key={letter.id}
+                  className="entry"
+                  role="link"
+                  tabIndex={0}
+                  onClick={() => navigate(`/letters/${letter.slug}`)}
+                  onKeyDown={(e) => e.key === 'Enter' && navigate(`/letters/${letter.slug}`)}
+                >
                   <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
                   <div className="entry-body">
-                    <h3><Link to={`/letters/${letter.slug}`}>{letter.title}</Link></h3>
-                    <p className="post-meta">By {letter.author?.name}</p>
+                    <p className="kicker">
+                      <span className={`kicker-badge ${isCommunityLetter ? '' : 'kicker-badge-owner'}`}>
+                        {isCommunityLetter ? 'Community' : 'Owner'}
+                      </span>
+                      Letter
+                    </p>
+                    <h3><Link to={`/letters/${letter.slug}`} onClick={(e) => e.stopPropagation()}>{letter.title}</Link></h3>
+                    <p className="post-meta">
+                      By <Link to={`/authors/${letter.author?.id}`} onClick={(e) => e.stopPropagation()}>{letter.author?.name}</Link>
+                    </p>
                     {letter.excerpt && <p>{letter.excerpt}</p>}
                   </div>
                 </li>
@@ -148,7 +179,7 @@ export default function Home() {
         <section className="landing-section">
           <div className="landing-section-head">
             <h2>From the books catalog</h2>
-            <Link to="/books" className="text-link">See all &rarr;</Link>
+            <Link to="/books" className="text-link">See all</Link>
           </div>
           <div className="landing-books-grid">
             {books.map((book) => (
@@ -172,7 +203,7 @@ export default function Home() {
         <section className="landing-section">
           <div className="landing-section-head">
             <h2>Who writes here</h2>
-            <Link to="/portfolio" className="text-link">Meet everyone &rarr;</Link>
+            <Link to="/portfolio" className="text-link">Meet everyone</Link>
           </div>
           <div className="author-cards">
             {authors.map((author) => (

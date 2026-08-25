@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
+import OwnerBlog from './pages/OwnerBlog';
 import PostDetail from './pages/PostDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -26,6 +27,8 @@ import EditProfile from './pages/EditProfile';
 import MyPortfolio from './pages/MyPortfolio';
 import RequestCampaign from './pages/RequestCampaign';
 import AdminCampaigns from './pages/AdminCampaigns';
+import Campaigns from './pages/Campaigns';
+import CampaignDetail from './pages/CampaignDetail';
 
 export default function App() {
   return (
@@ -33,6 +36,7 @@ export default function App() {
       {/* Layout wraps every page below with the shared header/footer */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
+        <Route path="blog" element={<OwnerBlog />} />
         <Route path="posts/:slug" element={<PostDetail />} />
         <Route path="posts/:slug/edit" element={<EditPost />} />
         <Route path="write" element={<Write />} />
@@ -59,6 +63,8 @@ export default function App() {
         <Route path="admin/users" element={<AdminUsers />} />
         <Route path="request-campaign" element={<RequestCampaign />} />
         <Route path="admin/campaigns" element={<AdminCampaigns />} />
+        <Route path="campaigns" element={<Campaigns />} />
+        <Route path="campaigns/:id" element={<CampaignDetail />} />
       </Route>
     </Routes>
   );
