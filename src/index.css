@@ -451,22 +451,22 @@ p.kicker {
 /* Marks a post on the main Blog feed as someone else's, not the site
    owner's - shows up when a community post gets blended into Home after
    24h without a new owner post (see PostController@index, scope=home). */
-.kicker-badge {
-  display: inline-block;
-  background: var(--accent);
-  color: var(--paper);
-  font-size: 0.62rem;
-  padding: 0.15rem 0.45rem;
-  border-radius: 3px;
-  margin-right: 0.5rem;
-  letter-spacing: 0.04em;
+/* A small color "flag" next to a byline, personal to that author rather
+   than a two-tier owner/community label. Color assignment lives in
+   utils/authorFlag.js. */
+.author-byline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
 }
 
-/* The site owner's own posts/letters get a warmer, distinct color from the
-   accent blue used for community-authored entries, so the two are never
-   confused at a glance in a mixed list. */
-.kicker-badge-owner {
-  background: var(--wax);
+.author-flag {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .entry-body h2,
@@ -784,9 +784,12 @@ p.kicker {
   margin: -0.4rem 0 1rem;
 }
 
-/* Kept for EditProfile.jsx, which still uses the older flat label/input
-   layout rather than the auth-card pattern above (redesigning that page's
-   markup wasn't part of this pass, so its existing plain style stays put). */
+.form-success {
+  color: var(--theme-forest);
+  font-size: 0.85rem;
+  margin: -0.4rem 0 1rem;
+}
+
 .auth-form {
   max-width: 400px;
   margin: 0 auto;
@@ -2592,4 +2595,139 @@ select:focus-visible {
   border-top: 1px solid var(--border);
   padding-top: 1.5rem;
   margin-top: 2.5rem;
+}
+
+/* ---------- Settings page ---------- */
+.settings-page {
+  max-width: 880px;
+  margin: 0 auto;
+}
+
+.settings-layout {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 2.5rem;
+  margin-top: 2rem;
+  align-items: start;
+}
+
+.settings-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.settings-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-align: left;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.settings-tab:hover {
+  background: var(--paper-tint);
+  color: var(--ink);
+}
+
+.settings-tab-active {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 600;
+  border: 1px solid var(--border);
+}
+
+.settings-tab-icon {
+  display: flex;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.settings-tab-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.settings-panel {
+  min-width: 0;
+}
+
+.settings-form {
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-form:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.settings-form h2 {
+  margin-bottom: 0.15rem;
+}
+
+.settings-form label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+.settings-form input,
+.settings-form textarea {
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.settings-form button[type="submit"] {
+  align-self: flex-start;
+  margin-top: 0.5rem;
+}
+
+.settings-account-tab {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 680px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-tabs {
+    flex-direction: row;
+    overflow-x: auto;
+    position: static;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .settings-tab {
+    white-space: nowrap;
+  }
 }

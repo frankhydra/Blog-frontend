@@ -10,7 +10,7 @@ const BLANK = { title: '', description: '', image_url: '', link: '', sort_order:
 // profile until you explicitly publish it. The Preview tab renders your
 // items through the exact same component the public page uses, so what
 // you see is what visitors will eventually see once published.
-export default function MyPortfolio() {
+export default function MyPortfolio({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [items, setItems] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -119,19 +119,33 @@ export default function MyPortfolio() {
 
   return (
     <div>
-      <div className="my-portfolio-head">
-        <div>
-          <h1>Your portfolio</h1>
+      {!embedded && (
+        <div className="my-portfolio-head">
+          <div>
+            <h1>Your portfolio</h1>
+            <p className="post-meta">
+              Published items show on your author profile, and at the top of the
+              Portfolio page when you're the featured writer. Drafts stay
+              private to you until you publish them.
+            </p>
+          </div>
+          <button type="button" onClick={() => setView('preview')} className="nav-cta">
+            Preview
+          </button>
+        </div>
+      )}
+      {embedded && (
+        <div className="my-portfolio-head">
           <p className="post-meta">
             Published items show on your author profile, and at the top of the
             Portfolio page when you're the featured writer. Drafts stay
             private to you until you publish them.
           </p>
+          <button type="button" onClick={() => setView('preview')} className="nav-cta">
+            Preview
+          </button>
         </div>
-        <button type="button" onClick={() => setView('preview')} className="nav-cta">
-          Preview
-        </button>
-      </div>
+      )}
 
       <form onSubmit={(e) => handleSubmit(e, editingId ? null : false)} className="post-form">
         <h2>{editingId ? 'Edit item' : 'Add item'}</h2>

@@ -45,7 +45,6 @@ export default function Layout() {
 
             <nav className="primary-nav">
               <NavLink to="/" end>Home</NavLink>
-              <NavLink to="/blog">Owner's Blog</NavLink>
               <NavLink to="/community">Community Blogs</NavLink>
               <NavLink to="/letters">Letters</NavLink>
               <NavLink to="/books">Books</NavLink>
@@ -71,9 +70,8 @@ export default function Layout() {
                     {menuOpen && (
                       <div className="account-dropdown">
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
-                        <Link to="/my-portfolio" onClick={() => setMenuOpen(false)}>My portfolio</Link>
                         <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
-                        <Link to="/edit-profile" onClick={() => setMenuOpen(false)}>Edit profile</Link>
+                        <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {['admin', 'author'].includes(user.role) && (
                           <Link to="/write/letter" onClick={() => setMenuOpen(false)}>Write a letter</Link>
                         )}
@@ -119,7 +117,6 @@ export default function Layout() {
               <div className="footer-col">
                 <p className="footer-col-title">Explore</p>
                 <NavLink to="/" end>Home</NavLink>
-                <NavLink to="/blog">Owner's Blog</NavLink>
                 <NavLink to="/community">Community Blogs</NavLink>
                 <NavLink to="/letters">Letters</NavLink>
                 <NavLink to="/books">Books</NavLink>
@@ -134,9 +131,8 @@ export default function Layout() {
                     <Link to="/write">Write a post</Link>
                     {['admin', 'author'].includes(user.role) && <Link to="/write/letter">Write a letter</Link>}
                     <Link to="/my-posts">My posts</Link>
-                    <Link to="/my-portfolio">My portfolio</Link>
                     <Link to="/request-campaign">Request a campaign</Link>
-                    <Link to="/edit-profile">Edit profile</Link>
+                    <Link to="/settings">Settings</Link>
                   </>
                 ) : (
                   <>

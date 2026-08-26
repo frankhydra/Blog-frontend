@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
+import { getAuthorFlag } from '../utils/authorFlag';
 import CountdownTimer from '../components/CountdownTimer';
 
 // The landing page. Leads with what the platform *is* (multi-author blog +
@@ -70,7 +71,7 @@ export default function Home() {
           <ul className="entries">
             {posts.map((post) => {
               const { day, month } = formatPostmark(post.published_at);
-              const isCommunityPost = post.author?.role !== 'admin';
+              const flag = getAuthorFlag(post.author);
               return (
                 <li
                   key={post.id}
@@ -82,16 +83,12 @@ export default function Home() {
                 >
                   <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
                   <div className="entry-body">
-                    <p className="kicker">
-                      <span className={`kicker-badge ${isCommunityPost ? '' : 'kicker-badge-owner'}`}>
-                        {isCommunityPost ? 'Community' : 'Owner'}
-                      </span>
-                      {post.category ? post.category.name : 'Blog'}
-                    </p>
+                    <p className="kicker">{post.category ? post.category.name : 'Blog'}</p>
                     <h3>
                       <Link to={`/posts/${post.slug}`} onClick={(e) => e.stopPropagation()}>{post.title}</Link>
                     </h3>
-                    <p className="post-meta">
+                    <p className="post-meta author-byline">
+                      <span className="author-flag" style={{ background: flag.color }} title={flag.title} />
                       By <Link to={`/authors/${post.author.id}`} onClick={(e) => e.stopPropagation()}>{post.author.name}</Link>
                     </p>
                     {post.excerpt && <p>{post.excerpt}</p>}
@@ -144,7 +141,7 @@ export default function Home() {
           <ul className="entries">
             {letters.map((letter) => {
               const { day, month } = formatPostmark(letter.published_at);
-              const isCommunityLetter = letter.author?.role !== 'admin';
+              const flag = getAuthorFlag(letter.author);
               return (
                 <li
                   key={letter.id}
@@ -156,14 +153,10 @@ export default function Home() {
                 >
                   <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
                   <div className="entry-body">
-                    <p className="kicker">
-                      <span className={`kicker-badge ${isCommunityLetter ? '' : 'kicker-badge-owner'}`}>
-                        {isCommunityLetter ? 'Community' : 'Owner'}
-                      </span>
-                      Letter
-                    </p>
+                    <p className="kicker">Letter</p>
                     <h3><Link to={`/letters/${letter.slug}`} onClick={(e) => e.stopPropagation()}>{letter.title}</Link></h3>
-                    <p className="post-meta">
+                    <p className="post-meta author-byline">
+                      <span className="author-flag" style={{ background: flag.color }} title={flag.title} />
                       By <Link to={`/authors/${letter.author?.id}`} onClick={(e) => e.stopPropagation()}>{letter.author?.name}</Link>
                     </p>
                     {letter.excerpt && <p>{letter.excerpt}</p>}

@@ -52,7 +52,7 @@ export default function Portfolios() {
       {user ? (
         <>
           <p>Want to add to what's shown here?</p>
-          <Link to="/my-portfolio" className="nav-cta">Manage your portfolio</Link>
+          <Link to="/settings?tab=portfolio" className="nav-cta">Manage your portfolio</Link>
         </>
       ) : (
         <>
@@ -75,8 +75,8 @@ export default function Portfolios() {
 
       {isViewingSelf && (
         <p className="post-meta one-pager-self-links">
-          <Link to="/edit-profile">Edit your bio</Link> ·{' '}
-          <Link to="/my-portfolio">Manage your portfolio</Link>
+          <Link to="/settings?tab=profile">Edit your bio</Link> ·{' '}
+          <Link to="/settings?tab=portfolio">Manage your portfolio</Link>
         </p>
       )}
 

@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import OwnerBlog from './pages/OwnerBlog';
 import PostDetail from './pages/PostDetail';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -23,8 +22,7 @@ import NewBook from './pages/NewBook';
 import EditBook from './pages/EditBook';
 import About from './pages/About';
 import Portfolios from './pages/Portfolios';
-import EditProfile from './pages/EditProfile';
-import MyPortfolio from './pages/MyPortfolio';
+import Settings from './pages/Settings';
 import RequestCampaign from './pages/RequestCampaign';
 import AdminCampaigns from './pages/AdminCampaigns';
 import Campaigns from './pages/Campaigns';
@@ -36,7 +34,6 @@ export default function App() {
       {/* Layout wraps every page below with the shared header/footer */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
-        <Route path="blog" element={<OwnerBlog />} />
         <Route path="posts/:slug" element={<PostDetail />} />
         <Route path="posts/:slug/edit" element={<EditPost />} />
         <Route path="write" element={<Write />} />
@@ -53,8 +50,9 @@ export default function App() {
         <Route path="add-book" element={<NewBook />} />
         <Route path="about" element={<About />} />
         <Route path="portfolio" element={<Portfolios />} />
-        <Route path="edit-profile" element={<EditProfile />} />
-        <Route path="my-portfolio" element={<MyPortfolio />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="edit-profile" element={<Navigate to="/settings?tab=profile" replace />} />
+        <Route path="my-portfolio" element={<Navigate to="/settings?tab=portfolio" replace />} />
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="admin/comments" element={<AdminComments />} />

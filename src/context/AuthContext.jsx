@@ -52,8 +52,17 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  // Re-fetches the current user, e.g. after a Settings page save, so
+  // things like the header name/avatar update immediately instead of
+  // needing a full page reload.
+  async function refreshUser() {
+    const res = await apiClient.get('/user');
+    setUser(res.data);
+    return res.data;
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

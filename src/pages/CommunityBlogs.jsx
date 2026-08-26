@@ -3,16 +3,17 @@ import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
+import { getAuthorFlag } from '../utils/authorFlag';
 
 // Every post from everyone writing here - the owner, authors, and
-// contributors alike. "Owner's Blog" is the narrower, owner-only feed;
-// this page is the full picture, with each post badged so it's clear at a
-// glance who wrote it.
+// contributors alike, all in one shared feed. Each post carries a small
+// color flag next to the byline instead of an "Owner"/"Community" label,
+// so identity is personal rather than a two-tier split.
 export default function CommunityBlogs() {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Community Blogs', 'Every post from everyone writing here - the owner, authors, and contributors alike.');
+  usePageMeta('Community Blogs', 'Every post from everyone writing here, all in one shared feed.');
 
   useEffect(() => {
     apiClient
@@ -36,21 +37,17 @@ export default function CommunityBlogs() {
       <ul className="entries">
         {posts.map((post) => {
           const { day, month } = formatPostmark(post.published_at);
-          const isCommunityPost = post.author?.role !== 'admin';
+          const flag = getAuthorFlag(post.author);
           return (
             <li key={post.id} className="entry">
               <div className="postmark"><span className="day">{day}</span><span className="month">{month}</span></div>
               <div className="entry-body">
-                <p className="kicker">
-                  <span className={`kicker-badge ${isCommunityPost ? '' : 'kicker-badge-owner'}`}>
-                    {isCommunityPost ? 'Community' : 'Owner'}
-                  </span>
-                  {post.category ? post.category.name : 'Blog'}
-                </p>
+                <p className="kicker">{post.category ? post.category.name : 'Blog'}</p>
                 <h2>
                   <Link to={`/posts/${post.slug}`}>{post.title}</Link>
                 </h2>
-                <p className="post-meta">
+                <p className="post-meta author-byline">
+                  <span className="author-flag" style={{ background: flag.color }} title={flag.title} />
                   By <Link to={`/authors/${post.author.id}`}>{post.author.name}</Link>
                 </p>
                 {post.excerpt && <p>{post.excerpt}</p>}
