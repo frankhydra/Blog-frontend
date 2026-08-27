@@ -29,7 +29,7 @@ export default function Portfolios() {
   if (status === 'loading') return <p>Loading…</p>;
   if (status === 'error') return <p>Couldn't load this page.</p>;
 
-  const { featured, featured_portfolio: items, featured_posts: posts, other_authors: otherAuthors } = data;
+  const { featured, featured_portfolio: items, featured_posts: posts, featured_experience: experience, other_authors: otherAuthors } = data;
   const isViewingSelf = featured?.is_viewer;
   const hasOthers = otherAuthors && otherAuthors.length > 0;
 
@@ -69,6 +69,8 @@ export default function Portfolios() {
         person={featured}
         items={items}
         posts={posts}
+        experience={experience}
+        showContact={!isViewingSelf}
         topCta={topCta}
         bottomCta={!hasOthers ? bottomCta : null}
       />

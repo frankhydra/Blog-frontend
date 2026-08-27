@@ -3,7 +3,7 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import PortfolioOnePager from '../components/PortfolioOnePager';
 
-const BLANK = { title: '', description: '', image_url: '', link: '', sort_order: 0 };
+const BLANK = { title: '', category: '', description: '', image_url: '', link: '', sort_order: 0 };
 
 // Every logged-in user manages their own portfolio here. New items start
 // as drafts - nothing shows on the public /portfolio page or your author
@@ -40,6 +40,7 @@ export default function MyPortfolio({ embedded = false }) {
     setEditingId(item.id);
     setForm({
       title: item.title,
+      category: item.category ?? '',
       description: item.description ?? '',
       image_url: item.image_url ?? '',
       link: item.link ?? '',
@@ -58,6 +59,7 @@ export default function MyPortfolio({ embedded = false }) {
     try {
       const payload = {
         ...form,
+        category: form.category || null,
         description: form.description || null,
         image_url: form.image_url || null,
         link: form.link || null,
@@ -109,7 +111,19 @@ export default function MyPortfolio({ embedded = false }) {
           </button>
         </div>
         <PortfolioOnePager
-          person={{ name: user.name, bio: user.bio, avatar: user.avatar, role: user.role }}
+          person={{
+            id: user.id,
+            name: user.name,
+            bio: user.bio,
+            avatar: user.avatar,
+            role: user.role,
+            headline: user.headline,
+            availability: user.availability,
+            location: user.location,
+            website: user.website,
+            skills: user.skills,
+            social_links: user.social_links,
+          }}
           items={items}
           previewMode
         />
@@ -147,6 +161,23 @@ export default function MyPortfolio({ embedded = false }) {
         </div>
       )}
 
+      {items.length > 0 && (
+        <div className="portfolio-stats-bar">
+          <div className="portfolio-stat">
+            <span className="portfolio-stat-num">{items.length}</span>
+            <span className="portfolio-stat-label">Total items</span>
+          </div>
+          <div className="portfolio-stat">
+            <span className="portfolio-stat-num">{items.filter((i) => i.status === 'published').length}</span>
+            <span className="portfolio-stat-label">Published</span>
+          </div>
+          <div className="portfolio-stat">
+            <span className="portfolio-stat-num">{items.reduce((sum, i) => sum + (i.likes_count ?? 0), 0)}</span>
+            <span className="portfolio-stat-label">Total likes</span>
+          </div>
+        </div>
+      )}
+
       <form onSubmit={(e) => handleSubmit(e, editingId ? null : false)} className="post-form">
         <h2>{editingId ? 'Edit item' : 'Add item'}</h2>
 
@@ -156,6 +187,14 @@ export default function MyPortfolio({ embedded = false }) {
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
           required
+        />
+
+        <label htmlFor="category">Category</label>
+        <input
+          id="category"
+          value={form.category}
+          onChange={(e) => setForm({ ...form, category: e.target.value })}
+          placeholder="e.g. Web, Design, Writing"
         />
 
         <label htmlFor="description">Description</label>
@@ -222,9 +261,11 @@ export default function MyPortfolio({ embedded = false }) {
         {items.map((item) => (
           <li key={item.id} className="moderation-item">
             <strong>{item.title}</strong>{' '}
+            {item.category && <span className="post-meta">· {item.category}</span>}{' '}
             <span className={`status-pill ${item.status === 'published' ? 'status-pill-published' : 'status-pill-draft'}`}>
               {item.status === 'published' ? 'Published' : 'Draft'}
             </span>
+            {item.likes_count > 0 && <span className="post-meta"> · {item.likes_count} likes</span>}
             <div className="moderation-actions">
               <button onClick={() => toggleStatus(item)}>
                 {item.status === 'published' ? 'Unpublish' : 'Publish'}

@@ -31,6 +31,8 @@ export default function AuthorProfile() {
         person={author}
         items={author.portfolio}
         posts={author.posts}
+        experience={author.experience}
+        showContact
         backLink={{ to: '/portfolio', label: 'Back to Portfolio' }}
       />
     </div>
