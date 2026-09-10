@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Suspense } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import Loading from './Loading';
 
 const ICON_MENU = (
@@ -16,8 +17,32 @@ const ICON_CLOSE = (
   </svg>
 );
 
+const ICON_SUN = (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+    <path
+      d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+    />
+  </svg>
+);
+
+const ICON_MOON = (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M20.2 14.6A8.6 8.6 0 1 1 9.4 3.8a7 7 0 0 0 10.8 10.8Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export default function Layout() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -142,6 +167,21 @@ export default function Layout() {
                 <Link to="/login" className="nav-cta">Log in</Link>
               )}
             </div>
+
+            {/* Always visible regardless of screen width - unlike the rest
+                of .header-actions, this shouldn't disappear into the
+                hamburger menu just because it's a small button, since a
+                theme toggle is the kind of thing people expect to reach
+                in one tap. */}
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {theme === 'dark' ? ICON_SUN : ICON_MOON}
+            </button>
 
             {/* Hamburger toggle - CSS hides this above 640px, so it never
                 shows up alongside the desktop nav. */}

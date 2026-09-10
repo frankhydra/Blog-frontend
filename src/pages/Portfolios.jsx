@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
-import Loading from '../components/Loading';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 // The public Portfolio page - a community directory of every blogger on
 // the platform, ranked by how often they actually post, paginated rather
@@ -29,7 +29,6 @@ export default function Portfolios() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [page]);
 
-  if (status === 'loading' && !pageData) return <Loading fullPage />;
   if (status === 'error') return <p>Couldn't load this page.</p>;
 
   const people = pageData?.data ?? [];
@@ -44,19 +43,19 @@ export default function Portfolios() {
         Fellow writers publishing here — click through for their full profile and portfolio.
       </p>
 
-      {status === 'loading' && <Loading />}
+      {status === 'loading' && <SkeletonGrid variant="author" count={6} />}
 
-      {people.length === 0 && status === 'ready' && (
+      {status === 'ready' && people.length === 0 && (
         <p className="empty-state">Nobody's published anything yet.</p>
       )}
 
-      {people.length > 0 && (
+      {status === 'ready' && people.length > 0 && (
         <div className="author-cards">
           {people.map((author) => (
             <Link to={`/authors/${author.id}`} key={author.id} className="author-card">
               <div className="author-card-head">
                 {author.avatar ? (
-                  <img src={author.avatar} alt={author.name} className="author-card-avatar" />
+                  <img src={author.avatar} alt={author.name} className="author-card-avatar" loading="lazy" />
                 ) : (
                   <span className="author-card-avatar author-card-avatar-fallback">
                     {author.name.charAt(0).toUpperCase()}
@@ -79,7 +78,7 @@ export default function Portfolios() {
                 <div className="author-card-portfolio">
                   {author.portfolio_preview.map((item) => (
                     item.image_url ? (
-                      <img key={item.id} src={item.image_url} alt={item.title} />
+                      <img key={item.id} src={item.image_url} alt={item.title} loading="lazy" />
                     ) : (
                       <span key={item.id} className="author-card-portfolio-placeholder">
                         {item.title}

@@ -4,7 +4,7 @@ import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
-import Loading from '../components/Loading';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 // Every published post carrying a given tag - reached by clicking a tag
 // chip on a post, or from the "browse all tags" list on /tags. Reuses
@@ -30,7 +30,6 @@ export default function TagPosts() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [slug]);
 
-  if (status === 'loading') return <Loading fullPage />;
   if (status === 'error') return <p>Couldn't load these posts.</p>;
 
   return (
@@ -39,9 +38,11 @@ export default function TagPosts() {
       <p className="kicker">Tagged</p>
       <h1>#{slug}</h1>
 
-      {posts.length === 0 && <p className="empty-state">No published posts with this tag yet.</p>}
-      <ul className="entries">
-        {posts.map((post) => {
+      {status === 'loading' && <SkeletonGrid variant="entry" count={4} />}
+      {status === 'ready' && posts.length === 0 && <p className="empty-state">No published posts with this tag yet.</p>}
+      {status === 'ready' && (
+        <ul className="entries">
+          {posts.map((post) => {
           const { day, month } = formatPostmark(post.published_at);
           const flag = getAuthorFlag(post.author);
           return (
@@ -61,7 +62,8 @@ export default function TagPosts() {
             </li>
           );
         })}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }

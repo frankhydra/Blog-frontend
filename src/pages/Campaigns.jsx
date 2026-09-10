@@ -48,7 +48,7 @@ export default function Campaigns() {
             onClick={() => navigate(`/campaigns/${c.id}`)}
             onKeyDown={(e) => e.key === 'Enter' && navigate(`/campaigns/${c.id}`)}
           >
-            {c.image_url && <img src={c.image_url} alt="" className="campaign-card-image" />}
+            {c.image_url && <img src={c.image_url} alt="" className="campaign-card-image" loading="lazy" />}
             <div className="campaign-card-body">
               <h3>{c.title}</h3>
               <p>{c.description}</p>

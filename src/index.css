@@ -11,11 +11,56 @@
   --wax: #8C2F39;
   --border: #D9D0C1;
 
+  /* Solid-fill buttons/badges (accent bg + white/paper text - primary
+     buttons across the whole app, the reaction "active" state, etc.) use
+     this instead of --accent. It's deliberately NOT overridden in dark
+     mode below: --accent itself gets lighter there so it stays readable
+     as plain text/links on a dark page, but a lighter blue behind white
+     button text loses too much contrast to read comfortably - so button
+     fills keep this original, darker navy in both themes instead. */
+  --accent-solid: #2B3A67;
+
   /* Extra accent colors used only to give each spotlight/campaign card its
      own identity - same restrained, muted-ink feel as --accent/--wax
      rather than bright "AI palette" colors. */
   --theme-forest: #43613F;
   --theme-ochre: #A2732B;
+
+  /* Shadow tint as an unitless r,g,b triplet (not a full color) so it can
+     be dropped into rgba(var(--shadow-rgb), <alpha>) at each call site -
+     every box-shadow in this file keeps its own offset/blur/alpha, only
+     the tint itself swaps between light and dark mode. */
+  --shadow-rgb: 36, 31, 27;
+}
+
+/* ---------- Dark mode ----------
+   Every color below is a *role* variable (page background, primary text,
+   muted text, borders, elevated surfaces) that most of this file already
+   read through --paper/--ink/--muted/--border/--card - so overriding them
+   here is enough to re-theme the whole app. --accent/--wax/--theme-forest/
+   --theme-ochre are also lifted a shade lighter, since the originals were
+   tuned for dark text on a light page and go muddy/low-contrast used as
+   text or borders on a dark one.
+
+   A handful of spots that are deliberately "dark chrome" regardless of
+   theme - the header/footer bands, the Write/Log-in button, the mobile
+   menu panel, the account trigger, the floating media toolbar, and the
+   editor's own selectable "paper/ink" writing-canvas swatches - were
+   written with the literal hex values instead of these variables, on
+   purpose, so they keep their current look in both themes rather than
+   flattening into the page around them. */
+[data-theme="dark"] {
+  --ink: #ECE4D4;
+  --paper: #17130F;
+  --paper-tint: #211C15;
+  --card: #241F18;
+  --muted: #A89A85;
+  --border: #3D3529;
+  --accent: #8AA0E8;
+  --wax: #C4626D;
+  --theme-forest: #7FA878;
+  --theme-ochre: #D1A059;
+  --shadow-rgb: 0, 0, 0;
 }
 
 /* Shared breakpoint scale - every @media rule in this file uses one of
@@ -46,6 +91,7 @@ body {
   color: var(--ink);
   font-family: 'Source Serif 4', serif;
   line-height: 1.6;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 h1, h2, h3 {
@@ -101,7 +147,7 @@ p.kicker {
 }
 
 .header-band {
-  background: var(--ink);
+  background: #241F1B;
   border-bottom: 1px solid rgba(247, 243, 236, 0.08);
 }
 
@@ -117,7 +163,7 @@ p.kicker {
   font-family: 'Fraunces', serif;
   font-weight: 600;
   font-size: 1.3rem;
-  color: var(--paper);
+  color: #F7F3EC;
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -145,11 +191,11 @@ p.kicker {
 }
 
 .primary-nav a:hover {
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 .primary-nav a.active {
-  color: var(--paper);
+  color: #F7F3EC;
   border-bottom-color: var(--wax);
 }
 
@@ -165,8 +211,8 @@ p.kicker {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--ink);
-  background: var(--paper);
+  color: #241F1B;
+  background: #F7F3EC;
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 3px;
@@ -175,7 +221,7 @@ p.kicker {
 
 .nav-cta:hover {
   background: var(--wax);
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 /* Hamburger toggle - hidden by default, only shown below 640px (see the
@@ -191,7 +237,7 @@ p.kicker {
   background: none;
   border: 1px solid rgba(247, 243, 236, 0.2);
   border-radius: 8px;
-  color: var(--paper);
+  color: #F7F3EC;
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -203,6 +249,34 @@ p.kicker {
 
 .mobile-menu-toggle:hover {
   border-color: rgba(247, 243, 236, 0.45);
+}
+
+/* Sun/moon theme toggle - lives next to the hamburger button and, unlike
+   .header-actions, is never hidden by the 1024px nav breakpoint below, so
+   it's reachable in one tap at every screen width. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 1px solid rgba(247, 243, 236, 0.2);
+  border-radius: 8px;
+  color: #F7F3EC;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.theme-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+.theme-toggle:hover {
+  border-color: rgba(247, 243, 236, 0.45);
+  transform: rotate(12deg);
 }
 
 /* The desktop nav needs real room: brand + 6 links + Write button + the
@@ -252,7 +326,7 @@ p.kicker {
   text-align: left;
   background: none;
   border: none;
-  color: var(--paper);
+  color: #F7F3EC;
   text-decoration: none;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
@@ -264,7 +338,7 @@ p.kicker {
 }
 
 .mobile-menu-panel a.active {
-  color: var(--paper);
+  color: #F7F3EC;
   border-left: 2px solid var(--wax);
   padding-left: 0.6rem;
 }
@@ -288,7 +362,7 @@ p.kicker {
   padding: 0.5rem 0.25rem 0.75rem;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 /* Account dropdown */
@@ -305,7 +379,7 @@ p.kicker {
   border-radius: 20px;
   padding: 0.35rem 0.85rem 0.35rem 0.35rem;
   cursor: pointer;
-  color: var(--paper);
+  color: #F7F3EC;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
 }
@@ -318,8 +392,8 @@ p.kicker {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: var(--accent);
-  color: var(--paper);
+  background: var(--accent-solid);
+  color: #F7F3EC;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -339,7 +413,7 @@ p.kicker {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;
-  box-shadow: 0 8px 24px rgba(36, 31, 27, 0.18);
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.18);
   min-width: 200px;
   padding: 0.5rem;
   display: flex;
@@ -391,7 +465,7 @@ p.kicker {
 }
 
 .footer-band {
-  background: var(--ink);
+  background: #241F1B;
 }
 
 .site-footer {
@@ -411,7 +485,7 @@ p.kicker {
   font-family: 'Fraunces', serif;
   font-weight: 600;
   font-size: 1.15rem;
-  color: var(--paper);
+  color: #F7F3EC;
   text-decoration: none;
 }
 
@@ -447,7 +521,7 @@ p.kicker {
 
 .footer-col a:hover,
 .footer-col a.active {
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 .footer-bottom {
@@ -474,7 +548,7 @@ p.kicker {
 }
 
 .footer-bottom-links a:hover {
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 .back-to-top {
@@ -488,7 +562,7 @@ p.kicker {
 }
 
 .back-to-top:hover {
-  color: var(--paper);
+  color: #F7F3EC;
 }
 
 @media (max-width: 640px) {
@@ -706,7 +780,7 @@ p.kicker {
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(36, 31, 27, 0.1);
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.1);
   padding: 2.25rem 2rem;
   display: flex;
   flex-direction: column;
@@ -871,7 +945,7 @@ p.kicker {
 .auth-submit {
   margin-top: 0.5rem;
   padding: 0.75rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 8px;
@@ -947,7 +1021,7 @@ p.kicker {
 .auth-form button {
   margin-top: 1rem;
   padding: 0.6rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 4px;
@@ -976,9 +1050,9 @@ p.kicker {
 }
 
 .reaction-buttons .reaction-active {
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
-  border-color: var(--accent);
+  border-color: var(--accent-solid);
 }
 
 .comments {
@@ -1041,7 +1115,7 @@ p.kicker {
 .comment-form button {
   margin-top: 0.75rem;
   padding: 0.6rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 4px;
@@ -1082,7 +1156,7 @@ p.kicker {
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
 }
 
@@ -1412,9 +1486,9 @@ p.kicker {
 }
 
 .studio-pill-active {
-  background: var(--accent);
-  color: var(--paper);
-  border-color: var(--accent);
+  background: var(--accent-solid);
+  color: #F7F3EC;
+  border-color: var(--accent-solid);
 }
 
 @keyframes audioPulse {
@@ -1451,8 +1525,8 @@ p.kicker {
   transform: scale(1.08);
 }
 
-.canvas-swatch-paper { background: var(--paper); }
-.canvas-swatch-ink { background: var(--ink); }
+.canvas-swatch-paper { background: #F7F3EC; }
+.canvas-swatch-ink { background: #241F1B; }
 .canvas-swatch-sepia { background: #fbf0d9; }
 
 .canvas-swatch-active {
@@ -1491,7 +1565,7 @@ p.kicker {
   background: var(--paper);
 }
 
-.callout-chip-tip { border-color: #2f6d4c; color: #2f6d4c; }
+.callout-chip-tip { border-color: var(--theme-forest); color: var(--theme-forest); }
 .callout-chip-warning { border-color: var(--wax); color: var(--wax); }
 .callout-chip-stat { border-color: var(--accent); color: var(--accent); }
 
@@ -1509,7 +1583,7 @@ p.kicker {
 .callout-tip {
   background: rgba(47, 109, 76, 0.08);
   border: 1px solid rgba(47, 109, 76, 0.35);
-  color: #21492f;
+  color: var(--theme-forest);
 }
 
 .callout-warning {
@@ -1592,8 +1666,8 @@ p.kicker {
 
 /* Canvas themes - the writing surface's own background, independent of the
    page chrome around it */
-.editor-content.canvas-paper .ql-editor { background: var(--card); color: var(--ink); }
-.editor-content.canvas-ink .ql-editor { background: var(--ink); color: var(--paper); }
+.editor-content.canvas-paper .ql-editor { background: #FDFBF7; color: #241F1B; }
+.editor-content.canvas-ink .ql-editor { background: #241F1B; color: #F7F3EC; }
 .editor-content.canvas-sepia .ql-editor { background: #fbf0d9; color: #432818; }
 
 .editor-content img,
@@ -1625,27 +1699,27 @@ p.kicker {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: #241F1B;
+  color: #F7F3EC;
   padding: 0.4rem 0.5rem;
   border-radius: 6px;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.68rem;
-  box-shadow: 0 6px 18px rgba(36, 31, 27, 0.35);
+  box-shadow: 0 6px 18px rgba(var(--shadow-rgb), 0.35);
 }
 
 .media-float-toolbar button {
   background: rgba(247, 243, 236, 0.1);
   border: 1px solid rgba(247, 243, 236, 0.2);
-  color: var(--paper);
+  color: #F7F3EC;
   border-radius: 3px;
   padding: 0.2rem 0.4rem;
   cursor: pointer;
 }
 
 .media-float-toolbar button:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-solid);
+  border-color: var(--accent-solid);
 }
 
 .media-float-label {
@@ -1794,7 +1868,7 @@ p.kicker {
 .post-form button[type="submit"] {
   margin-top: 1.25rem;
   padding: 0.6rem 1.5rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 4px;
@@ -1949,7 +2023,7 @@ p.kicker {
 .author-card:focus-visible {
   transform: translateY(-3px);
   border-color: var(--accent);
-  box-shadow: 0 12px 24px rgba(36, 31, 27, 0.08);
+  box-shadow: 0 12px 24px rgba(var(--shadow-rgb), 0.08);
 }
 
 .author-card-head {
@@ -2025,9 +2099,15 @@ p.kicker {
   gap: 0.5rem;
 }
 
+/* flex: 1 1 0 (not the default auto) plus min-width: 0 is what actually
+   keeps these images side by side and contained - without both, a flex
+   item's default min-width is its own intrinsic size, so an image wider
+   than its share of the row refuses to shrink and spills out over
+   whatever sits next to/below it instead of being cropped to fit. */
 .author-card-portfolio img,
 .author-card-portfolio-placeholder {
-  width: 100%;
+  flex: 1 1 0;
+  min-width: 0;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   border-radius: 4px;
@@ -2080,8 +2160,8 @@ p.kicker {
 
 .text-link:hover,
 .text-link:focus-visible {
-  background: var(--accent);
-  color: var(--paper);
+  background: var(--accent-solid);
+  color: #F7F3EC;
   transform: translateY(-1px);
 }
 
@@ -2444,7 +2524,7 @@ select:focus-visible {
 .write-choice-card:focus-visible {
   transform: translateY(-4px);
   border-color: var(--accent);
-  box-shadow: 0 12px 28px rgba(36, 31, 27, 0.1);
+  box-shadow: 0 12px 28px rgba(var(--shadow-rgb), 0.1);
 }
 
 .write-choice-card-letter:hover,
@@ -2764,7 +2844,7 @@ select:focus-visible {
 }
 
 .countdown-chip-live {
-  color: var(--paper);
+  color: #F7F3EC;
   background: var(--wax);
   border-color: var(--wax);
 }
@@ -3114,7 +3194,7 @@ select:focus-visible {
 .settings-save-button {
   align-self: flex-start;
   padding: 0.65rem 1.75rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 6px;
@@ -3174,7 +3254,7 @@ select:focus-visible {
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 1.1rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 6px;
@@ -3753,7 +3833,7 @@ select:focus-visible {
   align-items: center;
   gap: 0.5rem;
   padding: 0.65rem 1.25rem;
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
   border: none;
   border-radius: 6px;
@@ -3862,7 +3942,7 @@ select:focus-visible {
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background: rgba(36, 31, 27, 0.72);
+  background: rgba(var(--shadow-rgb), 0.72);
   color: white;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.62rem;
@@ -3928,7 +4008,7 @@ select:focus-visible {
 }
 
 .portfolio-edit-button {
-  background: var(--accent);
+  background: var(--accent-solid);
   color: white;
 }
 
@@ -4044,6 +4124,69 @@ select:focus-visible {
   border-radius: 8px;
   padding: 1rem 1.25rem;
   background: var(--paper-tint);
+}
+
+/* ---------- Skeleton loading placeholders ----------
+   Gray shimmering card outlines for list/grid views specifically (post
+   feeds, book/portfolio/author grids) - reads as more "in progress" than
+   a bare spinner for content that's about to appear as a grid of cards.
+   The full-page spinner (Loading fullPage) is unchanged and still used
+   for auth/whole-page loads; this only replaces the *list area* while
+   the rest of the page (header, "write" CTA) stays visible immediately.
+   See components/SkeletonGrid.jsx. */
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton-block {
+  background: linear-gradient(100deg, var(--border) 20%, var(--paper-tint) 42%, var(--border) 64%);
+  background-size: 250% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  border-color: transparent !important;
+}
+
+.skeleton-circle {
+  border-radius: 50%;
+}
+
+.skeleton-line {
+  height: 0.85rem;
+  margin: 0.5rem auto 0;
+}
+
+.skeleton-postmark {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  margin: 0 auto 0.4rem;
+}
+
+.skeleton-line-kicker { width: 40%; height: 0.6rem; }
+.skeleton-line-title { width: 75%; height: 1.1rem; }
+.skeleton-line-byline { width: 55%; }
+.skeleton-line-excerpt { width: 90%; }
+.skeleton-line-book-title { width: 80%; margin-left: 10%; }
+
+.skeleton-author-meta {
+  flex: 1;
+}
+.skeleton-line-name { width: 60%; margin: 0 0 0.4rem; }
+.skeleton-line-meta { width: 40%; height: 0.65rem; margin: 0; }
+.skeleton-line-bio { width: 100%; margin: 0.7rem 0 0; }
+.skeleton-line-bio-short { width: 70%; }
+.skeleton-line-desc { width: 100%; margin-top: 0.4rem; }
+.skeleton-line-desc-short { width: 60%; }
+
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-block {
+    animation: none;
+  }
 }
 
 /* ---------- Pagination ----------

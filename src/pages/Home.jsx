@@ -116,7 +116,7 @@ export default function Home() {
                 onClick={() => navigate(`/campaigns/${c.id}`)}
                 onKeyDown={(e) => e.key === 'Enter' && navigate(`/campaigns/${c.id}`)}
               >
-                {c.image_url && <img src={c.image_url} alt="" className="spotlight-card-image" />}
+                {c.image_url && <img src={c.image_url} alt="" className="spotlight-card-image" loading="lazy" />}
                 <div className="spotlight-card-body">
                   <h3>{c.title}</h3>
                   <p>{c.description}</p>
@@ -178,7 +178,7 @@ export default function Home() {
             {books.map((book) => (
               <Link to={`/books/${book.slug}`} key={book.id} className="landing-book-card">
                 {book.cover_url ? (
-                  <img src={book.cover_url} alt={book.title} />
+                  <img src={book.cover_url} alt={book.title} loading="lazy" />
                 ) : (
                   <span className="landing-book-card-fallback">{book.title.charAt(0).toUpperCase()}</span>
                 )}
@@ -203,7 +203,7 @@ export default function Home() {
               <Link to={`/authors/${author.id}`} key={author.id} className="author-card">
                 <div className="author-card-head">
                   {author.avatar ? (
-                    <img src={author.avatar} alt={author.name} className="author-card-avatar" />
+                    <img src={author.avatar} alt={author.name} className="author-card-avatar" loading="lazy" />
                   ) : (
                     <span className="author-card-avatar author-card-avatar-fallback">
                       {author.name.charAt(0).toUpperCase()}

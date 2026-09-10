@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 export default function Books() {
   const { user } = useAuth();
@@ -33,23 +34,25 @@ export default function Books() {
         </p>
       )}
 
-      {status === 'loading' && <p>Loading…</p>}
+      {status === 'loading' && <SkeletonGrid variant="book" count={6} />}
       {status === 'error' && <p>Couldn't load books.</p>}
       {status === 'ready' && books.length === 0 && <p>No books listed yet.</p>}
 
-      <div className="book-grid">
-        {books.map((book) => (
-          <Link to={`/books/${book.slug}`} key={book.id} className="book-card">
-            {book.cover_url ? (
-              <img src={book.cover_url} alt={book.title} className="book-cover" />
-            ) : (
-              <div className="book-cover book-cover-placeholder">{book.title}</div>
-            )}
-            <h3>{book.title}</h3>
-            <p className="post-meta">{book.author_name}</p>
-          </Link>
-        ))}
-      </div>
+      {status === 'ready' && (
+        <div className="book-grid">
+          {books.map((book) => (
+            <Link to={`/books/${book.slug}`} key={book.id} className="book-card">
+              {book.cover_url ? (
+                <img src={book.cover_url} alt={book.title} className="book-cover" loading="lazy" />
+              ) : (
+                <div className="book-cover book-cover-placeholder">{book.title}</div>
+              )}
+              <h3>{book.title}</h3>
+              <p className="post-meta">{book.author_name}</p>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

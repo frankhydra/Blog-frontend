@@ -233,7 +233,7 @@ export default function PortfolioOnePager({
                 <article key={item.id} className="portfolio-project-card">
                   <div className="portfolio-project-image-wrap">
                     {item.image_url ? (
-                      <img src={item.image_url} alt={item.title} className="portfolio-project-image" />
+                      <img src={item.image_url} alt={item.title} className="portfolio-project-image" loading="lazy" />
                     ) : (
                       <div className="portfolio-project-image-placeholder">No cover image</div>
                     )}

@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
-import Loading from '../components/Loading';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 // Every post from everyone writing here - the owner, authors, and
 // contributors alike, all in one shared feed. Each post carries a small
 // color flag next to the byline instead of an "Owner"/"Community" label,
 // so identity is personal rather than a two-tier split.
 export default function CommunityBlogs() {
+  const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
@@ -26,7 +28,6 @@ export default function CommunityBlogs() {
       .catch(() => setStatus('error'));
   }, []);
 
-  if (status === 'loading') return <Loading fullPage />;
   if (status === 'error') return <p>Couldn't load posts.</p>;
 
   return (
@@ -35,9 +36,17 @@ export default function CommunityBlogs() {
       <h1>Everyone writing on this platform</h1>
       <p className="post-meta"><Link to="/tags">Browse by tag &rarr;</Link></p>
 
-      {posts.length === 0 && <p className="empty-state">No posts published yet.</p>}
-      <ul className="entries">
-        {posts.map((post) => {
+      {user && (
+        <p className="post-meta">
+          <Link to="/write/post">Write a new post</Link>
+        </p>
+      )}
+
+      {status === 'loading' && <SkeletonGrid variant="entry" count={6} />}
+      {status === 'ready' && posts.length === 0 && <p className="empty-state">No posts published yet.</p>}
+      {status === 'ready' && (
+        <ul className="entries">
+          {posts.map((post) => {
           const { day, month } = formatPostmark(post.published_at);
           const flag = getAuthorFlag(post.author);
           return (
@@ -57,7 +66,8 @@ export default function CommunityBlogs() {
             </li>
           );
         })}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }

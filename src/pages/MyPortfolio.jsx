@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import PortfolioOnePager from '../components/PortfolioOnePager';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 const BLANK = { title: '', category: '', description: '', image_url: '', link: '', sort_order: 0 };
 
@@ -349,7 +350,7 @@ export default function MyPortfolio({ embedded = false }) {
         </div>
       )}
 
-      {status === 'loading' && <p>Loading…</p>}
+      {status === 'loading' && <SkeletonGrid variant="project" count={3} />}
       {status === 'ready' && items.length === 0 && (
         <p className="post-meta">Nothing added yet - use "Add new project" to get your first item in.</p>
       )}
@@ -360,7 +361,7 @@ export default function MyPortfolio({ embedded = false }) {
             <article key={item.id} className="portfolio-project-card">
               <div className="portfolio-project-image-wrap">
                 {item.image_url ? (
-                  <img src={item.image_url} alt="" className="portfolio-project-image" />
+                  <img src={item.image_url} alt="" className="portfolio-project-image" loading="lazy" />
                 ) : (
                   <div className="portfolio-project-image-placeholder">No cover image</div>
                 )}

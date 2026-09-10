@@ -85,7 +85,7 @@ export default function AdminCampaigns() {
               </p>
             )}
             {c.image_url && (
-              <img src={c.image_url} alt="" style={{ maxWidth: '220px', borderRadius: '8px', display: 'block', marginBottom: '0.75rem' }} />
+              <img src={c.image_url} alt="" loading="lazy" style={{ maxWidth: '220px', borderRadius: '8px', display: 'block', marginBottom: '0.75rem' }} />
             )}
 
             <input

@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
+import SkeletonGrid from '../components/SkeletonGrid';
 
 export default function Letters() {
   const { user } = useAuth();
@@ -34,12 +35,13 @@ export default function Letters() {
         </p>
       )}
 
-      {status === 'loading' && <p>Loading…</p>}
+      {status === 'loading' && <SkeletonGrid variant="entry" count={4} />}
       {status === 'error' && <p>Couldn't load letters.</p>}
       {status === 'ready' && letters.length === 0 && <p>No letters published yet.</p>}
 
-      <ul className="entries">
-        {letters.map((letter) => {
+      {status === 'ready' && (
+        <ul className="entries">
+          {letters.map((letter) => {
           const { day, month } = formatPostmark(letter.published_at);
           const flag = getAuthorFlag(letter.author);
           return (
@@ -61,7 +63,8 @@ export default function Letters() {
             </li>
           );
         })}
-      </ul>
+        </ul>
+      )}
     </div>
   );
 }
