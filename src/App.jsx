@@ -1,37 +1,54 @@
+import { lazy } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './components/Layout';
-import Home from './pages/Home';
-import PostDetail from './pages/PostDetail';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import AdminComments from './pages/AdminComments';
-import CommunityBlogs from './pages/CommunityBlogs';
-import AuthorProfile from './pages/AuthorProfile';
-import AdminUsers from './pages/AdminUsers';
-import NewPost from './pages/NewPost';
-import EditPost from './pages/EditPost';
-import MyPosts from './pages/MyPosts';
-import Letters from './pages/Letters';
-import LetterDetail from './pages/LetterDetail';
-import NewLetter from './pages/NewLetter';
-import EditLetter from './pages/EditLetter';
-import Write from './pages/Write';
-import Books from './pages/Books';
-import BookDetail from './pages/BookDetail';
-import NewBook from './pages/NewBook';
-import EditBook from './pages/EditBook';
-import About from './pages/About';
-import Portfolios from './pages/Portfolios';
-import Settings from './pages/Settings';
-import RequestCampaign from './pages/RequestCampaign';
-import AdminCampaigns from './pages/AdminCampaigns';
-import Campaigns from './pages/Campaigns';
-import CampaignDetail from './pages/CampaignDetail';
+
+// Every page is loaded lazily, split into its own chunk that Vite only
+// fetches when that route is actually visited - previously everything
+// (including the Quill rich text editor, pulled in by PostForm/NewPost/
+// EditPost/NewLetter/EditLetter) shipped in one 620KB+ bundle on every
+// single page load, admin pages and Settings included, regardless of
+// whether the visitor ever touched them. Layout and Loading stay as
+// regular imports since they're needed immediately on every route.
+const Home = lazy(() => import('./pages/Home'));
+const PostDetail = lazy(() => import('./pages/PostDetail'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
+const AdminComments = lazy(() => import('./pages/AdminComments'));
+const CommunityBlogs = lazy(() => import('./pages/CommunityBlogs'));
+const AllTags = lazy(() => import('./pages/AllTags'));
+const TagPosts = lazy(() => import('./pages/TagPosts'));
+const AuthorProfile = lazy(() => import('./pages/AuthorProfile'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers'));
+const AdminCategories = lazy(() => import('./pages/AdminCategories'));
+const MyContactMessages = lazy(() => import('./pages/MyContactMessages'));
+const NewPost = lazy(() => import('./pages/NewPost'));
+const EditPost = lazy(() => import('./pages/EditPost'));
+const MyPosts = lazy(() => import('./pages/MyPosts'));
+const Letters = lazy(() => import('./pages/Letters'));
+const LetterDetail = lazy(() => import('./pages/LetterDetail'));
+const NewLetter = lazy(() => import('./pages/NewLetter'));
+const EditLetter = lazy(() => import('./pages/EditLetter'));
+const Write = lazy(() => import('./pages/Write'));
+const Books = lazy(() => import('./pages/Books'));
+const BookDetail = lazy(() => import('./pages/BookDetail'));
+const NewBook = lazy(() => import('./pages/NewBook'));
+const EditBook = lazy(() => import('./pages/EditBook'));
+const About = lazy(() => import('./pages/About'));
+const Portfolios = lazy(() => import('./pages/Portfolios'));
+const Settings = lazy(() => import('./pages/Settings'));
+const RequestCampaign = lazy(() => import('./pages/RequestCampaign'));
+const AdminCampaigns = lazy(() => import('./pages/AdminCampaigns'));
+const Campaigns = lazy(() => import('./pages/Campaigns'));
+const CampaignDetail = lazy(() => import('./pages/CampaignDetail'));
 
 export default function App() {
   return (
     <Routes>
-      {/* Layout wraps every page below with the shared header/footer */}
+      {/* Layout wraps every page below with the shared header/footer.
+          Suspense lives INSIDE Layout (around its <Outlet/>), not here -
+          so the header/footer chrome stays mounted across navigations
+          instead of the whole page flashing to a blank loading state
+          every time a lazy route's chunk is still being fetched. */}
       <Route path="/" element={<Layout />}>
         <Route index element={<Home />} />
         <Route path="posts/:slug" element={<PostDetail />} />
@@ -57,8 +74,12 @@ export default function App() {
         <Route path="register" element={<Register />} />
         <Route path="admin/comments" element={<AdminComments />} />
         <Route path="community" element={<CommunityBlogs />} />
+        <Route path="tags" element={<AllTags />} />
+        <Route path="tags/:slug" element={<TagPosts />} />
         <Route path="authors/:id" element={<AuthorProfile />} />
         <Route path="admin/users" element={<AdminUsers />} />
+        <Route path="admin/categories" element={<AdminCategories />} />
+        <Route path="my/contact-messages" element={<MyContactMessages />} />
         <Route path="request-campaign" element={<RequestCampaign />} />
         <Route path="admin/campaigns" element={<AdminCampaigns />} />
         <Route path="campaigns" element={<Campaigns />} />

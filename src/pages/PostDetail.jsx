@@ -6,6 +6,7 @@ import ReactionButtons from '../components/ReactionButtons';
 import CommentSection from '../components/CommentSection';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
+import Loading from '../components/Loading';
 
 export default function PostDetail() {
   const { slug } = useParams();
@@ -25,10 +26,19 @@ export default function PostDetail() {
       .catch(() => setStatus('error'));
   }, [slug]);
 
-  if (status === 'loading') return <p>Loading…</p>;
+  if (status === 'loading') return <Loading fullPage />;
   if (status === 'error') return <p>That post couldn't be found.</p>;
 
   const { day, month } = formatPostmark(post.published_at);
+
+  // Reading time isn't stored anywhere - it's fully derivable from the
+  // post body, so it's simplest to compute it here rather than add a
+  // column and keep it in sync on every save. Same 200wpm formula the
+  // editor itself uses (RichTextEditor.jsx) so the numbers agree if
+  // anyone ever compares "read time" while writing vs. while reading.
+  const plainText = post.body.replace(/<[^>]+>/g, ' ');
+  const wordCount = plainText.trim() ? plainText.trim().split(/\s+/).length : 0;
+  const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
   return (
     <article className="post-detail">
@@ -41,6 +51,7 @@ export default function PostDetail() {
           <h1>{post.title}</h1>
           <p className="post-meta">
             By <Link to={`/authors/${post.author.id}`}>{post.author.name}</Link>
+            {' '}· {readingTime} min read
           </p>
         </div>
       </div>
@@ -63,6 +74,17 @@ export default function PostDetail() {
           }),
         }}
       />
+
+      {post.tags?.length > 0 && (
+        <div className="skill-chip-row post-tag-row">
+          {post.tags.map((tag) => (
+            <Link key={tag.id} to={`/tags/${tag.slug}`} className="skill-chip post-tag-chip">
+              {tag.name}
+            </Link>
+          ))}
+        </div>
+      )}
+
       <ReactionButtons post={post} />
       <CommentSection post={post} />
     </article>

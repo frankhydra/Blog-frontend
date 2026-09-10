@@ -96,207 +96,233 @@ export default function PortfolioOnePager({
   return (
     <div className="one-pager">
       {previewMode && (
-        <div className="one-pager-preview-banner">
-          Preview — this is how your portfolio looks to visitors. Draft items
-          below are marked and won't show on your public page until published.
+        <div className="one-pager-narrow">
+          <div className="one-pager-preview-banner">
+            Preview — this is how your portfolio looks to visitors. Draft items
+            below are marked and won't show on your public page until published.
+          </div>
         </div>
       )}
 
-      {backLink && (
-        <Link to={backLink.to} className="back-link">
-          &larr; {backLink.label}
-        </Link>
-      )}
-
-      <header className="one-pager-hero">
-        {person.avatar ? (
-          <img src={person.avatar} alt={person.name} className="one-pager-avatar" />
-        ) : (
-          <span className="one-pager-avatar one-pager-avatar-fallback">
-            {person.name.charAt(0).toUpperCase()}
-          </span>
+      <div className="one-pager-narrow">
+        {backLink && (
+          <Link to={backLink.to} className="back-link">
+            &larr; {backLink.label}
+          </Link>
         )}
 
-        <div className="one-pager-hero-text">
-          {roleLabel && <p className="kicker">{roleLabel}</p>}
-          <h1>{person.name}</h1>
-          {person.headline && <p className="one-pager-headline">{person.headline}</p>}
-
-          {person.availability && (
-            <span className="availability-pill">
-              <span className="availability-dot" />
-              {person.availability}
+        <header className="one-pager-hero">
+          {person.avatar ? (
+            <img src={person.avatar} alt={person.name} className="one-pager-avatar" />
+          ) : (
+            <span className="one-pager-avatar one-pager-avatar-fallback">
+              {person.name.charAt(0).toUpperCase()}
             </span>
           )}
 
-          {person.bio && <p className="one-pager-bio">{person.bio}</p>}
+          <div className="one-pager-hero-text">
+            {roleLabel && <p className="kicker">{roleLabel}</p>}
+            <h1>{person.name}</h1>
+            {person.headline && <p className="one-pager-headline">{person.headline}</p>}
 
-          {(person.location || person.website) && (
-            <div className="one-pager-meta-row">
-              {person.location && (
-                <span className="one-pager-meta-item">
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z" stroke="currentColor" strokeWidth="1.6" />
-                    <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.6" />
-                  </svg>
-                  {person.location}
-                </span>
-              )}
-              {person.website && (
-                <a
-                  href={person.website}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="one-pager-meta-item one-pager-meta-link"
-                >
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
-                    <path d="M3.5 12h17M12 3.5c2.5 2.4 3.8 5.4 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.4-3.8-8.5S9.5 5.9 12 3.5Z" stroke="currentColor" strokeWidth="1.6" />
-                  </svg>
-                  {person.website.replace(/^https?:\/\//, '')}
-                </a>
-              )}
-            </div>
-          )}
+            {person.availability && (
+              <span className="availability-pill">
+                <span className="availability-dot" />
+                {person.availability}
+              </span>
+            )}
 
-          {person.skills?.length > 0 && (
-            <div className="skill-chip-row">
-              {person.skills.map((skill) => (
-                <span key={skill} className="skill-chip">{skill}</span>
-              ))}
-            </div>
-          )}
+            {person.bio && <p className="one-pager-bio">{person.bio}</p>}
 
-          {hasSocialLinks && (
-            <div className="social-icon-row">
-              {Object.entries(socialLinks).map(([platform, url]) => (
-                url ? (
-                  <a key={platform} href={url} target="_blank" rel="noreferrer" className="social-icon-link" title={platform}>
-                    {SOCIAL_ICONS[platform]}
-                  </a>
-                ) : null
-              ))}
-            </div>
-          )}
-        </div>
-      </header>
-
-      {topCta}
-
-      <section className="one-pager-section">
-        <div className="one-pager-section-head">
-          <h2>Work</h2>
-          {categories.length > 0 && (
-            <div className="category-filter-row">
-              <button
-                type="button"
-                className={`category-filter-btn ${categoryFilter === 'all' ? 'category-filter-btn-active' : ''}`}
-                onClick={() => setCategoryFilter('all')}
-              >
-                All
-              </button>
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  className={`category-filter-btn ${categoryFilter === cat ? 'category-filter-btn-active' : ''}`}
-                  onClick={() => setCategoryFilter(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {visibleItems.length === 0 && (
-          <p className="post-meta">
-            {previewMode ? "You haven't added anything yet — add your first item below." : 'Nothing here yet.'}
-          </p>
-        )}
-
-        <ul className="one-pager-list">
-          {visibleItems.map((item) => {
-            const like = likeState[item.id] ?? { liked: item.liked_by_viewer, count: item.likes_count ?? 0 };
-            return (
-              <li key={item.id} className="one-pager-row">
-                {item.image_url && (
-                  <img src={item.image_url} alt={item.title} className="one-pager-row-thumb" />
+            {(person.location || person.website) && (
+              <div className="one-pager-meta-row">
+                {person.location && (
+                  <span className="one-pager-meta-item">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 21s7-6.5 7-11.5A7 7 0 0 0 5 9.5C5 14.5 12 21 12 21Z" stroke="currentColor" strokeWidth="1.6" />
+                      <circle cx="12" cy="9.5" r="2.3" stroke="currentColor" strokeWidth="1.6" />
+                    </svg>
+                    {person.location}
+                  </span>
                 )}
-                <div className="one-pager-row-body">
-                  <div className="one-pager-row-head">
-                    <h3>{item.link ? (
-                      <a href={item.link} target="_blank" rel="noreferrer">{item.title}</a>
-                    ) : item.title}</h3>
-                    {item.category && <span className="item-category-tag">{item.category}</span>}
+                {person.website && (
+                  <a
+                    href={person.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="one-pager-meta-item one-pager-meta-link"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.6" />
+                      <path d="M3.5 12h17M12 3.5c2.5 2.4 3.8 5.4 3.8 8.5s-1.3 6.1-3.8 8.5c-2.5-2.4-3.8-5.4-3.8-8.5S9.5 5.9 12 3.5Z" stroke="currentColor" strokeWidth="1.6" />
+                    </svg>
+                    {person.website.replace(/^https?:\/\//, '')}
+                  </a>
+                )}
+              </div>
+            )}
+
+            {person.skills?.length > 0 && (
+              <div className="skill-chip-row">
+                {person.skills.map((skill) => (
+                  <span key={skill} className="skill-chip">{skill}</span>
+                ))}
+              </div>
+            )}
+
+            {hasSocialLinks && (
+              <div className="social-icon-row">
+                {Object.entries(socialLinks).map(([platform, url]) => (
+                  url ? (
+                    <a key={platform} href={url} target="_blank" rel="noreferrer" className="social-icon-link" title={platform}>
+                      {SOCIAL_ICONS[platform]}
+                    </a>
+                  ) : null
+                ))}
+              </div>
+            )}
+          </div>
+        </header>
+
+        {topCta}
+      </div>
+
+      {/* Work section breaks out to the full one-pager width so the project
+          grid has real room - matching the same card layout used in the
+          Portfolio manager (Settings > Portfolio), just with a "View" link
+          and a like button instead of Edit/Delete. */}
+      <section className="one-pager-section one-pager-work-section">
+        <div className="one-pager-narrow">
+          <div className="one-pager-section-head">
+            <h2>Work</h2>
+            {categories.length > 0 && (
+              <div className="category-filter-row">
+                <button
+                  type="button"
+                  className={`category-filter-btn ${categoryFilter === 'all' ? 'category-filter-btn-active' : ''}`}
+                  onClick={() => setCategoryFilter('all')}
+                >
+                  All
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    className={`category-filter-btn ${categoryFilter === cat ? 'category-filter-btn-active' : ''}`}
+                    onClick={() => setCategoryFilter(cat)}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {visibleItems.length === 0 && (
+            <p className="post-meta">
+              {previewMode ? "You haven't added anything yet — add your first item below." : 'Nothing here yet.'}
+            </p>
+          )}
+        </div>
+
+        {visibleItems.length > 0 && (
+          <div className="portfolio-grid one-pager-work-grid">
+            {visibleItems.map((item) => {
+              const like = likeState[item.id] ?? { liked: item.liked_by_viewer, count: item.likes_count ?? 0 };
+              return (
+                <article key={item.id} className="portfolio-project-card">
+                  <div className="portfolio-project-image-wrap">
+                    {item.image_url ? (
+                      <img src={item.image_url} alt={item.title} className="portfolio-project-image" />
+                    ) : (
+                      <div className="portfolio-project-image-placeholder">No cover image</div>
+                    )}
+                    {item.category && <span className="portfolio-project-tag">{item.category}</span>}
                     {previewMode && item.status === 'draft' && (
-                      <span className="status-pill status-pill-draft">Draft</span>
+                      <span className="status-pill status-pill-draft one-pager-draft-badge">Draft</span>
                     )}
                   </div>
-                  {item.description && <p>{item.description}</p>}
-                  {!previewMode && (
-                    <button
-                      type="button"
-                      className={`like-button ${like.liked ? 'like-button-active' : ''}`}
-                      onClick={() => toggleLike(item)}
-                    >
-                      <HeartIcon filled={like.liked} />
-                      {like.count > 0 ? like.count : ''}
-                    </button>
-                  )}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
-      </section>
+                  <div className="portfolio-project-body">
+                    <div className="portfolio-project-title-row">
+                      <h3>{item.link ? (
+                        <a href={item.link} target="_blank" rel="noreferrer">{item.title}</a>
+                      ) : item.title}</h3>
+                    </div>
+                    {item.description && <p className="portfolio-project-desc">{item.description}</p>}
 
-      {experience.length > 0 && (
-        <section className="one-pager-section">
-          <h2>Experience</h2>
-          <div className="timeline">
-            {experience.map((exp) => (
-              <div key={exp.id} className="timeline-item">
-                <span className="timeline-dot" />
-                <div className="timeline-head">
-                  <h3>{exp.role} <span className="timeline-company">@ {exp.company}</span></h3>
-                  {exp.period && <span className="timeline-period">{exp.period}</span>}
-                </div>
-                {exp.details && <p>{exp.details}</p>}
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {posts.length > 0 && (
-        <section className="one-pager-section">
-          <h2>Recent writing</h2>
-          <ul className="one-pager-list">
-            {posts.map((post) => {
-              const { day, month } = formatPostmark(post.published_at);
-              return (
-                <li key={post.id} className="one-pager-row one-pager-row-writing">
-                  <span className="one-pager-row-date">{month} {day}</span>
-                  <div className="one-pager-row-body">
-                    <h3><Link to={`/posts/${post.slug}`}>{post.title}</Link></h3>
-                    {post.excerpt && <p>{post.excerpt}</p>}
+                    <div className="portfolio-project-actions">
+                      {!previewMode ? (
+                        <button
+                          type="button"
+                          className={`like-button ${like.liked ? 'like-button-active' : ''}`}
+                          onClick={() => toggleLike(item)}
+                        >
+                          <HeartIcon filled={like.liked} />
+                          {like.count > 0 ? like.count : ''}
+                        </button>
+                      ) : <span />}
+                      {item.link && (
+                        <a href={item.link} target="_blank" rel="noreferrer" className="text-link portfolio-project-view-link">
+                          View &rarr;
+                        </a>
+                      )}
+                    </div>
                   </div>
-                </li>
+                </article>
               );
             })}
-          </ul>
-        </section>
-      )}
+          </div>
+        )}
+      </section>
 
-      {showContact && !previewMode && (
-        <section className="one-pager-section">
-          <h2>Get in touch</h2>
-          <ContactAuthorForm authorId={person.id} authorName={person.name} />
-        </section>
-      )}
+      <div className="one-pager-narrow">
+        {experience.length > 0 && (
+          <section className="one-pager-section">
+            <h2>Experience</h2>
+            <div className="timeline">
+              {experience.map((exp) => (
+                <div key={exp.id} className="timeline-item">
+                  <span className="timeline-dot" />
+                  <div className="timeline-head">
+                    <h3>{exp.role} <span className="timeline-company">@ {exp.company}</span></h3>
+                    {exp.period && <span className="timeline-period">{exp.period}</span>}
+                  </div>
+                  {exp.details && <p>{exp.details}</p>}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {bottomCta}
+        {posts.length > 0 && (
+          <section className="one-pager-section">
+            <h2>Recent writing</h2>
+            <ul className="one-pager-list">
+              {posts.map((post) => {
+                const { day, month } = formatPostmark(post.published_at);
+                return (
+                  <li key={post.id} className="one-pager-row one-pager-row-writing">
+                    <span className="one-pager-row-date">{month} {day}</span>
+                    <div className="one-pager-row-body">
+                      <h3><Link to={`/posts/${post.slug}`}>{post.title}</Link></h3>
+                      {post.excerpt && <p>{post.excerpt}</p>}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        )}
+
+        {showContact && !previewMode && (
+          <section className="one-pager-section">
+            <h2>Get in touch</h2>
+            <ContactAuthorForm authorId={person.id} authorName={person.name} />
+          </section>
+        )}
+
+        {bottomCta}
+      </div>
     </div>
   );
 }

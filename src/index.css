@@ -18,6 +18,24 @@
   --theme-ochre: #A2732B;
 }
 
+/* Shared breakpoint scale - every @media rule in this file uses one of
+   these widths, so a component's mobile behavior always changes in step
+   with its neighbors instead of drifting apart at slightly different
+   widths (e.g. a two-column layout collapsing at a different point than
+   the sidebar next to it, which used to leave a squeezed no-man's-land
+   between the two breakpoints).
+     480px  - small phones (tightest layouts, single-column everything)
+     640px  - phones/small tablets (general content/spacing adjustments)
+     780px  - tablets (two-column app layouts, e.g. Settings, collapse here)
+     1024px - the header nav only. It's uniquely wide (brand + 6 links +
+              Write button + account trigger, ~1150-1200px needed), so it
+              switches to the hamburger menu well before other components
+              reach their own breakpoint - otherwise it overflows/wraps on
+              phones AND on tablets like an iPad in portrait or landscape.
+   CSS custom properties can't be used inside @media conditions, so this
+   is a documented convention rather than an enforced variable - when
+   adding a new responsive rule, reach for one of these first. */
+
 * {
   box-sizing: border-box;
 }
@@ -157,6 +175,119 @@ p.kicker {
 
 .nav-cta:hover {
   background: var(--wax);
+  color: var(--paper);
+}
+
+/* Hamburger toggle - hidden by default, only shown below 640px (see the
+   @media rule further down that also hides .primary-nav/.header-actions
+   at that same breakpoint, so exactly one of the two nav modes is ever
+   visible at once). 44px square hit area per touch-target guidelines. */
+.mobile-menu-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: 1px solid rgba(247, 243, 236, 0.2);
+  border-radius: 8px;
+  color: var(--paper);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.mobile-menu-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+
+.mobile-menu-toggle:hover {
+  border-color: rgba(247, 243, 236, 0.45);
+}
+
+/* The desktop nav needs real room: brand + 6 links + Write button + the
+   account trigger (avatar, name, chevron) adds up to roughly 1150-1200px
+   before anything touches. That's wider than a phone AND wider than most
+   tablets - an iPad in portrait (~768-834px) or even landscape on smaller
+   iPads was overflowing/wrapping badly with only a 640px cutoff. Nav gets
+   its own wider tier instead of reusing the standard 780px "tablet" one
+   that other two-column layouts use. */
+@media (max-width: 1024px) {
+  .primary-nav,
+  .header-actions {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: inline-flex;
+  }
+}
+
+/* Flat panel that drops below the header on mobile - nav links and account
+   actions live together here rather than nesting a dropdown inside a
+   dropdown, which is awkward to operate on a touchscreen. */
+.mobile-menu-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.5rem 0 1.25rem;
+  animation: mobile-menu-in 0.15s ease;
+}
+
+@keyframes mobile-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.mobile-menu-nav,
+.mobile-menu-account {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-panel a,
+.mobile-menu-panel button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: var(--paper);
+  text-decoration: none;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.85rem 0.25rem;
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.mobile-menu-panel a.active {
+  color: var(--paper);
+  border-left: 2px solid var(--wax);
+  padding-left: 0.6rem;
+}
+
+.mobile-menu-panel .dropdown-label {
+  color: rgba(247, 243, 236, 0.5);
+  padding: 0.5rem 0.25rem 0;
+  margin: 0;
+}
+
+.mobile-menu-divider {
+  height: 1px;
+  background: rgba(247, 243, 236, 0.12);
+  margin: 0.5rem 0;
+}
+
+.mobile-menu-user-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.25rem 0.75rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
   color: var(--paper);
 }
 
@@ -930,10 +1061,6 @@ p.kicker {
   color: var(--accent);
 }
 
-.admin-comments {
-  font-family: 'IBM Plex Mono', monospace;
-}
-
 .moderation-list {
   list-style: none;
   padding: 0;
@@ -969,26 +1096,185 @@ p.kicker {
   max-width: 500px;
 }
 
+/* ---------- Admin pages (Manage authors, Pending comments/campaigns) ----------
+   Shared card-based header, matching the eyebrow+icon+title pattern used in
+   the Portfolio manager, so Admin no longer looks like a different app
+   bolted onto the rest of the site. */
+.admin-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.admin-page-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.5rem 1.75rem;
+}
+
+.admin-page-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.admin-page-icon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.admin-page-head h1 {
+  margin: 0.3rem 0 0.4rem;
+  font-size: 1.4rem;
+}
+
+.admin-page-head p.post-meta {
+  max-width: 60ch;
+  margin: 0;
+}
+
+.admin-table-card {
+  overflow-x: auto;
+}
+
 .user-table {
   width: 100%;
   border-collapse: collapse;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
-  margin-top: 1.5rem;
 }
 
-.user-table th,
-.user-table td {
+.user-table th {
   text-align: left;
-  padding: 0.6rem 0.5rem;
+  padding: 0.5rem;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
   border-bottom: 1px solid var(--border);
 }
 
+.user-table td {
+  text-align: left;
+  padding: 0.7rem 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.user-table tr:last-child td {
+  border-bottom: none;
+}
+
 .user-table select {
-  padding: 0.3rem;
+  padding: 0.4rem 0.6rem;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 6px;
+  background: var(--paper);
   font: inherit;
+}
+
+/* Moderation queue cards - used by AdminComments and AdminCampaigns only.
+   Deliberately separate from .moderation-list/.moderation-item, which
+   RequestCampaign and the Settings > Experience tab also use - keeping
+   these independent means restyling the admin queues can't have a
+   side-effect on those other, unrelated lists. */
+.queue-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.queue-card {
+  padding: 1.25rem 1.5rem;
+}
+
+.queue-card-layout {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.queue-card-image {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.queue-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.queue-card-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 0.5rem;
+}
+
+.queue-card-body {
+  margin: 0 0 0.75rem;
+  font-family: 'Source Serif 4', serif;
+}
+
+.queue-note-input {
+  width: 100%;
+  max-width: 420px;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  font: inherit;
+  font-size: 0.85rem;
+  margin-bottom: 0.85rem;
+  display: block;
+}
+
+.queue-card-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.queue-approve-button,
+.queue-reject-button {
+  padding: 0.5rem 1.1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.queue-approve-button {
+  background: var(--theme-forest);
+  color: white;
+}
+
+.queue-approve-button:disabled,
+.queue-reject-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.queue-reject-button {
+  background: transparent;
+  color: var(--wax);
+  border: 1px solid var(--wax);
+}
+
+@media (max-width: 640px) {
+  .queue-card-layout {
+    flex-direction: column;
+  }
+
+  .queue-card-image {
+    width: 100%;
+    height: 160px;
+  }
 }
 
 .composer {
@@ -2040,27 +2326,7 @@ p.kicker {
   }
 
   .site-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1.25rem 0;
-  }
-
-  .primary-nav {
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.1rem;
-    width: 100%;
-  }
-
-  .header-actions {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .account-dropdown {
-    right: auto;
-    left: 0;
+    padding: 1.1rem 0;
   }
 
   .site-main {
@@ -2234,7 +2500,15 @@ select:focus-visible {
 
 /* ---------- One-page portfolio (public directory, author pages, preview) ---------- */
 .one-pager {
-  max-width: 640px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* Hero, bio, timeline, and recent-writing stay at a comfortable reading
+   width even though the outer .one-pager container is wide - only the
+   Work grid below uses the full width. */
+.one-pager-narrow {
+  max-width: 680px;
   margin: 0 auto;
 }
 
@@ -2599,7 +2873,7 @@ select:focus-visible {
 
 /* ---------- Settings page ---------- */
 .settings-page {
-  max-width: 880px;
+  max-width: 1180px;
   margin: 0 auto;
 }
 
@@ -2665,7 +2939,7 @@ select:focus-visible {
 }
 
 .settings-form {
-  max-width: 480px;
+  max-width: 640px;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -2714,7 +2988,7 @@ select:focus-visible {
   flex-direction: column;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 780px) {
   .settings-layout {
     grid-template-columns: 1fr;
   }
@@ -2831,7 +3105,7 @@ select:focus-visible {
   gap: 0 1rem;
 }
 
-@media (max-width: 560px) {
+@media (max-width: 640px) {
   .settings-field-grid {
     grid-template-columns: 1fr;
   }
@@ -3133,8 +3407,7 @@ select:focus-visible {
 .skill-chip-removable button {
   background: none;
   border: none;
-  color: var(--muted);
-  cursor: pointer;
+  color: var(--muted);  cursor: pointer;
   font-size: 0.9rem;
   line-height: 1;
   padding: 0;
@@ -3241,6 +3514,24 @@ select:focus-visible {
   color: var(--paper);
 }
 
+/* Work grid on the public portfolio / author profile pages - reuses the
+   same .portfolio-grid / .portfolio-project-card cards as the Portfolio
+   manager in Settings, so editing and viewing a project look consistent. */
+.one-pager-work-grid {
+  margin-top: 1.5rem;
+}
+
+.one-pager-draft-badge {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+}
+
+.portfolio-project-view-link {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+}
+
 .item-category-tag {
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.62rem;
@@ -3262,16 +3553,21 @@ select:focus-visible {
   color: var(--muted);
   font-size: 0.8rem;
   cursor: pointer;
-  padding: 0;
+  padding: 0.6rem;
+  margin-left: -0.6rem;
+  min-height: 44px;
+  min-width: 44px;
+  border-radius: 6px;
+}
+
+.like-button:hover {
+  background: var(--paper-tint);
+  color: var(--wax);
 }
 
 .like-button svg {
   width: 16px;
   height: 16px;
-}
-
-.like-button:hover {
-  color: var(--wax);
 }
 
 .like-button-active {
@@ -3390,28 +3686,128 @@ select:focus-visible {
   }
 }
 
-/* ---------- Portfolio stats bar (Settings > Portfolio) ---------- */
-.portfolio-stats-bar {
+/* ---------- Portfolio manager (Settings > Portfolio tab) ---------- */
+.portfolio-manager {
   display: flex;
-  gap: 1.5rem;
-  margin: 1.5rem 0;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--card);
+  flex-direction: column;
+  gap: 1.75rem;
 }
 
-.portfolio-stat {
+.portfolio-manager-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.75rem;
+}
+
+.portfolio-manager-head-text h1,
+.portfolio-manager-head-text h2 {
+  margin: 0.4rem 0 0.4rem;
+}
+
+.portfolio-manager-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--accent);
+  background: var(--paper-tint);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.25rem 0.75rem 0.25rem 0.55rem;
+  margin: 0;
+}
+
+.portfolio-manager-eyebrow-icon {
+  display: flex;
+  width: 14px;
+  height: 14px;
+}
+
+.portfolio-manager-eyebrow-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.portfolio-manager-head-text p.post-meta {
+  max-width: 46ch;
+}
+
+.portfolio-manager-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.portfolio-add-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.portfolio-add-button-icon {
+  display: flex;
+  width: 15px;
+  height: 15px;
+}
+
+.portfolio-add-button-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.portfolio-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+@media (max-width: 640px) {
+  .portfolio-stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.portfolio-stat-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1;
+  gap: 0.25rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1rem;
 }
 
 .portfolio-stat-num {
   font-family: 'Fraunces', serif;
-  font-size: 1.4rem;
+  font-size: 1.8rem;
   color: var(--ink);
+}
+
+.portfolio-stat-num-forest {
+  color: var(--theme-forest);
+}
+
+.portfolio-stat-num-wax {
+  color: var(--wax);
 }
 
 .portfolio-stat-label {
@@ -3420,5 +3816,328 @@ select:focus-visible {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted);
-  margin-top: 0.2rem;
+}
+
+/* Project cards grid */
+.portfolio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+}
+
+.portfolio-project-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-project-image-wrap {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: var(--paper-tint);
+}
+
+.portfolio-project-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.portfolio-project-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+}
+
+.portfolio-project-tag {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: rgba(36, 31, 27, 0.72);
+  color: white;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 999px;
+  padding: 0.2rem 0.6rem;
+}
+
+.portfolio-project-body {
+  padding: 1.1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.portfolio-project-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.portfolio-project-title-row h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.portfolio-project-desc {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.portfolio-project-actions {
+  margin-top: auto;
+  padding-top: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.portfolio-project-actions-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.portfolio-delete-button,
+.portfolio-edit-button {
+  padding: 0.4rem 0.9rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.portfolio-delete-button {
+  background: transparent;
+  color: var(--wax);
+  border: 1px solid var(--wax);
+}
+
+.portfolio-edit-button {
+  background: var(--accent);
+  color: white;
+}
+
+/* Add/edit project form card */
+.portfolio-form-card form {
+  max-width: 640px;
+}
+
+.portfolio-form-card label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin-top: 0.85rem;
+  display: block;
+}
+
+.portfolio-form-card input,
+.portfolio-form-card textarea {
+  width: 100%;
+  font-family: inherit;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  margin-top: 0.3rem;
+}
+
+.portfolio-cover-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  margin-top: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.portfolio-cover-preview {
+  width: 100px;
+  height: 68px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.portfolio-cover-inputs {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.portfolio-cover-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.portfolio-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+/* ---------- Shared loading state ----------
+   Replaces the old scattered <p>Loading…</p> text with one consistent
+   spinner + label, styled like the site's metadata (IBM Plex Mono, muted
+   ink) rather than a generic UI-kit spinner. */
+.loading-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.loading-state-full {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 4rem 0;
+}
+
+.loading-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: loading-spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Shared empty state ----------
+   One consistent look for every "nothing here yet" message, in place of
+   plain unstyled <p> text that varied in appearance page to page. */
+.empty-state {
+  color: var(--muted);
+  font-style: italic;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  background: var(--paper-tint);
+}
+
+/* ---------- Pagination ----------
+   First place in the app that needed page-by-page navigation (the
+   Portfolio community directory) - written as a shared, reusable pattern
+   for any future paginated list rather than a one-off. */
+.pagination-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin: 2.5rem 0;
+}
+
+.pagination-button {
+  padding: 0.55rem 1.1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--ink);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.pagination-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.pagination-button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pagination-status {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ---------- Admin > Categories ---------- */
+.category-add-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.category-add-row input {
+  flex: 1;
+  min-width: 220px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  font: inherit;
+}
+
+.category-rename-input {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font: inherit;
+  font-size: inherit;
+  width: 100%;
+  max-width: 240px;
+}
+
+.category-row-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+/* ---------- Post tags (PostDetail + tag browse page) ---------- */
+.post-tag-row {
+  margin: 1.5rem 0;
+}
+
+.post-tag-chip {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.post-tag-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.tag-browse-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.5rem 0 2.5rem;
 }

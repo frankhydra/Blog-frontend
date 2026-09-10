@@ -15,6 +15,8 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
   const [categoryId, setCategoryId] = useState(initialPost?.category_id ?? '');
   const [status, setStatus] = useState(initialPost?.status ?? 'draft');
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState(initialPost?.tags?.map((t) => t.name) ?? []);
+  const [tagInput, setTagInput] = useState('');
   const [activeTab, setActiveTab] = useState('author'); // 'author' | 'reader'
 
   const canPublish = userRole === 'admin' || userRole === 'author';
@@ -22,6 +24,18 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
   useEffect(() => {
     apiClient.get('/categories').then((res) => setCategories(res.data));
   }, []);
+
+  function addTag() {
+    const value = tagInput.trim();
+    if (value && tags.length < 10 && !tags.some((t) => t.toLowerCase() === value.toLowerCase())) {
+      setTags([...tags, value]);
+    }
+    setTagInput('');
+  }
+
+  function removeTag(tag) {
+    setTags(tags.filter((t) => t !== tag));
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -31,6 +45,7 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
       body,
       category_id: categoryId || null,
       status,
+      tags,
     });
   }
 
@@ -80,6 +95,28 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
+
+          <label htmlFor="tag-input">Tags (up to 10)</label>
+          <div className="skill-input-row">
+            <input
+              id="tag-input"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addTag(); } }}
+              placeholder="Type a tag and press Enter…"
+            />
+            <button type="button" onClick={addTag} className="skill-add-button">+ Add</button>
+          </div>
+          {tags.length > 0 && (
+            <div className="skill-chip-row">
+              {tags.map((tag) => (
+                <span key={tag} className="skill-chip skill-chip-removable">
+                  {tag}
+                  <button type="button" onClick={() => removeTag(tag)} aria-label={`Remove ${tag}`}>&times;</button>
+                </span>
+              ))}
+            </div>
+          )}
 
           <label>Body</label>
           <RichTextEditor content={body} onChange={setBody} />

@@ -1,41 +1,45 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
 import Loading from '../components/Loading';
 
-// Every post from everyone writing here - the owner, authors, and
-// contributors alike, all in one shared feed. Each post carries a small
-// color flag next to the byline instead of an "Owner"/"Community" label,
-// so identity is personal rather than a two-tier split.
-export default function CommunityBlogs() {
+// Every published post carrying a given tag - reached by clicking a tag
+// chip on a post, or from the "browse all tags" list on /tags. Reuses
+// the exact same .entries/.entry list markup as CommunityBlogs so a
+// filtered view looks like a natural subset of that page, not a
+// different page style.
+export default function TagPosts() {
+  const { slug } = useParams();
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Community Blogs', 'Every post from everyone writing here, all in one shared feed.');
+  usePageMeta(`#${slug}`, `Posts tagged "${slug}".`);
 
   useEffect(() => {
+    setStatus('loading');
     apiClient
-      .get('/posts')
+      .get('/posts', { params: { tag: slug } })
       .then((res) => {
         setPosts(res.data.data);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
-  }, []);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [slug]);
 
   if (status === 'loading') return <Loading fullPage />;
-  if (status === 'error') return <p>Couldn't load posts.</p>;
+  if (status === 'error') return <p>Couldn't load these posts.</p>;
 
   return (
     <div>
-      <p className="kicker">Community Blogs</p>
-      <h1>Everyone writing on this platform</h1>
-      <p className="post-meta"><Link to="/tags">Browse by tag &rarr;</Link></p>
+      <Link to="/tags" className="back-link">&larr; All tags</Link>
+      <p className="kicker">Tagged</p>
+      <h1>#{slug}</h1>
 
-      {posts.length === 0 && <p className="empty-state">No posts published yet.</p>}
+      {posts.length === 0 && <p className="empty-state">No published posts with this tag yet.</p>}
       <ul className="entries">
         {posts.map((post) => {
           const { day, month } = formatPostmark(post.published_at);

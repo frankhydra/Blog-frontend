@@ -1,12 +1,35 @@
 import { useEffect, useRef, useState } from 'react';
+import { Suspense } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Loading from './Loading';
+
+const ICON_MENU = (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
+
+const ICON_CLOSE = (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+  </svg>
+);
 
 export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // Mobile nav - below 640px the primary nav + account menu disappear from
+  // the header bar entirely (see the @media rule in index.css) and this
+  // hamburger toggle takes their place. Kept as one flat panel (nav links
+  // + account actions together) rather than nesting a dropdown inside a
+  // dropdown, since that's awkward on a touchscreen.
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const mobileMenuRef = useRef(null);
+  const mobileToggleRef = useRef(null);
 
   // The backend serves /sitemap.xml at its own root (not under /api) - derive
   // that from the same VITE_API_URL the api client already uses, rather than
@@ -18,22 +41,46 @@ export default function Layout() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  // Close the account dropdown on outside click, so it behaves like a
-  // real menu rather than staying stuck open.
+  // Close the account dropdown / mobile panel on outside click, so they
+  // behave like real menus rather than staying stuck open. Escape closes
+  // both too.
   useEffect(() => {
     function handleClick(e) {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(e.target) &&
+        mobileToggleRef.current &&
+        !mobileToggleRef.current.contains(e.target)
+      ) {
+        setMobileMenuOpen(false);
+      }
+    }
+    function handleKeydown(e) {
+      if (e.key === 'Escape') {
+        setMenuOpen(false);
+        setMobileMenuOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKeydown);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKeydown);
+    };
   }, []);
 
   function handleLogout() {
     setMenuOpen(false);
+    setMobileMenuOpen(false);
     logout();
     navigate('/');
+  }
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
   }
 
   return (
@@ -41,7 +88,7 @@ export default function Layout() {
       <div className="band header-band">
         <div className="inner">
           <header className="site-header">
-            <Link to="/" className="brand">Franklin Nchukwi</Link>
+            <Link to="/" className="brand" onClick={closeMobileMenu}>Franklin Nchukwi</Link>
 
             <nav className="primary-nav">
               <NavLink to="/" end>Home</NavLink>
@@ -71,10 +118,10 @@ export default function Layout() {
                       <div className="account-dropdown">
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
                         <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
-                        <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {['admin', 'author'].includes(user.role) && (
-                          <Link to="/write/letter" onClick={() => setMenuOpen(false)}>Write a letter</Link>
+                          <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
                         )}
+                        <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {user.role === 'admin' && (
                           <>
                             <div className="dropdown-divider" />
@@ -82,6 +129,7 @@ export default function Layout() {
                             <Link to="/admin/comments" onClick={() => setMenuOpen(false)}>Moderate comments</Link>
                             <Link to="/admin/campaigns" onClick={() => setMenuOpen(false)}>Moderate campaigns</Link>
                             <Link to="/admin/users" onClick={() => setMenuOpen(false)}>Manage authors</Link>
+                            <Link to="/admin/categories" onClick={() => setMenuOpen(false)}>Manage categories</Link>
                           </>
                         )}
                         <div className="dropdown-divider" />
@@ -94,14 +142,82 @@ export default function Layout() {
                 <Link to="/login" className="nav-cta">Log in</Link>
               )}
             </div>
+
+            {/* Hamburger toggle - CSS hides this above 640px, so it never
+                shows up alongside the desktop nav. */}
+            <button
+              type="button"
+              ref={mobileToggleRef}
+              className="mobile-menu-toggle"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-menu-panel"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+            >
+              {mobileMenuOpen ? ICON_CLOSE : ICON_MENU}
+            </button>
           </header>
+
+          {mobileMenuOpen && (
+            <div id="mobile-menu-panel" className="mobile-menu-panel" ref={mobileMenuRef}>
+              <nav className="mobile-menu-nav">
+                <NavLink to="/" end onClick={closeMobileMenu}>Home</NavLink>
+                <NavLink to="/community" onClick={closeMobileMenu}>Community Blogs</NavLink>
+                <NavLink to="/letters" onClick={closeMobileMenu}>Letters</NavLink>
+                <NavLink to="/books" onClick={closeMobileMenu}>Books</NavLink>
+                <NavLink to="/portfolio" onClick={closeMobileMenu}>Portfolio</NavLink>
+                <NavLink to="/about" onClick={closeMobileMenu}>About</NavLink>
+              </nav>
+
+              <div className="mobile-menu-divider" />
+
+              {user ? (
+                <div className="mobile-menu-account">
+                  <div className="mobile-menu-user-row">
+                    <span className="account-avatar">{user.name.charAt(0).toUpperCase()}</span>
+                    <span className="account-name">{user.name}</span>
+                  </div>
+                  <Link to="/write" onClick={closeMobileMenu}>Write</Link>
+                  <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
+                  <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
+                  {['admin', 'author'].includes(user.role) && (
+                    <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
+                  )}
+                  <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
+                  {user.role === 'admin' && (
+                    <>
+                      <div className="mobile-menu-divider" />
+                      <p className="dropdown-label">Admin</p>
+                      <Link to="/admin/comments" onClick={closeMobileMenu}>Moderate comments</Link>
+                      <Link to="/admin/campaigns" onClick={closeMobileMenu}>Moderate campaigns</Link>
+                      <Link to="/admin/users" onClick={closeMobileMenu}>Manage authors</Link>
+                      <Link to="/admin/categories" onClick={closeMobileMenu}>Manage categories</Link>
+                    </>
+                  )}
+                  <div className="mobile-menu-divider" />
+                  <button type="button" onClick={handleLogout}>Log out</button>
+                </div>
+              ) : (
+                <div className="mobile-menu-account">
+                  <Link to="/login" onClick={closeMobileMenu}>Log in</Link>
+                  <Link to="/register" onClick={closeMobileMenu}>Create an account</Link>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
       <div className="band main-band">
         <main className="inner site-main">
-          {/* Outlet renders whichever page React Router has matched */}
-          <Outlet />
+          {/* Outlet renders whichever page React Router has matched.
+              Wrapped in Suspense since every page is now lazy-loaded
+              (see App.jsx) - this shows a loading state in just the
+              content area while a route's chunk is being fetched,
+              without the header/footer themselves unmounting. */}
+          <Suspense fallback={<Loading fullPage />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
 
@@ -128,8 +244,7 @@ export default function Layout() {
                 <p className="footer-col-title">Account</p>
                 {user ? (
                   <>
-                    <Link to="/write">Write a post</Link>
-                    {['admin', 'author'].includes(user.role) && <Link to="/write/letter">Write a letter</Link>}
+                    <Link to="/write">Write</Link>
                     <Link to="/my-posts">My posts</Link>
                     <Link to="/request-campaign">Request a campaign</Link>
                     <Link to="/settings">Settings</Link>

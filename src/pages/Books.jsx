@@ -25,7 +25,7 @@ export default function Books() {
     <div>
       <p className="kicker">Books</p>
       <h1>Self-published, mine and others'</h1>
-      <p className="post-meta">A shelf for books by me and other writers on this platform.</p>
+      <p className="post-meta">A shelf for books by writers on this platform.</p>
 
       {user && (
         <p>
