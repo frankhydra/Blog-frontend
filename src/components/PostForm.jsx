@@ -20,6 +20,12 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
   const [activeTab, setActiveTab] = useState('author'); // 'author' | 'reader'
 
   const canPublish = userRole === 'admin' || userRole === 'author';
+  // A contributor's own already-published post (an admin approved it
+  // earlier) shouldn't be resubmittable or re-privatized just by editing
+  // it - only the status the form actually understands as "this contributor
+  // is still working on getting this approved".
+  const alreadyPublished = !canPublish && initialPost?.status === 'published';
+  const alreadySubmitted = Boolean(initialPost?.submitted_at);
 
   useEffect(() => {
     apiClient.get('/categories').then((res) => setCategories(res.data));
@@ -37,16 +43,41 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
     setTags(tags.filter((t) => t !== tag));
   }
 
-  function handleSubmit(e) {
-    e.preventDefault();
-    onSubmit({
+  function submitForm(submitForReview = false) {
+    const payload = {
       title,
       excerpt: excerpt || null,
       body,
       category_id: categoryId || null,
-      status,
       tags,
-    });
+    };
+
+    if (canPublish) {
+      // Author/admin: unchanged - the status dropdown says exactly what
+      // they want, so send it as-is.
+      payload.status = status;
+    } else if (!alreadyPublished) {
+      // Contributor, still pre-publication: never send `status` at all -
+      // the backend already forces it to 'draft' either way, and leaving
+      // it out means an edit to an already-published post (see
+      // alreadyPublished below) can't accidentally get sent here either.
+      // submit_for_review is the real signal: whether this save should
+      // enter the admin's review queue or stay a private work-in-progress.
+      payload.submit_for_review = submitForReview;
+    }
+    // else: contributor editing an already-published post - no status,
+    // no submit_for_review, just the content fields. It's already live;
+    // this is a straight content fix, not a review-workflow action.
+
+    onSubmit(payload);
+  }
+
+  // Enter-to-submit / the single admin-author button both fall back to
+  // "don't submit for review" - the contributor-only second button below
+  // is the only path that ever passes submitForReview=true.
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    submitForm(false);
   }
 
   const categoryName = categories.find((c) => String(c.id) === String(categoryId))?.name;
@@ -71,7 +102,7 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
       </div>
 
       {activeTab === 'author' ? (
-        <form onSubmit={handleSubmit} className="post-form">
+        <form onSubmit={handleFormSubmit} className="post-form">
           <label htmlFor="title">Title</label>
           <input
             id="title"
@@ -128,17 +159,46 @@ export default function PostForm({ initialPost, onSubmit, submitting, userRole }
                 <option value="draft">Save as draft</option>
                 <option value="published">Publish now</option>
               </select>
+              <button type="submit" disabled={submitting}>
+                {submitting ? 'Saving…' : 'Save post'}
+              </button>
+            </>
+          ) : alreadyPublished ? (
+            <>
+              <p className="post-meta">
+                This post is already published. Changes save straight to the
+                live version - there's no review step for an edit.
+              </p>
+              <button type="submit" disabled={submitting}>
+                {submitting ? 'Saving…' : 'Save changes'}
+              </button>
             </>
           ) : (
-            <p className="post-meta">
-              Your posts are saved as drafts and reviewed by the site admin before
-              they're published.
-            </p>
+            <>
+              <p className="post-meta">
+                {alreadySubmitted
+                  ? 'This post is submitted and waiting on the site admin to review it. Save draft keeps editing privately without re-notifying them; the other button re-submits your latest changes.'
+                  : "Save draft keeps this private while you work on it. Submit for review sends it to the site admin - it still won't be public until they approve it."}
+              </p>
+              <div className="post-form-actions">
+                <button
+                  type="button"
+                  onClick={() => submitForm(false)}
+                  disabled={submitting}
+                  className="queue-secondary-button"
+                >
+                  {submitting ? 'Saving…' : 'Save draft'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => submitForm(true)}
+                  disabled={submitting}
+                >
+                  {submitting ? 'Submitting…' : alreadySubmitted ? 'Resubmit for review' : 'Submit for review'}
+                </button>
+              </div>
+            </>
           )}
-
-          <button type="submit" disabled={submitting}>
-            {submitting ? 'Saving…' : 'Save post'}
-          </button>
         </form>
       ) : (
         <ContentPreview kind="post" title={title} excerpt={excerpt} body={body} meta={categoryName} />

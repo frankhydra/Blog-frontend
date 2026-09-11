@@ -142,7 +142,9 @@ export default function Layout() {
                     {menuOpen && (
                       <div className="account-dropdown">
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
-                        <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
+                        {user.role !== 'admin' && (
+                          <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
+                        )}
                         {['admin', 'author'].includes(user.role) && (
                           <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
                         )}
@@ -151,6 +153,8 @@ export default function Layout() {
                           <>
                             <div className="dropdown-divider" />
                             <p className="dropdown-label">Admin</p>
+                            <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                            <Link to="/admin/posts" onClick={() => setMenuOpen(false)}>Review posts</Link>
                             <Link to="/admin/comments" onClick={() => setMenuOpen(false)}>Moderate comments</Link>
                             <Link to="/admin/campaigns" onClick={() => setMenuOpen(false)}>Moderate campaigns</Link>
                             <Link to="/admin/users" onClick={() => setMenuOpen(false)}>Manage authors</Link>
@@ -219,7 +223,9 @@ export default function Layout() {
                   </div>
                   <Link to="/write" onClick={closeMobileMenu}>Write</Link>
                   <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
-                  <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
+                  {user.role !== 'admin' && (
+                    <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
+                  )}
                   {['admin', 'author'].includes(user.role) && (
                     <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
                   )}
@@ -228,6 +234,8 @@ export default function Layout() {
                     <>
                       <div className="mobile-menu-divider" />
                       <p className="dropdown-label">Admin</p>
+                      <Link to="/admin/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
+                      <Link to="/admin/posts" onClick={closeMobileMenu}>Review posts</Link>
                       <Link to="/admin/comments" onClick={closeMobileMenu}>Moderate comments</Link>
                       <Link to="/admin/campaigns" onClick={closeMobileMenu}>Moderate campaigns</Link>
                       <Link to="/admin/users" onClick={closeMobileMenu}>Manage authors</Link>
@@ -286,7 +294,9 @@ export default function Layout() {
                   <>
                     <Link to="/write">Write</Link>
                     <Link to="/my-posts">My posts</Link>
-                    <Link to="/request-campaign">Request a campaign</Link>
+                    {user.role !== 'admin' && (
+                      <Link to="/request-campaign">Request a campaign</Link>
+                    )}
                     <Link to="/settings">Settings</Link>
                   </>
                 ) : (

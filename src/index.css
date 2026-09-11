@@ -753,6 +753,31 @@ p.kicker {
   margin-bottom: 1.5rem;
 }
 
+/* A <button> that needs to read as plain text next to real <Link>s inside
+   .post-meta (e.g. "Edit · Delete" on a post/letter/book's own detail
+   page) - same font, size, and color as the surrounding text and the
+   links beside it, just underlined on hover so it still reads as
+   clickable. Colored oxblood since, unlike Edit, this one is destructive. */
+.link-button-inline {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--wax);
+  cursor: pointer;
+}
+
+.link-button-inline:hover {
+  text-decoration: underline;
+}
+
+.link-button-inline:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .post-body {
   /* pre-wrap kept intentionally: older posts written before the rich editor
      existed are plain text with real line breaks, and need this to display
@@ -1214,6 +1239,44 @@ p.kicker {
   overflow-x: auto;
 }
 
+/* Admin dashboard moderation summary (see AdminDashboard.jsx) - three
+   equal tiles, each a link straight into its own queue page. A count of
+   0 still renders (not hidden) so "nothing waiting" is visibly confirmed
+   rather than looking like the tile failed to load. */
+.dashboard-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.dashboard-summary-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  background: var(--paper-tint);
+}
+
+.dashboard-summary-tile:hover {
+  border-color: var(--accent);
+}
+
+.dashboard-summary-count {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  color: var(--accent);
+}
+
+@media (max-width: 640px) {
+  .dashboard-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .user-table {
   width: 100%;
   border-collapse: collapse;
@@ -1338,6 +1401,22 @@ p.kicker {
   background: transparent;
   color: var(--wax);
   border: 1px solid var(--wax);
+}
+
+/* Neutral outline action (e.g. "Read & edit") that sits alongside
+   approve/reject but isn't itself a moderation decision - kept visually
+   distinct from .queue-reject-button so a navigation link never reads as
+   the destructive/reject option. */
+.queue-secondary-button {
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  background: transparent;
+  color: var(--ink);
+  text-decoration: none;
+  display: inline-block;
 }
 
 @media (max-width: 640px) {
@@ -1894,6 +1973,36 @@ p.kicker {
   border-radius: 4px;
   cursor: pointer;
   align-self: flex-start;
+}
+
+/* Contributor's save-draft / submit-for-review pair (see PostForm.jsx).
+   Both are type="button" (each needs its own distinct onClick, not one
+   shared form submit), so they fall outside the button[type="submit"]
+   rule above - same visual weight as that button, deliberately, so
+   "Submit for review" reads as the primary action next to it. */
+.post-form-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.post-form-actions button {
+  padding: 0.6rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.post-form-actions button:not(.queue-secondary-button) {
+  background: var(--accent-solid);
+  color: white;
+  border: none;
+}
+
+.post-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: default;
 }
 
 .book-grid {

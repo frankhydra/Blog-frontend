@@ -38,6 +38,8 @@ const Portfolios = lazy(() => import('./pages/Portfolios'));
 const Settings = lazy(() => import('./pages/Settings'));
 const RequestCampaign = lazy(() => import('./pages/RequestCampaign'));
 const AdminCampaigns = lazy(() => import('./pages/AdminCampaigns'));
+const AdminPosts = lazy(() => import('./pages/AdminPosts'));
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const Campaigns = lazy(() => import('./pages/Campaigns'));
 const CampaignDetail = lazy(() => import('./pages/CampaignDetail'));
 
@@ -82,6 +84,8 @@ export default function App() {
         <Route path="my/contact-messages" element={<MyContactMessages />} />
         <Route path="request-campaign" element={<RequestCampaign />} />
         <Route path="admin/campaigns" element={<AdminCampaigns />} />
+        <Route path="admin/posts" element={<AdminPosts />} />
+        <Route path="admin/dashboard" element={<AdminDashboard />} />
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="campaigns/:id" element={<CampaignDetail />} />
       </Route>

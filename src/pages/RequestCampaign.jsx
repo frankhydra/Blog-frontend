@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
@@ -11,10 +12,11 @@ const STATUS_LABEL = {
   rejected: 'Not approved',
 };
 
-// Any logged-in user can ask for a spot in the home page campaign spotlight
-// - a book launch, an event, anything worth pushing to the front of the
-// site. Requests start pending and only go public once an admin approves
-// them from /admin/campaigns.
+// Any logged-in author or contributor can ask for a spot in the home page
+// campaign spotlight - a book launch, an event, anything worth pushing to
+// the front of the site. Requests start pending and only go public once an
+// admin approves them from /admin/campaigns. Admins don't request one here
+// - they already control the spotlight directly (see the guard below).
 export default function RequestCampaign() {
   const { user, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
@@ -93,6 +95,15 @@ export default function RequestCampaign() {
 
   if (authLoading) return <p>Loading…</p>;
   if (!user) return <p>You need to log in to request a campaign spotlight.</p>;
+  if (user.role === 'admin') {
+    return (
+      <p className="empty-state">
+        Admins already control the spotlight directly from{' '}
+        <Link to="/admin/campaigns">Moderate campaigns</Link> - there's no need
+        to request one here.
+      </p>
+    );
+  }
 
   return (
     <div>

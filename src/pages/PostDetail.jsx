@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import apiClient from '../api/client';
+import { useAuth } from '../context/AuthContext';
 import ReactionButtons from '../components/ReactionButtons';
 import CommentSection from '../components/CommentSection';
 import usePageMeta from '../hooks/usePageMeta';
@@ -10,8 +11,11 @@ import Loading from '../components/Loading';
 
 export default function PostDetail() {
   const { slug } = useParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [deleting, setDeleting] = useState(false);
 
   usePageMeta(post?.title, post?.excerpt);
 
@@ -26,9 +30,22 @@ export default function PostDetail() {
       .catch(() => setStatus('error'));
   }, [slug]);
 
+  async function handleDelete() {
+    if (!confirm(`Delete "${post.title}"? This can't be undone.`)) return;
+    setDeleting(true);
+    try {
+      await apiClient.delete(`/posts/${post.slug}`);
+      navigate('/my-posts');
+    } catch {
+      alert("Couldn't delete that post.");
+      setDeleting(false);
+    }
+  }
+
   if (status === 'loading') return <Loading fullPage />;
   if (status === 'error') return <p>That post couldn't be found.</p>;
 
+  const canManage = user && (user.id === post.author?.id || user.role === 'admin');
   const { day, month } = formatPostmark(post.published_at);
 
   // Reading time isn't stored anywhere - it's fully derivable from the
@@ -52,6 +69,14 @@ export default function PostDetail() {
           <p className="post-meta">
             By <Link to={`/authors/${post.author.id}`}>{post.author.name}</Link>
             {' '}· {readingTime} min read
+            {canManage && (
+              <>
+                {' '}· <Link to={`/posts/${post.slug}/edit`}>Edit</Link>
+                {' '}· <button type="button" onClick={handleDelete} disabled={deleting} className="link-button-inline">
+                  {deleting ? 'Deleting…' : 'Delete'}
+                </button>
+              </>
+            )}
           </p>
         </div>
       </div>
