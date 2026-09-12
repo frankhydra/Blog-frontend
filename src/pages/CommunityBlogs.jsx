@@ -34,13 +34,11 @@ export default function CommunityBlogs() {
     <div>
       <p className="kicker">Community Blogs</p>
       <h1>Everyone writing on this platform</h1>
-      <p className="post-meta"><Link to="/tags">Browse by tag &rarr;</Link></p>
 
-      {user && (
-        <p className="post-meta">
-          <Link to="/write/post">Write a new post</Link>
-        </p>
-      )}
+      <div className="community-actions-row">
+        <Link to="/tags" className="text-link">Browse by tag</Link>
+        {user && <Link to="/write/post" className="text-link">Write a new post</Link>}
+      </div>
 
       {status === 'loading' && <SkeletonGrid variant="entry" count={6} />}
       {status === 'ready' && posts.length === 0 && <p className="empty-state">No posts published yet.</p>}
