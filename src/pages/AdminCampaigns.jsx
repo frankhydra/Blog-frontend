@@ -13,7 +13,7 @@ const ICON_SPOTLIGHT = (
 // Card-based to match the design system already defined for this page in
 // index.css (.admin-page / .queue-card) - this component just hadn't been
 // updated to actually use it yet, unlike MyContactMessages.jsx which has.
-export default function AdminCampaigns() {
+export default function AdminCampaigns({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -68,21 +68,8 @@ export default function AdminCampaigns() {
     return <p className="empty-state">You don't have access to this page.</p>;
   }
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_SPOTLIGHT}</span>
-        <div>
-          <p className="settings-card-eyebrow">Moderation queue</p>
-          <h1>Pending campaign requests</h1>
-          <p className="post-meta">
-            Approved requests appear in the spotlight on the home page.
-            Rejecting one is final for that request - the author can always
-            submit a fresh one.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load the moderation queue.</p>}
       {status === 'ready' && campaigns.length === 0 && (
@@ -140,6 +127,27 @@ export default function AdminCampaigns() {
           ))}
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_SPOTLIGHT}</span>
+        <div>
+          <p className="settings-card-eyebrow">Moderation queue</p>
+          <h1>Pending campaign requests</h1>
+          <p className="post-meta">
+            Approved requests appear in the spotlight on the home page.
+            Rejecting one is final for that request - the author can always
+            submit a fresh one.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

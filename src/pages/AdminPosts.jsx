@@ -25,7 +25,7 @@ const ICON_REVIEW = (
 // case (the post's fine as-is); the edit link covers everything else,
 // including quietly deleting it from there if it doesn't belong on the
 // site at all.
-export default function AdminPosts() {
+export default function AdminPosts({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -68,22 +68,8 @@ export default function AdminPosts() {
     return <p className="empty-state">You don't have access to this page.</p>;
   }
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_REVIEW}</span>
-        <div>
-          <p className="settings-card-eyebrow">Review queue</p>
-          <h1>Posts awaiting review</h1>
-          <p className="post-meta">
-            A contributor's post saves as a draft and stays invisible to
-            everyone but them until you publish it here. Read the full post
-            before deciding - the title and excerpt alone aren't enough to
-            judge it on.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load the review queue.</p>}
       {error && <p className="form-error">{error}</p>}
@@ -125,6 +111,28 @@ export default function AdminPosts() {
           ))}
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_REVIEW}</span>
+        <div>
+          <p className="settings-card-eyebrow">Review queue</p>
+          <h1>Posts awaiting review</h1>
+          <p className="post-meta">
+            A contributor's post saves as a draft and stays invisible to
+            everyone but them until you publish it here. Read the full post
+            before deciding - the title and excerpt alone aren't enough to
+            judge it on.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

@@ -141,6 +141,12 @@ export default function Layout() {
 
                     {menuOpen && (
                       <div className="account-dropdown">
+                        {user.role === 'author' && (
+                          <Link to="/author/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                        )}
+                        {user.role === 'contributor' && (
+                          <Link to="/contributor/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                        )}
                         <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
                         {user.role !== 'admin' && (
                           <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
@@ -152,13 +158,7 @@ export default function Layout() {
                         {user.role === 'admin' && (
                           <>
                             <div className="dropdown-divider" />
-                            <p className="dropdown-label">Admin</p>
-                            <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
-                            <Link to="/admin/posts" onClick={() => setMenuOpen(false)}>Review posts</Link>
-                            <Link to="/admin/comments" onClick={() => setMenuOpen(false)}>Moderate comments</Link>
-                            <Link to="/admin/campaigns" onClick={() => setMenuOpen(false)}>Moderate campaigns</Link>
-                            <Link to="/admin/users" onClick={() => setMenuOpen(false)}>Manage authors</Link>
-                            <Link to="/admin/categories" onClick={() => setMenuOpen(false)}>Manage categories</Link>
+                            <Link to="/admin/dashboard" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
                           </>
                         )}
                         <div className="dropdown-divider" />
@@ -222,6 +222,12 @@ export default function Layout() {
                     <span className="account-name">{user.name}</span>
                   </div>
                   <Link to="/write" onClick={closeMobileMenu}>Write</Link>
+                  {user.role === 'author' && (
+                    <Link to="/author/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
+                  )}
+                  {user.role === 'contributor' && (
+                    <Link to="/contributor/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
+                  )}
                   <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
                   {user.role !== 'admin' && (
                     <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
@@ -233,13 +239,7 @@ export default function Layout() {
                   {user.role === 'admin' && (
                     <>
                       <div className="mobile-menu-divider" />
-                      <p className="dropdown-label">Admin</p>
-                      <Link to="/admin/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
-                      <Link to="/admin/posts" onClick={closeMobileMenu}>Review posts</Link>
-                      <Link to="/admin/comments" onClick={closeMobileMenu}>Moderate comments</Link>
-                      <Link to="/admin/campaigns" onClick={closeMobileMenu}>Moderate campaigns</Link>
-                      <Link to="/admin/users" onClick={closeMobileMenu}>Manage authors</Link>
-                      <Link to="/admin/categories" onClick={closeMobileMenu}>Manage categories</Link>
+                      <Link to="/admin/dashboard" onClick={closeMobileMenu}>Admin dashboard</Link>
                     </>
                   )}
                   <div className="mobile-menu-divider" />

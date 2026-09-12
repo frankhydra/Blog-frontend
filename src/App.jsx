@@ -40,6 +40,8 @@ const RequestCampaign = lazy(() => import('./pages/RequestCampaign'));
 const AdminCampaigns = lazy(() => import('./pages/AdminCampaigns'));
 const AdminPosts = lazy(() => import('./pages/AdminPosts'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
+const AuthorDashboard = lazy(() => import('./pages/AuthorDashboard'));
+const ContributorDashboard = lazy(() => import('./pages/ContributorDashboard'));
 const Campaigns = lazy(() => import('./pages/Campaigns'));
 const CampaignDetail = lazy(() => import('./pages/CampaignDetail'));
 
@@ -86,6 +88,8 @@ export default function App() {
         <Route path="admin/campaigns" element={<AdminCampaigns />} />
         <Route path="admin/posts" element={<AdminPosts />} />
         <Route path="admin/dashboard" element={<AdminDashboard />} />
+        <Route path="author/dashboard" element={<AuthorDashboard />} />
+        <Route path="contributor/dashboard" element={<ContributorDashboard />} />
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="campaigns/:id" element={<CampaignDetail />} />
       </Route>

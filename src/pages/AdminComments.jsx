@@ -13,7 +13,7 @@ const ICON_COMMENT = (
 // Card-based to match the design system already defined for this page in
 // index.css (.admin-page / .queue-card) - this component just hadn't been
 // updated to actually use it yet, unlike MyContactMessages.jsx which has.
-export default function AdminComments() {
+export default function AdminComments({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [comments, setComments] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -55,20 +55,8 @@ export default function AdminComments() {
     return <p className="empty-state">You don't have access to this page.</p>;
   }
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_COMMENT}</span>
-        <div>
-          <p className="settings-card-eyebrow">Moderation queue</p>
-          <h1>Pending comments</h1>
-          <p className="post-meta">
-            Approved comments appear publicly under their post right away.
-            Rejecting one is final - the commenter can always post again.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load the moderation queue.</p>}
       {status === 'ready' && comments.length === 0 && (
@@ -104,6 +92,26 @@ export default function AdminComments() {
           ))}
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_COMMENT}</span>
+        <div>
+          <p className="settings-card-eyebrow">Moderation queue</p>
+          <h1>Pending comments</h1>
+          <p className="post-meta">
+            Approved comments appear publicly under their post right away.
+            Rejecting one is final - the commenter can always post again.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

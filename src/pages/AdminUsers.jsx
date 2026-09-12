@@ -16,7 +16,7 @@ const ICON_USERS = (
 // Card header matches the other Admin pages (Comments/Campaigns/Posts);
 // the table itself keeps its own .admin-table-card/.user-table styling,
 // already defined in index.css but previously unused here.
-export default function AdminUsers() {
+export default function AdminUsers({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -56,20 +56,8 @@ export default function AdminUsers() {
   if (authLoading) return <Loading fullPage />;
   if (!user || user.role !== 'admin') return <p className="empty-state">You don't have access to this page.</p>;
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_USERS}</span>
-        <div>
-          <p className="settings-card-eyebrow">User management</p>
-          <h1>Manage authors</h1>
-          <p className="post-meta">
-            Promote a contributor to author once you're ready for them to
-            publish publicly and appear in the community blogs section.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load users.</p>}
       {error && <p className="form-error">{error}</p>}
@@ -108,6 +96,26 @@ export default function AdminUsers() {
           </table>
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_USERS}</span>
+        <div>
+          <p className="settings-card-eyebrow">User management</p>
+          <h1>Manage authors</h1>
+          <p className="post-meta">
+            Promote a contributor to author once you're ready for them to
+            publish publicly and appear in the community blogs section.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

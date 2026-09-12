@@ -16,7 +16,7 @@ const ICON_TAG = (
 // category's posts just become uncategorized rather than being blocked
 // or removed. The post count shown per row is just so an admin knows the
 // impact before deleting, not a hard guardrail.
-export default function AdminCategories() {
+export default function AdminCategories({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -116,20 +116,8 @@ export default function AdminCategories() {
   if (authLoading) return <Loading fullPage />;
   if (!user || user.role !== 'admin') return <p>You don't have access to this page.</p>;
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_TAG}</span>
-        <div>
-          <p className="settings-card-eyebrow">Admin</p>
-          <h1>Manage categories</h1>
-          <p className="post-meta">
-            Categories organize posts across the blog. Deleting one doesn't delete
-            its posts - they just become uncategorized.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {error && <p className="form-error">{error}</p>}
 
       <section className="settings-card">
@@ -221,6 +209,26 @@ export default function AdminCategories() {
           </table>
         </section>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_TAG}</span>
+        <div>
+          <p className="settings-card-eyebrow">Admin</p>
+          <h1>Manage categories</h1>
+          <p className="post-meta">
+            Categories organize posts across the blog. Deleting one doesn't delete
+            its posts - they just become uncategorized.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

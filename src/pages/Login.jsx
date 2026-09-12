@@ -17,8 +17,17 @@ export default function Login() {
     setError('');
     setSubmitting(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const user = await login(email, password);
+      // Send each role to their own dashboard instead of always the
+      // public homepage - the whole point of building those dashboards
+      // was to give each role a real landing page with what needs their
+      // attention, so login should actually take them there.
+      const dashboardByRole = {
+        admin: '/admin/dashboard',
+        author: '/author/dashboard',
+        contributor: '/contributor/dashboard',
+      };
+      navigate(dashboardByRole[user.role] ?? '/');
     } catch {
       setError('Those credentials do not match our records.');
     } finally {

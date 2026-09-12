@@ -1259,6 +1259,13 @@ p.kicker {
   text-decoration: none;
   color: var(--ink);
   background: var(--paper-tint);
+  /* Now also used as a <button> (see AdminDashboard.jsx, switches tabs
+     instead of navigating) - these resets make a button match the
+     anchor version exactly rather than looking like a native button. */
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
 }
 
 .dashboard-summary-tile:hover {
@@ -3121,6 +3128,21 @@ select:focus-visible {
 .settings-tab-icon svg {
   width: 100%;
   height: 100%;
+}
+
+/* Pending-count badge on an admin dashboard tab (see AdminDashboard.jsx) -
+   pushed to the right of the label via margin-left: auto, since .settings-tab
+   is already a flex row. Only rendered when count > 0, so a clear queue
+   just shows the plain label with no empty pill. */
+.settings-tab-badge {
+  margin-left: auto;
+  background: var(--wax);
+  color: white;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  line-height: 1;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
 }
 
 .settings-panel {
