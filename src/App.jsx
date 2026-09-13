@@ -9,7 +9,7 @@ import Layout from './components/Layout';
 // single page load, admin pages and Settings included, regardless of
 // whether the visitor ever touched them. Layout and Loading stay as
 // regular imports since they're needed immediately on every route.
-const Home = lazy(() => import('./pages/Home'));
+const HomeGate = lazy(() => import('./pages/HomeGate'));
 const PostDetail = lazy(() => import('./pages/PostDetail'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -57,7 +57,7 @@ export default function App() {
           instead of the whole page flashing to a blank loading state
           every time a lazy route's chunk is still being fetched. */}
       <Route path="/" element={<Layout />}>
-        <Route index element={<Home />} />
+        <Route index element={<HomeGate />} />
         <Route path="posts/:slug" element={<PostDetail />} />
         <Route path="posts/:slug/edit" element={<EditPost />} />
         <Route path="write" element={<Write />} />

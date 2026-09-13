@@ -4650,6 +4650,185 @@ select:focus-visible {
   margin: 0.6rem 0 0;
 }
 
+/* Only shown when Join is reused as HomeGate's first-visit welcome (see
+   asGate prop) - a deliberately quiet, low-contrast way out for anyone
+   who doesn't want to subscribe. This is a one-time welcome, not a
+   paywall, so it should never feel like the only way forward is to
+   hand over an email address. */
+.join-skip-link {
+  display: block;
+  text-align: center;
+  margin-top: 1.1rem;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.join-skip-link:hover {
+  color: var(--ink);
+}
+
+/* ---------- Welcome gate animation (HomeGate → Join asGate) ----------
+   Kept intentionally in the existing palette (wax/ochre/accent) rather
+   than the gold/dark tones of the reference design that prompted this -
+   the ask was to keep the site's own look, not to recolor it. */
+.gate-emblem-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 1.25rem;
+  cursor: pointer;
+}
+
+.gate-emblem-glow {
+  position: absolute;
+  inset: -22px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(140, 47, 57, 0.3), rgba(162, 115, 43, 0.16) 55%, transparent 75%);
+  filter: blur(10px);
+  animation: gate-pulse-glow 5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes gate-pulse-glow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.9; transform: scale(1.08); }
+}
+
+.gate-emblem-svg {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gate-emblem-wrap:hover .gate-emblem-svg {
+  transform: scale(1.06) rotate(6deg);
+}
+
+.gate-ring-outer {
+  stroke: var(--wax);
+  transform-origin: 60px 60px;
+  animation: gate-spin-slow 18s linear infinite;
+}
+
+.gate-ring-inner {
+  stroke: var(--accent);
+  transform-origin: 60px 60px;
+  animation: gate-spin-slow-reverse 24s linear infinite;
+}
+
+@keyframes gate-spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gate-spin-slow-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.gate-emblem-core {
+  fill: var(--theme-ochre);
+  animation: gate-pulse-core 4s ease-in-out infinite;
+  transform-origin: 60px 60px;
+}
+
+@keyframes gate-pulse-core {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+
+.gate-ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid var(--wax);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gate-ripple-active {
+  animation: gate-ripple-expand 0.7s ease-out forwards;
+}
+
+@keyframes gate-ripple-expand {
+  0% { transform: scale(0.7); opacity: 0.8; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+/* Floating background motifs with mouse parallax - see Join.jsx, which
+   sets this layer's transform directly on a ref during mousemove rather
+   than through React state, so it can update every frame without
+   triggering a re-render on every pixel of cursor movement. */
+.join-page {
+  position: relative;
+}
+
+.gate-parallax-layer {
+  position: absolute;
+  inset: -2rem -1rem auto -1rem;
+  height: 420px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+  transition: transform 0.1s linear;
+}
+
+.gate-float-motif {
+  position: absolute;
+  opacity: 0.14;
+  color: var(--wax);
+  animation: gate-float 9s ease-in-out infinite;
+}
+
+.gate-float-motif-2 {
+  color: var(--theme-ochre);
+  animation-duration: 11s;
+  animation-delay: 1.5s;
+}
+
+.gate-float-motif-3 {
+  color: var(--accent);
+  animation-duration: 7.5s;
+  animation-delay: 0.7s;
+}
+
+@keyframes gate-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(4deg); }
+}
+
+/* .join-hero/.join-form-card already exist above - these just layer an
+   entrance animation on top when the gate is showing (see Join.jsx). */
+.gate-fade-up {
+  position: relative;
+  z-index: 1;
+  animation: gate-fade-up-kf 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.gate-fade-up-delay {
+  animation-delay: 0.15s;
+}
+
+@keyframes gate-fade-up-kf {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-emblem-glow,
+  .gate-ring-outer,
+  .gate-ring-inner,
+  .gate-emblem-core,
+  .gate-float-motif,
+  .gate-fade-up {
+    animation: none;
+  }
+}
+
 .join-success {
   text-align: center;
 }
