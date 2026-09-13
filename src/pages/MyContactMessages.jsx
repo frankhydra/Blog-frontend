@@ -11,11 +11,11 @@ const ICON_INBOX = (
 );
 
 // A personal inbox, not an admin-only page - anyone whose profile can
-// receive a "contact this author" message (admins and authors; a
-// contributor's public profile isn't reachable in the first place) sees
-// their own messages here. This used to be write-only: saved to the
-// database and emailed once, with no way to ever read it back through
-// the app.
+// receive a "contact this author" message (admin, author, or
+// contributor - every role's profile is publicly reachable, see
+// AuthorController::show) sees their own messages here. This used to be
+// write-only: saved to the database and emailed once, with no way to
+// ever read it back through the app.
 export default function MyContactMessages() {
   const { user, loading: authLoading } = useAuth();
   const [messages, setMessages] = useState([]);
@@ -60,9 +60,10 @@ export default function MyContactMessages() {
       {messages.length > 0 && (
         <div className="queue-list">
           {messages.map((msg) => (
-            <article key={msg.id} className="settings-card queue-card">
+            <article key={msg.id} className={`settings-card queue-card ${msg.is_new ? 'queue-card-new' : ''}`}>
               <p className="queue-card-meta">
-                <strong>{msg.sender_name}</strong>
+                {msg.is_new && <span className="status-pill status-pill-pending">New</span>}
+                {' '}<strong>{msg.sender_name}</strong>
                 {' '}&lt;<a href={`mailto:${msg.sender_email}`}>{msg.sender_email}</a>&gt;
                 {' '}· {new Date(msg.created_at).toLocaleString(undefined, {
                   dateStyle: 'medium',

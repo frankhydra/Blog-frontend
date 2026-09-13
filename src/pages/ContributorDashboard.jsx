@@ -35,6 +35,7 @@ export default function ContributorDashboard() {
   const { user, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState([]);
   const [portfolioItems, setPortfolioItems] = useState([]);
+  const [extras, setExtras] = useState({ unread_messages: 0, subscribers: 0, subscribers_new: 0 });
   const [status, setStatus] = useState('loading');
 
   useEffect(() => {
@@ -51,6 +52,25 @@ export default function ContributorDashboard() {
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
+
+    // Best-effort, separate from the load above so a hiccup here can't
+    // block the rest of the dashboard. Deliberately the lightweight
+    // /new-count endpoints rather than the full inbox/My Subscribers
+    // pages, which mark things read/checked as a side effect of loading
+    // them - hitting those from the dashboard would silently clear the
+    // badge before it's ever seen (4.9).
+    Promise.all([
+      apiClient.get('/my/contact-messages/unread-count'),
+      apiClient.get('/my/subscribers/new-count'),
+    ])
+      .then(([unreadRes, subsRes]) => {
+        setExtras({
+          unread_messages: unreadRes.data.unread_messages,
+          subscribers: subsRes.data.count,
+          subscribers_new: subsRes.data.new_since_last_check,
+        });
+      })
+      .catch(() => {});
   }, [authLoading, user]);
 
   if (authLoading) return <Loading fullPage />;
@@ -72,6 +92,24 @@ export default function ContributorDashboard() {
 
       <div className="settings-card">
         <Link to="/write/post" className="nav-cta">Write a new post</Link>
+      </div>
+
+      <div className="settings-card">
+        <div className="dashboard-summary-grid">
+          <Link to="/my/contact-messages" className="dashboard-summary-tile">
+            <span className="dashboard-summary-count">{extras.unread_messages}</span>
+            <span>Unread message{extras.unread_messages === 1 ? '' : 's'}</span>
+          </Link>
+          <Link to="/my/subscribers" className="dashboard-summary-tile">
+            <span className="dashboard-summary-count">
+              {extras.subscribers}
+              {extras.subscribers_new > 0 && (
+                <span className="dashboard-summary-new">+{extras.subscribers_new} new</span>
+              )}
+            </span>
+            <span>Subscriber{extras.subscribers === 1 ? '' : 's'}</span>
+          </Link>
+        </div>
       </div>
 
       {status === 'loading' && <Loading />}

@@ -1264,7 +1264,7 @@ p.kicker {
    rather than looking like the tile failed to load. */
 .dashboard-summary-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 1rem;
 }
 
@@ -1297,10 +1297,41 @@ p.kicker {
   color: var(--accent);
 }
 
+/* The 4.9 "new since last checked" badge, shown next to a tile's count
+   when there's something worth noticing - small enough not to compete
+   with the count itself, in --wax so it reads as "new" rather than
+   blending into the same accent color the count already uses. */
+.dashboard-summary-new {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--wax);
+  vertical-align: middle;
+}
+
 @media (max-width: 640px) {
   .dashboard-summary-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* ---------- Subscribers pages (4.7 / 4.8) ---------- */
+.subscriber-platform-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.subscriber-platform-row .dashboard-summary-count {
+  font-size: 1.6rem;
+  margin-right: 0.35rem;
 }
 
 .user-table {
@@ -1351,6 +1382,15 @@ p.kicker {
 
 .queue-card {
   padding: 1.25rem 1.5rem;
+}
+
+/* Highlights a message that was still unread the moment the inbox was
+   opened (see ContactController::mine()'s is_new flag) - a left accent
+   border rather than a filled background, so it doesn't fight with the
+   "New" pill already doing the heavier lifting, and reads fine in both
+   themes since --accent already flips appropriately. */
+.queue-card-new {
+  border-left: 3px solid var(--accent);
 }
 
 .queue-card-layout {

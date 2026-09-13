@@ -23,6 +23,7 @@ const AuthorProfile = lazy(() => import('./pages/AuthorProfile'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers'));
 const AdminCategories = lazy(() => import('./pages/AdminCategories'));
 const MyContactMessages = lazy(() => import('./pages/MyContactMessages'));
+const MySubscribers = lazy(() => import('./pages/MySubscribers'));
 const NewPost = lazy(() => import('./pages/NewPost'));
 const EditPost = lazy(() => import('./pages/EditPost'));
 const MyPosts = lazy(() => import('./pages/MyPosts'));
@@ -88,6 +89,7 @@ export default function App() {
         <Route path="admin/users" element={<AdminUsers />} />
         <Route path="admin/categories" element={<AdminCategories />} />
         <Route path="my/contact-messages" element={<MyContactMessages />} />
+        <Route path="my/subscribers" element={<MySubscribers />} />
         <Route path="request-campaign" element={<RequestCampaign />} />
         <Route path="admin/campaigns" element={<AdminCampaigns />} />
         <Route path="admin/posts" element={<AdminPosts />} />

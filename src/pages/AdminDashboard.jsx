@@ -8,6 +8,7 @@ import AdminComments from './AdminComments';
 import AdminCampaigns from './AdminCampaigns';
 import AdminUsers from './AdminUsers';
 import AdminCategories from './AdminCategories';
+import AdminSubscribers from './AdminSubscribers';
 
 const ICON_OVERVIEW = (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,6 +48,12 @@ const ICON_CATEGORIES = (
     <circle cx="8.2" cy="8.2" r="1.4" stroke="currentColor" strokeWidth="1.8" />
   </svg>
 );
+const ICON_SUBSCRIBERS = (
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6.5h16v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-11Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    <path d="M4.5 7l7.5 6 7.5-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const TABS = [
   { id: 'overview', label: 'Overview', icon: ICON_OVERVIEW },
@@ -55,6 +62,7 @@ const TABS = [
   { id: 'campaigns', label: 'Moderate campaigns', icon: ICON_CAMPAIGNS },
   { id: 'authors', label: 'Manage authors', icon: ICON_AUTHORS },
   { id: 'categories', label: 'Manage categories', icon: ICON_CATEGORIES },
+  { id: 'subscribers', label: 'Subscribers', icon: ICON_SUBSCRIBERS },
 ];
 
 // Everything that used to be six separate links crammed into the account
@@ -72,6 +80,7 @@ export default function AdminDashboard() {
   const activeTab = TABS.some((t) => t.id === requestedTab) ? requestedTab : 'overview';
 
   const [summary, setSummary] = useState(null);
+  const [subscriberNews, setSubscriberNews] = useState({ platform: 0, mine: 0 });
   const [myPosts, setMyPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
@@ -86,6 +95,23 @@ export default function AdminDashboard() {
     apiClient
       .get('/admin/dashboard-summary')
       .then((res) => setSummary(res.data))
+      .catch(() => {});
+
+    // 4.9's "new since last checked" badges - deliberately the
+    // lightweight /new-count endpoints, not the full Subscribers tab or
+    // My Subscribers page, which reset the count as a side effect of
+    // loading them (see SubscriberController::adminIndex()/mine() vs
+    // adminNewCount()/newCount()).
+    Promise.all([
+      apiClient.get('/admin/subscribers/new-count'),
+      apiClient.get('/my/subscribers/new-count'),
+    ])
+      .then(([platformRes, mineRes]) => {
+        setSubscriberNews({
+          platform: platformRes.data.new_since_last_check,
+          mine: mineRes.data.new_since_last_check,
+        });
+      })
       .catch(() => {});
   }, [authLoading, user]);
 
@@ -142,6 +168,9 @@ export default function AdminDashboard() {
               {tab.id === 'campaigns' && summary?.pending_campaigns > 0 && (
                 <span className="settings-tab-badge">{summary.pending_campaigns}</span>
               )}
+              {tab.id === 'subscribers' && subscriberNews.platform > 0 && (
+                <span className="settings-tab-badge">{subscriberNews.platform}</span>
+              )}
             </button>
           ))}
         </nav>
@@ -171,6 +200,28 @@ export default function AdminDashboard() {
                     <button type="button" className="dashboard-summary-tile" onClick={() => setTab('campaigns')}>
                       <span className="dashboard-summary-count">{summary.pending_campaigns}</span>
                       <span>Campaign{summary.pending_campaigns === 1 ? '' : 's'} pending</span>
+                    </button>
+                    <Link to="/my/contact-messages" className="dashboard-summary-tile">
+                      <span className="dashboard-summary-count">{summary.unread_messages}</span>
+                      <span>Unread message{summary.unread_messages === 1 ? '' : 's'}</span>
+                    </Link>
+                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
+                      <span className="dashboard-summary-count">
+                        {summary.my_subscribers}
+                        {subscriberNews.mine > 0 && (
+                          <span className="dashboard-summary-new">+{subscriberNews.mine} new</span>
+                        )}
+                      </span>
+                      <span>Your subscribers</span>
+                    </button>
+                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
+                      <span className="dashboard-summary-count">
+                        {summary.platform_subscribers}
+                        {subscriberNews.platform > 0 && (
+                          <span className="dashboard-summary-new">+{subscriberNews.platform} new</span>
+                        )}
+                      </span>
+                      <span>Platform list subscribers</span>
                     </button>
                   </div>
                 </div>
@@ -221,6 +272,7 @@ export default function AdminDashboard() {
           {activeTab === 'campaigns' && <AdminCampaigns embedded />}
           {activeTab === 'authors' && <AdminUsers embedded />}
           {activeTab === 'categories' && <AdminCategories embedded />}
+          {activeTab === 'subscribers' && <AdminSubscribers embedded />}
         </div>
       </div>
     </div>
