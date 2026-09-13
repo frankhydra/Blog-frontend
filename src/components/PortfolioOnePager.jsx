@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { formatPostmark } from '../utils/postmark';
 import ContactAuthorForm from './ContactAuthorForm';
+import SubscribeToAuthorForm from './SubscribeToAuthorForm';
 
 const ROLE_LABELS = {
   admin: 'Site owner',
@@ -55,6 +56,7 @@ export default function PortfolioOnePager({
   experience = [],
   previewMode = false,
   showContact = false,
+  showSubscribe = false,
   topCta = null,
   bottomCta = null,
   backLink = null,
@@ -183,6 +185,10 @@ export default function PortfolioOnePager({
             )}
           </div>
         </header>
+
+        {showSubscribe && !previewMode && (
+          <SubscribeToAuthorForm authorId={person.id} authorName={person.name} />
+        )}
 
         {topCta}
       </div>

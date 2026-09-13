@@ -3916,6 +3916,101 @@ select:focus-visible {
   }
 }
 
+/* ---------- Subscribe to author (public profile, 4.6) ---------- */
+.subscribe-author {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.subscribe-author-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  margin: 0 0 0.2rem;
+}
+
+.subscribe-author-sub {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin: 0 0 0.9rem;
+}
+
+.subscribe-author-row {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.subscribe-author-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+/* Same solid-fill treatment as every other primary button (.auth-submit,
+   .join-submit-button, etc.) - accent-solid + a fixed darker-navy hover,
+   not the theme-flipping --accent, so the white label stays readable in
+   dark mode too. */
+.subscribe-author-row button {
+  padding: 0.65rem 1.1rem;
+  background: var(--accent-solid);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease;
+}
+
+.subscribe-author-row button:hover:not(:disabled) {
+  background: #232f54;
+}
+
+.subscribe-author-row button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.subscribe-author-trust {
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0.6rem 0 0;
+}
+
+.subscribe-author-done {
+  text-align: center;
+}
+
+.subscribe-author-message {
+  font-family: 'Fraunces', serif;
+  font-size: 1.05rem;
+  margin: 0 0 0.3rem;
+}
+
+.subscribe-author-unsubscribe a {
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 480px) {
+  .subscribe-author-row {
+    flex-direction: column;
+  }
+}
+
 /* ---------- Portfolio manager (Settings > Portfolio tab) ---------- */
 .portfolio-manager {
   display: flex;
@@ -4441,4 +4536,101 @@ select:focus-visible {
   gap: 0.75rem;
   flex-wrap: wrap;
   margin: 1rem 0 2rem;
+}
+
+/* ---------- /join landing page ---------- */
+.join-page {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.join-hero {
+  border-bottom: none;
+  margin-bottom: 1rem;
+  padding-top: 2rem;
+}
+
+.join-form-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 2rem;
+}
+
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.join-form input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.join-submit-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.95rem 1rem;
+  margin-top: 0.4rem;
+  background: var(--accent-solid);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-family: 'Fraunces', serif;
+  cursor: pointer;
+}
+
+.join-submit-button:hover:not(:disabled) {
+  background: #232f54;
+}
+
+.join-submit-button:disabled {
+  opacity: 0.65;
+  cursor: default;
+}
+
+.join-trust-line {
+  text-align: center;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0.6rem 0 0;
+}
+
+.join-success {
+  text-align: center;
+}
+
+.join-success-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.4rem;
+  margin: 0 0 0.75rem;
+}
+
+.join-unsubscribe-url {
+  word-break: break-all;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.8rem;
+  background: var(--paper-tint);
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.hero-join-mention {
+  margin-top: 1.5rem;
+  text-align: center;
 }

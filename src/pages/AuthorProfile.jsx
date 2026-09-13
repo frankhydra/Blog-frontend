@@ -33,6 +33,7 @@ export default function AuthorProfile() {
         posts={author.posts}
         experience={author.experience}
         showContact
+        showSubscribe
         backLink={{ to: '/portfolio', label: 'Back to Portfolio' }}
       />
     </div>

@@ -151,9 +151,7 @@ export default function Layout() {
                         {user.role !== 'admin' && (
                           <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
                         )}
-                        {['admin', 'author'].includes(user.role) && (
-                          <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
-                        )}
+                        <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
                         <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {user.role === 'admin' && (
                           <>
@@ -232,9 +230,7 @@ export default function Layout() {
                   {user.role !== 'admin' && (
                     <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
                   )}
-                  {['admin', 'author'].includes(user.role) && (
-                    <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
-                  )}
+                  <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
                   <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
                   {user.role === 'admin' && (
                     <>
@@ -286,6 +282,7 @@ export default function Layout() {
                 <NavLink to="/books">Books</NavLink>
                 <NavLink to="/portfolio">Portfolio</NavLink>
                 <NavLink to="/about">About</NavLink>
+                <NavLink to="/join">Join the list</NavLink>
               </div>
 
               <div className="footer-col">

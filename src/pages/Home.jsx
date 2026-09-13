@@ -57,6 +57,9 @@ export default function Home() {
           <Link to="/community" className="nav-cta">Read the blog</Link>
           <Link to="/register" className="text-link">Start writing here</Link>
         </div>
+        <p className="post-meta hero-join-mention">
+          Prefer email? <Link to="/join">Join the mailing list</Link> instead.
+        </p>
       </section>
 
       <section className="landing-section">

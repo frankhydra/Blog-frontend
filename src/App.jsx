@@ -16,6 +16,8 @@ const Register = lazy(() => import('./pages/Register'));
 const AdminComments = lazy(() => import('./pages/AdminComments'));
 const CommunityBlogs = lazy(() => import('./pages/CommunityBlogs'));
 const AllTags = lazy(() => import('./pages/AllTags'));
+const Unsubscribe = lazy(() => import('./pages/Unsubscribe'));
+const Join = lazy(() => import('./pages/Join'));
 const TagPosts = lazy(() => import('./pages/TagPosts'));
 const AuthorProfile = lazy(() => import('./pages/AuthorProfile'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers'));
@@ -79,6 +81,8 @@ export default function App() {
         <Route path="admin/comments" element={<AdminComments />} />
         <Route path="community" element={<CommunityBlogs />} />
         <Route path="tags" element={<AllTags />} />
+        <Route path="unsubscribe/:token" element={<Unsubscribe />} />
+        <Route path="join" element={<Join />} />
         <Route path="tags/:slug" element={<TagPosts />} />
         <Route path="authors/:id" element={<AuthorProfile />} />
         <Route path="admin/users" element={<AdminUsers />} />
