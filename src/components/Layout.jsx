@@ -18,36 +18,34 @@ const ICON_CLOSE = (
   </svg>
 );
 
-const ICON_SUN = (
-  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
-    <path
-      d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-    />
-  </svg>
-);
-
-const ICON_MOON = (
+// Replaces the old sun/moon toggle now that there are six themes instead
+// of a light/dark binary - a palette reads as "pick a theme" rather than
+// implying just one more state to flip through.
+const ICON_PALETTE = (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
-      d="M20.2 14.6A8.6 8.6 0 1 1 9.4 3.8a7 7 0 0 0 10.8 10.8Z"
+      d="M12 3.5c-4.7 0-8.5 3.6-8.5 8 0 3.3 2.5 4.2 4.2 4.2.7 0 1-.4 1-.9 0-.4-.2-.6-.4-.9-.3-.4-.6-.8-.6-1.5 0-1.1 1-2 2.2-2h2.4c2.5 0 4.7-1.7 4.7-4.4 0-3.5-3.5-6.5-9-6.5Z"
       stroke="currentColor"
-      strokeWidth="1.8"
+      strokeWidth="1.6"
       strokeLinejoin="round"
     />
+    <circle cx="7.8" cy="11" r="1" fill="currentColor" />
+    <circle cx="9.3" cy="7.3" r="1" fill="currentColor" />
+    <circle cx="13.4" cy="6.6" r="1" fill="currentColor" />
+    <circle cx="16.4" cy="9.3" r="1" fill="currentColor" />
   </svg>
 );
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme, themes } = useTheme();
   const { hideHeader, hideFooter } = useChrome();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const themeMenuRef = useRef(null);
+  const activeTheme = themes.find((t) => t.key === theme) || themes[0];
 
   // Mobile nav - below 640px the primary nav + account menu disappear from
   // the header bar entirely (see the @media rule in index.css) and this
@@ -76,6 +74,9 @@ export default function Layout() {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
         setMenuOpen(false);
       }
+      if (themeMenuRef.current && !themeMenuRef.current.contains(e.target)) {
+        setThemeMenuOpen(false);
+      }
       if (
         mobileMenuRef.current &&
         !mobileMenuRef.current.contains(e.target) &&
@@ -88,6 +89,7 @@ export default function Layout() {
     function handleKeydown(e) {
       if (e.key === 'Escape') {
         setMenuOpen(false);
+        setThemeMenuOpen(false);
         setMobileMenuOpen(false);
       }
     }
@@ -176,17 +178,51 @@ export default function Layout() {
             {/* Always visible regardless of screen width - unlike the rest
                 of .header-actions, this shouldn't disappear into the
                 hamburger menu just because it's a small button, since a
-                theme toggle is the kind of thing people expect to reach
-                in one tap. */}
-            <button
-              type="button"
-              className="theme-toggle"
-              onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              {theme === 'dark' ? ICON_SUN : ICON_MOON}
-            </button>
+                theme picker is the kind of thing people expect to reach
+                in one tap. Same dropdown pattern as .account-menu above:
+                a trigger button plus an absolutely-positioned panel,
+                closed on outside click/Escape. */}
+            <div className="theme-menu" ref={themeMenuRef}>
+              <button
+                type="button"
+                className="theme-toggle"
+                onClick={() => setThemeMenuOpen((open) => !open)}
+                aria-expanded={themeMenuOpen}
+                aria-label={`Change theme (current: ${activeTheme.label})`}
+                title={`Change theme (current: ${activeTheme.label})`}
+              >
+                {ICON_PALETTE}
+              </button>
+
+              {themeMenuOpen && (
+                <div className="theme-dropdown" role="menu">
+                  <p className="dropdown-label">Theme</p>
+                  {themes.map((t) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      role="menuitemradio"
+                      aria-checked={t.key === theme}
+                      className={`theme-option${t.key === theme ? ' theme-option-active' : ''}`}
+                      onClick={() => {
+                        setTheme(t.key);
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <span
+                        className="theme-swatch"
+                        style={{ background: t.swatch[0], borderColor: t.swatch[1] }}
+                        aria-hidden="true"
+                      >
+                        <span className="theme-swatch-dot" style={{ background: t.swatch[1] }} />
+                      </span>
+                      {t.label}
+                      {t.key === theme && <span className="theme-option-check" aria-hidden="true">✓</span>}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
             {/* Hamburger toggle - CSS hides this above 640px, so it never
                 shows up alongside the desktop nav. */}

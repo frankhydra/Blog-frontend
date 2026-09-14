@@ -20,6 +20,13 @@
      fills keep this original, darker navy in both themes instead. */
   --accent-solid: #2B3A67;
 
+  /* Hover state for every solid accent-fill button (.auth-submit,
+     .join-submit-button, .subscribe-author-row button, etc.) - was three
+     separate hardcoded #232f54s before theming; pulled into a variable so
+     each theme below can supply its own darker shade instead of every
+     theme's buttons darkening toward this one fixed navy on hover. */
+  --accent-solid-hover: #232f54;
+
   /* Extra accent colors used only to give each spotlight/campaign card its
      own identity - same restrained, muted-ink feel as --accent/--wax
      rather than bright "AI palette" colors. */
@@ -49,7 +56,7 @@
    written with the literal hex values instead of these variables, on
    purpose, so they keep their current look in both themes rather than
    flattening into the page around them. */
-[data-theme="dark"] {
+[data-theme="midnight"] {
   --ink: #ECE4D4;
   --paper: #17130F;
   --paper-tint: #211C15;
@@ -57,9 +64,94 @@
   --muted: #A89A85;
   --border: #3D3529;
   --accent: #8AA0E8;
+  --accent-solid: #2B3A67;
+  --accent-solid-hover: #232f54;
   --wax: #C4626D;
   --theme-forest: #7FA878;
   --theme-ochre: #D1A059;
+  --shadow-rgb: 0, 0, 0;
+}
+
+/* ---------- Harbor (blue family, light) ----------
+   Cool blue-grey paper instead of postmark's warm cream, deep navy ink,
+   steel-blue accent. Copper/rust kept as the secondary "wax" pop so it
+   still reads as one coherent design system and not just postmark with
+   a blue filter over it - same relationship postmark's own indigo/
+   oxblood pairing has. */
+[data-theme="harbor"] {
+  --ink: #1B2733;
+  --paper: #EEF2F6;
+  --paper-tint: #E2E9F0;
+  --card: #FBFCFE;
+  --muted: #5B6B7A;
+  --border: #CBD6E1;
+  --accent: #2F5FA8;
+  --accent-solid: #234A87;
+  --accent-solid-hover: #1B3968;
+  --wax: #B0512E;
+  --theme-forest: #3C6E5E;
+  --theme-ochre: #A97C3D;
+  --shadow-rgb: 15, 23, 33;
+}
+
+/* ---------- Indigo Night (blue family, dark) ----------
+   Harbor's dark counterpart - deep blue-black rather than midnight's
+   warm near-black, periwinkle ink/accent. Same warm copper "wax" pop as
+   Harbor so the two read as a matched light/dark pair. */
+[data-theme="indigo"] {
+  --ink: #DCE3F0;
+  --paper: #0E1420;
+  --paper-tint: #161D2C;
+  --card: #1B2333;
+  --muted: #8B96AC;
+  --border: #2B3446;
+  --accent: #7B93D9;
+  --accent-solid: #33488A;
+  --accent-solid-hover: #283A6E;
+  --wax: #D97757;
+  --theme-forest: #6FA890;
+  --theme-ochre: #D6A85E;
+  --shadow-rgb: 0, 0, 0;
+}
+
+/* ---------- Meadow (green family, light) ----------
+   Sage-tinted paper, deep forest ink, moss-green accent. Warm terracotta
+   wax for the same kind of complementary pop as the other themes. */
+[data-theme="meadow"] {
+  --ink: #22301F;
+  --paper: #F3F5EC;
+  --paper-tint: #E7ECDA;
+  --card: #FBFCF7;
+  --muted: #667259;
+  --border: #D6DEC5;
+  --accent: #3F6B3A;
+  --accent-solid: #37592F;
+  --accent-solid-hover: #294321;
+  --wax: #A15A2E;
+  --theme-forest: #557C46;
+  --theme-ochre: #B08430;
+  --shadow-rgb: 20, 26, 16;
+}
+
+/* ---------- Ash (neutral graphite, dark) ----------
+   A cooler, more minimal dark option than Midnight's warm near-black -
+   true neutral charcoal with a desaturated slate-blue accent rather than
+   Indigo Night's fuller blue, so it reads as understated rather than
+   "the blue theme, but dark". Amber-copper wax keeps it from feeling
+   cold/sterile. */
+[data-theme="ash"] {
+  --ink: #E8E8E6;
+  --paper: #161617;
+  --paper-tint: #1E1E20;
+  --card: #242426;
+  --muted: #9B9B9C;
+  --border: #333335;
+  --accent: #8697AD;
+  --accent-solid: #3E4C60;
+  --accent-solid-hover: #2F3A4A;
+  --wax: #C97B4A;
+  --theme-forest: #7A9182;
+  --theme-ochre: #B99B63;
   --shadow-rgb: 0, 0, 0;
 }
 
@@ -295,7 +387,78 @@ p.kicker {
 
 .theme-toggle:hover {
   border-color: rgba(247, 243, 236, 0.45);
-  transform: rotate(12deg);
+}
+
+/* Theme picker dropdown - same shape as .account-menu/.account-dropdown
+   (relative trigger + absolutely-positioned panel below it), just
+   right-aligned under a smaller icon-only trigger instead of the wider
+   avatar+name button. */
+.theme-menu {
+  position: relative;
+}
+
+.theme-dropdown {
+  position: absolute;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(var(--shadow-rgb), 0.18);
+  min-width: 190px;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.5rem 0.6rem;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.theme-option:hover {
+  background: var(--paper-tint);
+}
+
+.theme-option-active {
+  color: var(--accent);
+}
+
+.theme-option-check {
+  margin-left: auto;
+  font-size: 0.7rem;
+}
+
+/* Two-tone swatch - outer ring is a theme's paper color, inner dot its
+   accent - so each option previews itself without needing to actually
+   switch to it first. */
+.theme-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.theme-swatch-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
 }
 
 /* The desktop nav needs real room: brand + 6 links + Write button + the
@@ -1002,7 +1165,7 @@ p.kicker {
 }
 
 .auth-submit:hover {
-  background: #232f54;
+  background: var(--accent-solid-hover);
 }
 
 .auth-submit:active {
@@ -4013,7 +4176,7 @@ select:focus-visible {
 }
 
 .subscribe-author-row button:hover:not(:disabled) {
-  background: #232f54;
+  background: var(--accent-solid-hover);
 }
 
 .subscribe-author-row button:disabled {
@@ -4632,7 +4795,7 @@ select:focus-visible {
 }
 
 .join-submit-button:hover:not(:disabled) {
-  background: #232f54;
+  background: var(--accent-solid-hover);
 }
 
 .join-submit-button:disabled {
@@ -4657,6 +4820,7 @@ select:focus-visible {
    hand over an email address. */
 .join-skip-link {
   display: block;
+  width: 100%;
   text-align: center;
   margin-top: 1.1rem;
   color: var(--muted);
@@ -4664,6 +4828,15 @@ select:focus-visible {
   font-size: 0.75rem;
   text-decoration: underline;
   text-underline-offset: 3px;
+  /* Rendered as a real <button> (not an <a>) since it has no href of its
+     own - it calls onSkip to dismiss the gate in place. Reset the
+     browser's default button chrome so it reads as plain quiet text,
+     same as it would as a link. */
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 400;
 }
 
 .join-skip-link:hover {

@@ -35,10 +35,11 @@ const MOTIF_ENVELOPE = (
 //
 // Also reused as the first-visit gate at "/" (see HomeGate.jsx) - asGate
 // swaps in slightly more "you found this" framing for that context and
-// adds a way to continue without subscribing, and onContinue lets the
-// gate move straight to the home page on success instead of showing the
-// standalone page's inline success card.
-export default function Join({ asGate = false, onContinue = null }) {
+// adds a way to continue without subscribing (onSkip, rendered as
+// .join-skip-link below), and onContinue lets the gate move straight to
+// the home page on success instead of showing the standalone page's
+// inline success card.
+export default function Join({ asGate = false, onContinue = null, onSkip = null }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'done' | 'error'
@@ -150,6 +151,11 @@ export default function Join({ asGate = false, onContinue = null }) {
             </button>
             {error && <p className="form-error">{error}</p>}
             <p className="join-trust-line">No spam. No tracking. Unsubscribe anytime.</p>
+            {asGate && onSkip && (
+              <button type="button" className="join-skip-link" onClick={onSkip}>
+                Not right now - take me to the site
+              </button>
+            )}
           </form>
         )}
       </section>
