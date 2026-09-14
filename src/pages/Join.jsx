@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
+import useHideFooter from '../hooks/useHideFooter';
+import useHideHeader from '../hooks/useHideHeader';
 import WelcomeEmblem from '../components/WelcomeEmblem';
 
 // Three simple, tasteful motifs (a nib pen, a wax seal, an open envelope)
@@ -45,6 +47,16 @@ export default function Join({ asGate = false, onContinue = null }) {
   const parallaxRef = useRef(null);
 
   usePageMeta('Join the list', 'Get new posts, letters, and books the moment they publish.');
+
+  // Only while acting as the first-visit gate (see HomeGate.jsx) - the
+  // standalone /join page reached from the footer keeps the normal site
+  // chrome, same as every other page. Hiding the header too (not just
+  // the footer) matters here specifically: leaving the nav visible would
+  // let a visitor just click "Letters" or "Books" and leave without ever
+  // subscribing, which defeats the point of this being a real gate
+  // rather than a dismissible banner.
+  useHideFooter(asGate);
+  useHideHeader(asGate);
 
   // Direct DOM manipulation via a ref, not React state - a mousemove
   // handler firing dozens of times a second would otherwise mean dozens

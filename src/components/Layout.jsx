@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useChrome } from '../context/ChromeContext';
 import Loading from './Loading';
 
 const ICON_MENU = (
@@ -43,6 +44,7 @@ const ICON_MOON = (
 export default function Layout() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { hideHeader, hideFooter } = useChrome();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -110,6 +112,7 @@ export default function Layout() {
 
   return (
     <div className="site">
+      {!hideHeader && (
       <div className="band header-band">
         <div className="inner">
           <header className="site-header">
@@ -251,6 +254,7 @@ export default function Layout() {
           )}
         </div>
       </div>
+      )}
 
       <div className="band main-band">
         <main className="inner site-main">
@@ -265,56 +269,58 @@ export default function Layout() {
         </main>
       </div>
 
-      <div className="band footer-band">
-        <div className="inner">
-          <footer className="site-footer">
-            <div className="footer-grid">
-              <div className="footer-brand">
-                <Link to="/" className="footer-brand-name">Franklin Nchukwi</Link>
-                <p className="footer-tagline">Writing on code, craft, and the occasional letter.</p>
+      {!hideFooter && (
+        <div className="band footer-band">
+          <div className="inner">
+            <footer className="site-footer">
+              <div className="footer-grid">
+                <div className="footer-brand">
+                  <Link to="/" className="footer-brand-name">Franklin Nchukwi</Link>
+                  <p className="footer-tagline">Writing on code, craft, and the occasional letter.</p>
+                </div>
+
+                <div className="footer-col">
+                  <p className="footer-col-title">Explore</p>
+                  <NavLink to="/" end>Home</NavLink>
+                  <NavLink to="/community">Community Blogs</NavLink>
+                  <NavLink to="/letters">Letters</NavLink>
+                  <NavLink to="/books">Books</NavLink>
+                  <NavLink to="/portfolio">Portfolio</NavLink>
+                  <NavLink to="/about">About</NavLink>
+                  <NavLink to="/join">Join the list</NavLink>
+                </div>
+
+                <div className="footer-col">
+                  <p className="footer-col-title">Account</p>
+                  {user ? (
+                    <>
+                      <Link to="/write">Write</Link>
+                      <Link to="/my-posts">My posts</Link>
+                      {user.role !== 'admin' && (
+                        <Link to="/request-campaign">Request a campaign</Link>
+                      )}
+                      <Link to="/settings">Settings</Link>
+                    </>
+                  ) : (
+                    <>
+                      <Link to="/login">Log in</Link>
+                      <Link to="/register">Create an account</Link>
+                    </>
+                  )}
+                </div>
               </div>
 
-              <div className="footer-col">
-                <p className="footer-col-title">Explore</p>
-                <NavLink to="/" end>Home</NavLink>
-                <NavLink to="/community">Community Blogs</NavLink>
-                <NavLink to="/letters">Letters</NavLink>
-                <NavLink to="/books">Books</NavLink>
-                <NavLink to="/portfolio">Portfolio</NavLink>
-                <NavLink to="/about">About</NavLink>
-                <NavLink to="/join">Join the list</NavLink>
+              <div className="footer-bottom">
+                <p>&copy; {new Date().getFullYear()} Franklin Nchukwi</p>
+                <div className="footer-bottom-links">
+                  <a href={sitemapUrl} target="_blank" rel="noreferrer">Sitemap</a>
+                  <button type="button" onClick={scrollToTop} className="back-to-top">Back to top ↑</button>
+                </div>
               </div>
-
-              <div className="footer-col">
-                <p className="footer-col-title">Account</p>
-                {user ? (
-                  <>
-                    <Link to="/write">Write</Link>
-                    <Link to="/my-posts">My posts</Link>
-                    {user.role !== 'admin' && (
-                      <Link to="/request-campaign">Request a campaign</Link>
-                    )}
-                    <Link to="/settings">Settings</Link>
-                  </>
-                ) : (
-                  <>
-                    <Link to="/login">Log in</Link>
-                    <Link to="/register">Create an account</Link>
-                  </>
-                )}
-              </div>
-            </div>
-
-            <div className="footer-bottom">
-              <p>&copy; {new Date().getFullYear()} Franklin Nchukwi</p>
-              <div className="footer-bottom-links">
-                <a href={sitemapUrl} target="_blank" rel="noreferrer">Sitemap</a>
-                <button type="button" onClick={scrollToTop} className="back-to-top">Back to top ↑</button>
-              </div>
-            </div>
-          </footer>
+            </footer>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
