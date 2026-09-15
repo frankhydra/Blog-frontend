@@ -197,7 +197,7 @@ function ProfileTab({ user }) {
       const res = await apiClient.post('/uploads', formData);
       setAvatar(res.data.url);
     } catch {
-      setAvatarUploadError('Upload failed - try a JPG, PNG, or WebP under 5MB.');
+      setAvatarUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
     } finally {
       setAvatarUploading(false);
       e.target.value = '';
@@ -224,7 +224,15 @@ function ProfileTab({ user }) {
       await refreshUser();
       setSaved(true);
     } catch (err) {
-      setError(err.response?.data?.errors?.website?.[0] || 'Something went wrong saving your profile.');
+      // Show whatever Laravel's validator actually objected to, for
+      // whichever field it was - not just website (the one field this
+      // used to special-case). A generic fallback message for every
+      // validation failure regardless of field is exactly what made the
+      // real social_links/empty-string bug invisible until someone dug
+      // into the Network tab by hand.
+      const errors = err.response?.data?.errors;
+      const firstMessage = errors && Object.values(errors)[0]?.[0];
+      setError(firstMessage || 'Something went wrong saving your profile.');
     } finally {
       setSubmitting(false);
     }
@@ -299,7 +307,7 @@ function ProfileTab({ user }) {
               )}
 
               {avatarUploadError && <p className="form-error">{avatarUploadError}</p>}
-              <p className="settings-card-hint">JPG, PNG, or WebP. Max 5MB.</p>
+              <p className="settings-card-hint">JPG, PNG, or WebP. Max 10MB.</p>
             </div>
           </div>
         </section>

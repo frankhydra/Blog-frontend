@@ -32,7 +32,7 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
       const { url } = await uploadFile(file, 'image');
       setCoverUrl(url);
     } catch {
-      setUploadError('Cover upload failed - try a JPG, PNG, or WebP under 5MB.');
+      setUploadError('Cover upload failed - try a JPG, PNG, or WebP under 10MB.');
     } finally {
       setUploadingCover(false);
     }
@@ -48,7 +48,7 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
       setFileUrl(url);
       setFileName(original_name);
     } catch {
-      setUploadError('File upload failed - try a PDF or EPUB under 20MB.');
+      setUploadError('File upload failed - try a PDF or EPUB under 50MB.');
     } finally {
       setUploadingFile(false);
     }

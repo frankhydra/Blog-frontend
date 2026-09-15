@@ -113,7 +113,7 @@ export default function MyPortfolio({ embedded = false }) {
       const res = await apiClient.post('/uploads', formData);
       setForm((f) => ({ ...f, image_url: res.data.url }));
     } catch {
-      setCoverUploadError('Upload failed - try a JPG, PNG, or WebP under 5MB.');
+      setCoverUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
     } finally {
       setCoverUploading(false);
       e.target.value = '';
@@ -287,7 +287,7 @@ export default function MyPortfolio({ embedded = false }) {
                 placeholder="or paste an image URL"
               />
               {coverUploadError && <p className="form-error">{coverUploadError}</p>}
-              <p className="settings-card-hint">JPG, PNG, or WebP. Max 5MB.</p>
+              <p className="settings-card-hint">JPG, PNG, or WebP. Max 10MB.</p>
             </div>
           </div>
 

@@ -199,7 +199,7 @@ export default function RichTextEditor({ content, onChange }) {
       quill.insertEmbed(index, 'image', res.data.url, 'user');
       quill.setSelection(index + 1);
     } catch {
-      alert('Image upload failed - try a JPG, PNG, or WebP under 5MB.');
+      alert('Image upload failed - try a JPG, PNG, or WebP under 10MB.');
     }
   }
 
