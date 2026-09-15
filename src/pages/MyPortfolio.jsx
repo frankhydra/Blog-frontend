@@ -121,7 +121,7 @@ export default function MyPortfolio({ embedded = false }) {
       });
       setForm((f) => ({ ...f, image_url: res.data.url }));
     } catch {
-      setCoverUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
+      setCoverUploadError('Upload failed - try a JPG, PNG, WebP, or JFIF under 10MB.');
     } finally {
       setCoverUploading(false);
       e.target.value = '';
@@ -273,7 +273,7 @@ export default function MyPortfolio({ embedded = false }) {
               <input
                 ref={coverFileInputRef}
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg,image/webp,image/pjpeg,.jfif"
                 onChange={handleCoverFileChange}
                 hidden
               />
@@ -295,7 +295,7 @@ export default function MyPortfolio({ embedded = false }) {
                 placeholder="or paste an image URL"
               />
               {coverUploadError && <p className="form-error">{coverUploadError}</p>}
-              <p className="settings-card-hint">JPG, PNG, or WebP. Max 10MB.</p>
+              <p className="settings-card-hint">JPG, PNG, WebP, or JFIF. Max 10MB.</p>
             </div>
           </div>
 

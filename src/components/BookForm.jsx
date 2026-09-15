@@ -43,7 +43,7 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
       const { url } = await uploadFile(toUpload, 'image', setCoverProgress);
       setCoverUrl(url);
     } catch {
-      setUploadError('Cover upload failed - try a JPG, PNG, or WebP under 10MB.');
+      setUploadError('Cover upload failed - try a JPG, PNG, WebP, or JFIF under 10MB.');
     } finally {
       setUploadingCover(false);
     }

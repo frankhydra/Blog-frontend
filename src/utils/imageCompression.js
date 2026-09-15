@@ -22,8 +22,16 @@
 // re-encoded result somehow came out larger than the original (can
 // happen with an already-small, already-optimized image) - so this can
 // only ever help, never hurt.
+// Some browser/OS combinations (notably Chrome on Windows) report an
+// empty or nonstandard `file.type` for .jfif files instead of
+// "image/jpeg" - the extension is checked as a fallback so those files
+// still get compressed instead of silently skipping straight to upload.
+const KNOWN_IMAGE_EXTENSIONS = /\.(jpe?g|jfif|png|webp)$/i;
+
 export async function compressImage(file, { maxDimension = 1600, quality = 0.82 } = {}) {
-  if (!file || !file.type || !file.type.startsWith('image/')) return file;
+  const looksLikeImage = (file?.type && file.type.startsWith('image/'))
+    || (file?.name && KNOWN_IMAGE_EXTENSIONS.test(file.name));
+  if (!file || !looksLikeImage) return file;
 
   try {
     const bitmap = await createImageBitmap(file);

@@ -207,7 +207,7 @@ function ProfileTab({ user }) {
       });
       setAvatar(res.data.url);
     } catch {
-      setAvatarUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
+      setAvatarUploadError('Upload failed - try a JPG, PNG, WebP, or JFIF under 10MB.');
     } finally {
       setAvatarUploading(false);
       e.target.value = '';
@@ -284,7 +284,7 @@ function ProfileTab({ user }) {
                 ref={avatarFileInputRef}
                 id="avatar-file"
                 type="file"
-                accept="image/png,image/jpeg,image/webp"
+                accept="image/png,image/jpeg,image/webp,image/pjpeg,.jfif"
                 onChange={handleAvatarFileChange}
                 hidden
               />
@@ -317,7 +317,7 @@ function ProfileTab({ user }) {
               )}
 
               {avatarUploadError && <p className="form-error">{avatarUploadError}</p>}
-              <p className="settings-card-hint">JPG, PNG, or WebP. Max 10MB.</p>
+              <p className="settings-card-hint">JPG, PNG, WebP, or JFIF. Max 10MB.</p>
             </div>
           </div>
         </section>
