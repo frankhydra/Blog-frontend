@@ -3,6 +3,7 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import PortfolioOnePager from '../components/PortfolioOnePager';
 import SkeletonGrid from '../components/SkeletonGrid';
+import { compressImage } from '../utils/imageCompression';
 
 const BLANK = { title: '', category: '', description: '', image_url: '', link: '', sort_order: 0 };
 
@@ -46,6 +47,7 @@ export default function MyPortfolio({ embedded = false }) {
   const titleInputRef = useRef(null);
   const coverFileInputRef = useRef(null);
   const [coverUploading, setCoverUploading] = useState(false);
+  const [coverUploadProgress, setCoverUploadProgress] = useState(0);
   const [coverUploadError, setCoverUploadError] = useState('');
 
   useEffect(() => {
@@ -106,11 +108,17 @@ export default function MyPortfolio({ embedded = false }) {
     if (!file) return;
     setCoverUploadError('');
     setCoverUploading(true);
+    setCoverUploadProgress(0);
     try {
+      const toUpload = await compressImage(file);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', toUpload);
       formData.append('type', 'image');
-      const res = await apiClient.post('/uploads', formData);
+      const res = await apiClient.post('/uploads', formData, {
+        onUploadProgress: (evt) => {
+          if (evt.total) setCoverUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+        },
+      });
       setForm((f) => ({ ...f, image_url: res.data.url }));
     } catch {
       setCoverUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
@@ -277,7 +285,7 @@ export default function MyPortfolio({ embedded = false }) {
                   disabled={coverUploading}
                 >
                   <span className="avatar-upload-button-icon">{ICON_UPLOAD}</span>
-                  {coverUploading ? 'Uploading…' : 'Upload image'}
+                  {coverUploading ? `Uploading… ${coverUploadProgress}%` : 'Upload image'}
                 </button>
               </div>
               <input

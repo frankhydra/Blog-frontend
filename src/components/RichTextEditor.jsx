@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import apiClient from '../api/client';
+import { compressImage } from '../utils/imageCompression';
 
 // Rich text editor for post/letter bodies, built on Quill.
 //
@@ -188,8 +189,12 @@ export default function RichTextEditor({ content, onChange }) {
     e.target.value = ''; // allow choosing the same file twice in a row
     if (!file) return;
 
+    // Inline post images are never shown larger than the article column,
+    // so the same shrink-before-upload treatment as avatar/cover images
+    // applies here too.
+    const toUpload = await compressImage(file);
     const formData = new FormData();
-    formData.append('file', file);
+    formData.append('file', toUpload);
     formData.append('type', 'image');
 
     try {

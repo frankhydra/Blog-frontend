@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
+import { compressImage } from '../utils/imageCompression';
 import MyPortfolio from './MyPortfolio';
 
 // Icons for the Profile tab's card headers - same minimal line-icon style
@@ -168,6 +169,7 @@ function ProfileTab({ user }) {
   // pasted URL. The URL field is kept as a fallback, tucked behind a toggle.
   const avatarFileInputRef = useRef(null);
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
   const [avatarUploadError, setAvatarUploadError] = useState('');
   const [showAvatarUrlField, setShowAvatarUrlField] = useState(false);
 
@@ -190,11 +192,19 @@ function ProfileTab({ user }) {
     if (!file) return;
     setAvatarUploadError('');
     setAvatarUploading(true);
+    setAvatarUploadProgress(0);
     try {
+      // Shrink an oversized photo before it goes over the wire - see
+      // imageCompression.js for why this helps most on a slow connection.
+      const toUpload = await compressImage(file);
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', toUpload);
       formData.append('type', 'image');
-      const res = await apiClient.post('/uploads', formData);
+      const res = await apiClient.post('/uploads', formData, {
+        onUploadProgress: (evt) => {
+          if (evt.total) setAvatarUploadProgress(Math.round((evt.loaded / evt.total) * 100));
+        },
+      });
       setAvatar(res.data.url);
     } catch {
       setAvatarUploadError('Upload failed - try a JPG, PNG, or WebP under 10MB.');
@@ -286,7 +296,7 @@ function ProfileTab({ user }) {
                   disabled={avatarUploading}
                 >
                   <span className="avatar-upload-button-icon">{ICON_UPLOAD}</span>
-                  {avatarUploading ? 'Uploading…' : 'Upload image'}
+                  {avatarUploading ? `Uploading… ${avatarUploadProgress}%` : 'Upload image'}
                 </button>
                 <button
                   type="button"

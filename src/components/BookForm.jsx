@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import apiClient from '../api/client';
+import { compressImage } from '../utils/imageCompression';
 
 export default function BookForm({ initialBook, onSubmit, submitting }) {
   const [title, setTitle] = useState(initialBook?.title ?? '');
@@ -10,16 +11,22 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
   const [fileName, setFileName] = useState(initialBook?.file_name ?? '');
 
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [coverProgress, setCoverProgress] = useState(0);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [fileProgress, setFileProgress] = useState(0);
   const [uploadError, setUploadError] = useState('');
 
-  async function uploadFile(file, type) {
+  async function uploadFile(file, type, onProgress) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('type', type);
     // Not setting Content-Type manually - axios sets the correct
     // multipart boundary automatically when given a FormData object.
-    const res = await apiClient.post('/uploads', formData);
+    const res = await apiClient.post('/uploads', formData, {
+      onUploadProgress: (evt) => {
+        if (evt.total && onProgress) onProgress(Math.round((evt.loaded / evt.total) * 100));
+      },
+    });
     return res.data;
   }
 
@@ -28,8 +35,12 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
     if (!file) return;
     setUploadError('');
     setUploadingCover(true);
+    setCoverProgress(0);
     try {
-      const { url } = await uploadFile(file, 'image');
+      // Cover art is only ever shown as a small thumbnail - shrink an
+      // oversized photo before upload, same as avatar/portfolio covers.
+      const toUpload = await compressImage(file);
+      const { url } = await uploadFile(toUpload, 'image', setCoverProgress);
       setCoverUrl(url);
     } catch {
       setUploadError('Cover upload failed - try a JPG, PNG, or WebP under 10MB.');
@@ -43,8 +54,14 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
     if (!file) return;
     setUploadError('');
     setUploadingFile(true);
+    setFileProgress(0);
     try {
-      const { url, original_name } = await uploadFile(file, 'document');
+      // The book file itself (PDF/EPUB) is NOT compressed - unlike the
+      // cover image, this is the actual content someone will read, so it
+      // has to go up byte-for-byte. On a slow connection a large book can
+      // legitimately take several minutes; the progress percentage below
+      // is what keeps that from looking like a stuck/broken upload.
+      const { url, original_name } = await uploadFile(file, 'document', setFileProgress);
       setFileUrl(url);
       setFileName(original_name);
     } catch {
@@ -87,7 +104,7 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
 
       <label htmlFor="cover_file">Cover image</label>
       <input id="cover_file" type="file" accept="image/*" onChange={handleCoverChange} />
-      {uploadingCover && <p className="post-meta">Uploading cover…</p>}
+      {uploadingCover && <p className="post-meta">Uploading cover… {coverProgress}%</p>}
       {coverUrl && (
         <img src={coverUrl} alt="Cover preview" style={{ width: 100, marginTop: '0.5rem', borderRadius: 4 }} />
       )}
@@ -101,7 +118,7 @@ export default function BookForm({ initialBook, onSubmit, submitting }) {
 
       <label htmlFor="book_file">Book file (PDF or EPUB, optional)</label>
       <input id="book_file" type="file" accept=".pdf,.epub" onChange={handleBookFileChange} />
-      {uploadingFile && <p className="post-meta">Uploading file…</p>}
+      {uploadingFile && <p className="post-meta">Uploading file… {fileProgress}%</p>}
       {fileName && <p className="post-meta">Attached: {fileName}</p>}
 
       {uploadError && <p className="form-error">{uploadError}</p>}
