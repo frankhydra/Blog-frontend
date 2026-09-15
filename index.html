@@ -10,21 +10,28 @@
     <title>Franklin Nchukwi</title>
     <script>
       // Set the theme attribute before React mounts (and before first
-      // paint), so a visitor who already chose - or whose OS prefers -
-      // dark mode never sees a flash of the light theme first. Kept as a
-      // tiny inline script rather than something inside main.jsx because
-      // anything in the React bundle necessarily runs after this initial
-      // HTML/CSS has already painted once.
+      // paint), so a visitor who already chose one of the six themes -
+      // or whose OS prefers dark mode, if they never chose - never sees
+      // a flash of the wrong theme first. Kept as a tiny inline script
+      // rather than something inside main.jsx because anything in the
+      // React bundle necessarily runs after this initial HTML/CSS has
+      // already painted once.
+      //
+      // The six valid keys and the OS-preference fallback must be kept
+      // in sync by hand with ThemeContext.jsx's THEMES/getInitialTheme -
+      // this script can't import from there since it has to run before
+      // any JS module loads.
       (function () {
+        var VALID = ['postmark', 'midnight', 'harbor', 'indigo', 'meadow', 'ash'];
         try {
           var stored = localStorage.getItem('theme');
-          var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-          if (theme === 'dark') {
-            document.documentElement.setAttribute('data-theme', 'dark');
-          }
+          var theme = VALID.indexOf(stored) !== -1
+            ? stored
+            : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'midnight' : 'postmark');
+          document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {
           // localStorage/matchMedia unavailable (e.g. privacy mode) -
-          // fall back to the default light theme, nothing to do here.
+          // fall back to the default postmark theme, nothing to do here.
         }
       })();
     </script>

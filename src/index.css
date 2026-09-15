@@ -38,6 +38,22 @@
      every box-shadow in this file keeps its own offset/blur/alpha, only
      the tint itself swaps between light and dark mode. */
   --shadow-rgb: 36, 31, 27;
+
+  /* "Chrome" colors - header band, footer band, the Write/Log-in button,
+     mobile menu panel, account trigger, and theme picker trigger. These
+     were previously hardcoded to this theme's ink/paper on every theme
+     (a deliberate simplification back when there were only two themes,
+     light and dark) - now that there are six, each theme gets its own
+     chrome pair instead, so the header/footer/hero CTA all read as part
+     of the same palette as everything else on the page rather than
+     staying one fixed brown-black regardless of what's selected.
+     --chrome-text-rgb is the unitless triplet used for every
+     rgba(var(--chrome-text-rgb), <alpha>) call (nav link states, footer
+     link opacity steps, dividers) - keep it in sync with --chrome-text
+     any time either changes. */
+  --chrome-bg: #241F1B;
+  --chrome-text: #F7F3EC;
+  --chrome-text-rgb: 247, 243, 236;
 }
 
 /* ---------- Dark mode ----------
@@ -70,6 +86,9 @@
   --theme-forest: #7FA878;
   --theme-ochre: #D1A059;
   --shadow-rgb: 0, 0, 0;
+  --chrome-bg: #0F0C09;
+  --chrome-text: #ECE4D4;
+  --chrome-text-rgb: 236, 228, 212;
 }
 
 /* ---------- Harbor (blue family, light) ----------
@@ -92,6 +111,9 @@
   --theme-forest: #3C6E5E;
   --theme-ochre: #A97C3D;
   --shadow-rgb: 15, 23, 33;
+  --chrome-bg: #1B2733;
+  --chrome-text: #EEF2F6;
+  --chrome-text-rgb: 238, 242, 246;
 }
 
 /* ---------- Indigo Night (blue family, dark) ----------
@@ -112,6 +134,9 @@
   --theme-forest: #6FA890;
   --theme-ochre: #D6A85E;
   --shadow-rgb: 0, 0, 0;
+  --chrome-bg: #080B12;
+  --chrome-text: #DCE3F0;
+  --chrome-text-rgb: 220, 227, 240;
 }
 
 /* ---------- Meadow (green family, light) ----------
@@ -131,6 +156,9 @@
   --theme-forest: #557C46;
   --theme-ochre: #B08430;
   --shadow-rgb: 20, 26, 16;
+  --chrome-bg: #22301F;
+  --chrome-text: #F3F5EC;
+  --chrome-text-rgb: 243, 245, 236;
 }
 
 /* ---------- Ash (neutral graphite, dark) ----------
@@ -153,6 +181,9 @@
   --theme-forest: #7A9182;
   --theme-ochre: #B99B63;
   --shadow-rgb: 0, 0, 0;
+  --chrome-bg: #0E0E0F;
+  --chrome-text: #E8E8E6;
+  --chrome-text-rgb: 232, 232, 230;
 }
 
 /* Shared breakpoint scale - every @media rule in this file uses one of
@@ -258,8 +289,8 @@ p.kicker {
 }
 
 .header-band {
-  background: #241F1B;
-  border-bottom: 1px solid rgba(247, 243, 236, 0.08);
+  background: var(--chrome-bg);
+  border-bottom: 1px solid rgba(var(--chrome-text-rgb), 0.08);
 }
 
 .site-header {
@@ -274,7 +305,7 @@ p.kicker {
   font-family: 'Fraunces', serif;
   font-weight: 600;
   font-size: 1.3rem;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   text-decoration: none;
   flex-shrink: 0;
 }
@@ -294,7 +325,7 @@ p.kicker {
 }
 
 .primary-nav a {
-  color: rgba(247, 243, 236, 0.62);
+  color: rgba(var(--chrome-text-rgb), 0.62);
   text-decoration: none;
   padding-bottom: 4px;
   border-bottom: 1px solid transparent;
@@ -302,11 +333,11 @@ p.kicker {
 }
 
 .primary-nav a:hover {
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 .primary-nav a.active {
-  color: #F7F3EC;
+  color: var(--chrome-text);
   border-bottom-color: var(--wax);
 }
 
@@ -322,8 +353,8 @@ p.kicker {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #241F1B;
-  background: #F7F3EC;
+  color: var(--chrome-bg);
+  background: var(--chrome-text);
   text-decoration: none;
   padding: 0.5rem 1rem;
   border-radius: 3px;
@@ -332,7 +363,7 @@ p.kicker {
 
 .nav-cta:hover {
   background: var(--wax);
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 /* Hamburger toggle - hidden by default, only shown below 640px (see the
@@ -346,9 +377,9 @@ p.kicker {
   width: 44px;
   height: 44px;
   background: none;
-  border: 1px solid rgba(247, 243, 236, 0.2);
+  border: 1px solid rgba(var(--chrome-text-rgb), 0.2);
   border-radius: 8px;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   cursor: pointer;
   flex-shrink: 0;
 }
@@ -359,10 +390,10 @@ p.kicker {
 }
 
 .mobile-menu-toggle:hover {
-  border-color: rgba(247, 243, 236, 0.45);
+  border-color: rgba(var(--chrome-text-rgb), 0.45);
 }
 
-/* Sun/moon theme toggle - lives next to the hamburger button and, unlike
+/* Theme picker trigger - lives next to the hamburger button and, unlike
    .header-actions, is never hidden by the 1024px nav breakpoint below, so
    it's reachable in one tap at every screen width. */
 .theme-toggle {
@@ -372,9 +403,9 @@ p.kicker {
   width: 44px;
   height: 44px;
   background: none;
-  border: 1px solid rgba(247, 243, 236, 0.2);
+  border: 1px solid rgba(var(--chrome-text-rgb), 0.2);
   border-radius: 8px;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   cursor: pointer;
   flex-shrink: 0;
   transition: border-color 0.15s ease, transform 0.15s ease;
@@ -386,7 +417,7 @@ p.kicker {
 }
 
 .theme-toggle:hover {
-  border-color: rgba(247, 243, 236, 0.45);
+  border-color: rgba(var(--chrome-text-rgb), 0.45);
 }
 
 /* Theme picker dropdown - same shape as .account-menu/.account-dropdown
@@ -508,7 +539,7 @@ p.kicker {
   text-align: left;
   background: none;
   border: none;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   text-decoration: none;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
@@ -520,20 +551,20 @@ p.kicker {
 }
 
 .mobile-menu-panel a.active {
-  color: #F7F3EC;
+  color: var(--chrome-text);
   border-left: 2px solid var(--wax);
   padding-left: 0.6rem;
 }
 
 .mobile-menu-panel .dropdown-label {
-  color: rgba(247, 243, 236, 0.5);
+  color: rgba(var(--chrome-text-rgb), 0.5);
   padding: 0.5rem 0.25rem 0;
   margin: 0;
 }
 
 .mobile-menu-divider {
   height: 1px;
-  background: rgba(247, 243, 236, 0.12);
+  background: rgba(var(--chrome-text-rgb), 0.12);
   margin: 0.5rem 0;
 }
 
@@ -544,7 +575,7 @@ p.kicker {
   padding: 0.5rem 0.25rem 0.75rem;
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.85rem;
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 /* Account dropdown */
@@ -557,17 +588,17 @@ p.kicker {
   align-items: center;
   gap: 0.5rem;
   background: none;
-  border: 1px solid rgba(247, 243, 236, 0.2);
+  border: 1px solid rgba(var(--chrome-text-rgb), 0.2);
   border-radius: 20px;
   padding: 0.35rem 0.85rem 0.35rem 0.35rem;
   cursor: pointer;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   font-family: 'IBM Plex Mono', monospace;
   font-size: 0.72rem;
 }
 
 .account-trigger:hover {
-  border-color: rgba(247, 243, 236, 0.45);
+  border-color: rgba(var(--chrome-text-rgb), 0.45);
 }
 
 .account-avatar {
@@ -584,7 +615,7 @@ p.kicker {
 }
 
 .account-chevron {
-  color: rgba(247, 243, 236, 0.5);
+  color: rgba(var(--chrome-text-rgb), 0.5);
   font-size: 0.6rem;
 }
 
@@ -647,7 +678,7 @@ p.kicker {
 }
 
 .footer-band {
-  background: #241F1B;
+  background: var(--chrome-bg);
 }
 
 .site-footer {
@@ -660,14 +691,14 @@ p.kicker {
   grid-template-columns: 1.6fr 1fr 1fr;
   gap: 2.5rem;
   padding-bottom: 2.25rem;
-  border-bottom: 1px solid rgba(247, 243, 236, 0.1);
+  border-bottom: 1px solid rgba(var(--chrome-text-rgb), 0.1);
 }
 
 .footer-brand-name {
   font-family: 'Fraunces', serif;
   font-weight: 600;
   font-size: 1.15rem;
-  color: #F7F3EC;
+  color: var(--chrome-text);
   text-decoration: none;
 }
 
@@ -676,7 +707,7 @@ p.kicker {
   max-width: 30ch;
   font-size: 0.78rem;
   line-height: 1.6;
-  color: rgba(247, 243, 236, 0.45);
+  color: rgba(var(--chrome-text-rgb), 0.45);
 }
 
 .footer-col {
@@ -690,12 +721,12 @@ p.kicker {
   font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: rgba(247, 243, 236, 0.4);
+  color: rgba(var(--chrome-text-rgb), 0.4);
 }
 
 .footer-col a {
   font-size: 0.78rem;
-  color: rgba(247, 243, 236, 0.65);
+  color: rgba(var(--chrome-text-rgb), 0.65);
   text-decoration: none;
   width: fit-content;
   transition: color 0.15s ease;
@@ -703,7 +734,7 @@ p.kicker {
 
 .footer-col a:hover,
 .footer-col a.active {
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 .footer-bottom {
@@ -714,7 +745,7 @@ p.kicker {
   gap: 1rem;
   padding-top: 1.5rem;
   font-size: 0.72rem;
-  color: rgba(247, 243, 236, 0.5);
+  color: rgba(var(--chrome-text-rgb), 0.5);
 }
 
 .footer-bottom-links {
@@ -724,13 +755,13 @@ p.kicker {
 }
 
 .footer-bottom-links a {
-  color: rgba(247, 243, 236, 0.5);
+  color: rgba(var(--chrome-text-rgb), 0.5);
   text-decoration: none;
   transition: color 0.15s ease;
 }
 
 .footer-bottom-links a:hover {
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 .back-to-top {
@@ -738,13 +769,13 @@ p.kicker {
   border: none;
   padding: 0;
   font: inherit;
-  color: rgba(247, 243, 236, 0.5);
+  color: rgba(var(--chrome-text-rgb), 0.5);
   cursor: pointer;
   transition: color 0.15s ease;
 }
 
 .back-to-top:hover {
-  color: #F7F3EC;
+  color: var(--chrome-text);
 }
 
 @media (max-width: 640px) {
