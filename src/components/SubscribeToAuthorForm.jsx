@@ -56,7 +56,7 @@ export default function SubscribeToAuthorForm({ authorId, authorName }) {
           aria-label={`Email address to subscribe to ${authorName}`}
         />
         <button type="submit" disabled={status === 'submitting'}>
-          {status === 'submitting' ? 'Subscribing…' : 'Subscribe'}
+          {status === 'submitting' ? 'Subscribing…' : 'Follow their list'}
         </button>
       </div>
       {error && <p className="form-error">{error}</p>}

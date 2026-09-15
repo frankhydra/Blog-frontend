@@ -10,7 +10,7 @@ export default function Books() {
   const [books, setBooks] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Books', 'Self-published books - mine and other writers on this platform.');
+  usePageMeta('Books', 'Books launched and sold directly by the people who wrote them.');
 
   useEffect(() => {
     apiClient
@@ -25,7 +25,7 @@ export default function Books() {
   return (
     <div>
       <p className="kicker">Books</p>
-      <h1>Self-published, mine and others'</h1>
+      <h1>Launched here, sold directly — no publisher in the middle</h1>
       <p className="post-meta">A shelf for books by writers on this platform.</p>
 
       {user && (

@@ -69,7 +69,7 @@ export default function MyPosts() {
       {status === 'error' && <p className="empty-state">Couldn't load your posts.</p>}
       {status === 'ready' && posts.length === 0 && (
         <p className="empty-state">
-          You haven't written anything yet. <Link to="/write/post">Write your first post</Link>.
+          Nothing here yet. That's the one thing only you can fix. <Link to="/write/post">Write your first post</Link>.
         </p>
       )}
 

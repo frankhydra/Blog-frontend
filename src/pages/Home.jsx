@@ -19,7 +19,7 @@ export default function Home() {
   const [authors, setAuthors] = useState(null);
   const [campaigns, setCampaigns] = useState(null);
 
-  usePageMeta(null, "A multi-author platform for blog posts, letters, and books - writing on the things we're building and thinking about.");
+  usePageMeta(null, "Own your name, your work, and what it earns you - write, publish a newsletter, and launch a book, all under one roof.");
 
   useEffect(() => {
     apiClient.get('/posts', { params: { scope: 'home' } })
@@ -46,16 +46,15 @@ export default function Home() {
   return (
     <div className="landing">
       <section className="hero">
-        <p className="kicker">A home for many voices</p>
-        <h1>Posts, letters, and books - written by more than one person.</h1>
+        <p className="kicker">A home you own</p>
+        <h1>You don't own your audience on someone else's platform. You rent it.</h1>
         <p className="hero-sub">
-          This is a small publishing platform: a running blog, a slower-paced
-          letters archive, and a shared books catalog, open to anyone who
-          wants to write here alongside the site owner.
+          Nchukwi is different: your posts, your list, your books, your name —
+          all under one roof, all yours, for as long as you want it.
         </p>
         <div className="hero-actions">
-          <Link to="/community" className="nav-cta">Read the blog</Link>
-          <Link to="/register" className="text-link">Start writing here</Link>
+          <Link to="/register" className="nav-cta">Claim your page</Link>
+          <Link to="/community" className="text-link">See what's been built</Link>
         </div>
         <p className="post-meta hero-join-mention">
           Prefer email? <Link to="/join">Join the mailing list</Link> instead.
@@ -64,7 +63,7 @@ export default function Home() {
 
       <section className="landing-section">
         <div className="landing-section-head">
-          <h2>Latest from the blog</h2>
+          <h2>Fresh off the press</h2>
           <Link to="/community" className="text-link">See all</Link>
         </div>
 
@@ -138,7 +137,7 @@ export default function Home() {
       {letters?.length > 0 && (
         <section className="landing-section">
           <div className="landing-section-head">
-            <h2>From the letters archive</h2>
+            <h2>Straight to their inbox</h2>
             <Link to="/letters" className="text-link">See all</Link>
           </div>
           <ul className="entries">
@@ -174,7 +173,7 @@ export default function Home() {
       {books?.length > 0 && (
         <section className="landing-section">
           <div className="landing-section-head">
-            <h2>From the books catalog</h2>
+            <h2>Launched here, sold directly</h2>
             <Link to="/books" className="text-link">See all</Link>
           </div>
           <div className="landing-books-grid">
@@ -198,7 +197,7 @@ export default function Home() {
       {authors?.length > 0 && (
         <section className="landing-section">
           <div className="landing-section-head">
-            <h2>Who writes here</h2>
+            <h2>Who owns a page here</h2>
             <Link to="/portfolio" className="text-link">Meet everyone</Link>
           </div>
           <div className="author-cards">

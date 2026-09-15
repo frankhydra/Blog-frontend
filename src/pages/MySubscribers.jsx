@@ -81,8 +81,8 @@ export default function MySubscribers() {
 
           {data.count === 0 ? (
             <p className="empty-state">
-              Nobody's subscribed yet - the "Subscribe" button lives on your
-              public profile page.
+              No subscribers yet. Once people follow you, they're yours to
+              keep - no algorithm in between.
             </p>
           ) : (
             <ul className="moderation-list">

@@ -12,7 +12,7 @@ export default function Letters() {
   const [letters, setLetters] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Letters', 'Public letters from everyone writing here, archived as they are published.');
+  usePageMeta('Letters', 'Newsletters worth subscribing to, from everyone building on Nchukwi.');
 
   useEffect(() => {
     apiClient
@@ -27,7 +27,7 @@ export default function Letters() {
   return (
     <div>
       <p className="kicker">Letters</p>
-      <h1>Public letters, from everyone writing here</h1>
+      <h1>Newsletters worth subscribing to, from everyone building here</h1>
 
       {user && ['admin', 'author'].includes(user.role) && (
         <p className="post-meta">

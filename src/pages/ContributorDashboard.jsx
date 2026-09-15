@@ -86,7 +86,7 @@ export default function ContributorDashboard() {
         <div>
           <p className="settings-card-eyebrow">Contributor</p>
           <h1>Welcome back, {user.name}</h1>
-          <p className="post-meta">Got something to say? Your posts are private until you submit them for review.</p>
+          <p className="post-meta">You're building something. Every post you submit gets a real review — not a black hole.</p>
         </div>
       </section>
 
@@ -122,7 +122,7 @@ export default function ContributorDashboard() {
               <h2>Your posts</h2>
             </div>
             {posts.length === 0 ? (
-              <p className="empty-state">You haven't written anything yet.</p>
+              <p className="empty-state">Nothing here yet. Write your first post and see it through review.</p>
             ) : (
               <ul className="post-list">
                 {posts.slice(0, 5).map((post) => (

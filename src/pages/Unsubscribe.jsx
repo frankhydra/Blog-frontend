@@ -35,7 +35,7 @@ export default function Unsubscribe() {
   return (
     <div className="one-pager-narrow">
       <p className="kicker">Subscription</p>
-      <h1>{status === 'done' ? "You're unsubscribed" : 'Something went wrong'}</h1>
+      <h1>{status === 'done' ? "You're unsubscribed — no hard feelings" : 'Something went wrong'}</h1>
       <p className="post-meta">{message}</p>
     </div>
   );

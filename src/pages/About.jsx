@@ -7,12 +7,12 @@ import usePageMeta from '../hooks/usePageMeta';
 // become editable from the admin panel later, this is the file to wire up
 // to a site-content endpoint.
 export default function About() {
-  usePageMeta('About', 'What this site is, who it is for, and why it exists.');
+  usePageMeta('About', 'Why Nchukwi exists, and who gets to own a page here.');
 
   return (
     <div className="about-page">
       <p className="kicker">About this site</p>
-      <h1>A place to write, in public</h1>
+      <h1>A home for people who'd rather own their work than rent a feed</h1>
 
       <p>
         This started as one person's personal blog — a spot to write about
@@ -32,7 +32,7 @@ export default function About() {
         name, not just a byline.
       </p>
 
-      <h2>Who writes here</h2>
+      <h2>Who's building here</h2>
       <p>
         Anyone can create an account. <strong>Authors</strong> can publish
         both blog posts and letters and appear in the public directory.{' '}

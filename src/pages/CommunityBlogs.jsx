@@ -16,7 +16,7 @@ export default function CommunityBlogs() {
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Community Blogs', 'Every post from everyone writing here, all in one shared feed.');
+  usePageMeta('Community Blogs', 'Every post from everyone building here, all in one shared feed.');
 
   useEffect(() => {
     apiClient
@@ -33,7 +33,7 @@ export default function CommunityBlogs() {
   return (
     <div>
       <p className="kicker">Community Blogs</p>
-      <h1>Everyone writing on this platform</h1>
+      <h1>Everyone building here</h1>
 
       <div className="community-actions-row">
         <Link to="/tags" className="text-link">Browse by tag</Link>
@@ -41,7 +41,7 @@ export default function CommunityBlogs() {
       </div>
 
       {status === 'loading' && <SkeletonGrid variant="entry" count={6} />}
-      {status === 'ready' && posts.length === 0 && <p className="empty-state">No posts published yet.</p>}
+      {status === 'ready' && posts.length === 0 && <p className="empty-state">Nothing published yet. This page fills up the moment someone writes.</p>}
       {status === 'ready' && (
         <ul className="entries">
           {posts.map((post) => {

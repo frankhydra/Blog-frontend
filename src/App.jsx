@@ -37,6 +37,7 @@ const BookDetail = lazy(() => import('./pages/BookDetail'));
 const NewBook = lazy(() => import('./pages/NewBook'));
 const EditBook = lazy(() => import('./pages/EditBook'));
 const About = lazy(() => import('./pages/About'));
+const HowMoneyMoves = lazy(() => import('./pages/HowMoneyMoves'));
 const Portfolios = lazy(() => import('./pages/Portfolios'));
 const Settings = lazy(() => import('./pages/Settings'));
 const RequestCampaign = lazy(() => import('./pages/RequestCampaign'));
@@ -73,6 +74,7 @@ export default function App() {
         <Route path="books/:slug/edit" element={<EditBook />} />
         <Route path="add-book" element={<NewBook />} />
         <Route path="about" element={<About />} />
+        <Route path="how-money-moves" element={<HowMoneyMoves />} />
         <Route path="portfolio" element={<Portfolios />} />
         <Route path="settings" element={<Settings />} />
         <Route path="edit-profile" element={<Navigate to="/settings?tab=profile" replace />} />

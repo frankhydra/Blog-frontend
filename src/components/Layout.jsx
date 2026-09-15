@@ -118,7 +118,7 @@ export default function Layout() {
       <div className="band header-band">
         <div className="inner">
           <header className="site-header">
-            <Link to="/" className="brand" onClick={closeMobileMenu}>Franklin Nchukwi</Link>
+            <Link to="/" className="brand" onClick={closeMobileMenu}>Nchukwi</Link>
 
             <nav className="primary-nav">
               <NavLink to="/" end>Home</NavLink>
@@ -311,8 +311,8 @@ export default function Layout() {
             <footer className="site-footer">
               <div className="footer-grid">
                 <div className="footer-brand">
-                  <Link to="/" className="footer-brand-name">Franklin Nchukwi</Link>
-                  <p className="footer-tagline">Writing on code, craft, and the occasional letter.</p>
+                  <Link to="/" className="footer-brand-name">Nchukwi</Link>
+                  <p className="footer-tagline">Own your name. Own your work. Own what it earns you.</p>
                 </div>
 
                 <div className="footer-col">
@@ -324,6 +324,7 @@ export default function Layout() {
                   <NavLink to="/portfolio">Portfolio</NavLink>
                   <NavLink to="/about">About</NavLink>
                   <NavLink to="/join">Join the list</NavLink>
+                  <NavLink to="/how-money-moves">How money moves</NavLink>
                 </div>
 
                 <div className="footer-col">
@@ -340,14 +341,14 @@ export default function Layout() {
                   ) : (
                     <>
                       <Link to="/login">Log in</Link>
-                      <Link to="/register">Create an account</Link>
+                      <Link to="/register">Claim your page</Link>
                     </>
                   )}
                 </div>
               </div>
 
               <div className="footer-bottom">
-                <p>&copy; {new Date().getFullYear()} Franklin Nchukwi</p>
+                <p>&copy; {new Date().getFullYear()} Nchukwi</p>
                 <div className="footer-bottom-links">
                   <a href={sitemapUrl} target="_blank" rel="noreferrer">Sitemap</a>
                   <button type="button" onClick={scrollToTop} className="back-to-top">Back to top ↑</button>

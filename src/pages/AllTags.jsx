@@ -31,7 +31,7 @@ export default function AllTags() {
       <p className="kicker">Browse</p>
       <h1>Tags</h1>
 
-      {tags.length === 0 && <p className="empty-state">No tagged posts yet.</p>}
+      {tags.length === 0 && <p className="empty-state">No tags in use yet — they'll show up here the moment someone writes with one.</p>}
 
       {tags.length > 0 && (
         <div className="tag-browse-list">

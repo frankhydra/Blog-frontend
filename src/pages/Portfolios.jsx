@@ -15,7 +15,7 @@ export default function Portfolios() {
   const [pageData, setPageData] = useState(null);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Portfolio', 'Bloggers publishing on this platform, ranked by how often they post.');
+  usePageMeta('Portfolio', 'Everyone who has claimed a page on Nchukwi, ranked by how often they ship.');
 
   useEffect(() => {
     setStatus('loading');
@@ -38,7 +38,7 @@ export default function Portfolios() {
   return (
     <div className="about-page">
       <p className="kicker">More voices</p>
-      <h1 style={{ marginTop: 0 }}>Other bloggers on this platform</h1>
+      <h1 style={{ marginTop: 0 }}>Everyone who's claimed a page here</h1>
       <p className="post-meta">
         Fellow writers publishing here — click through for their full profile and portfolio.
       </p>
@@ -46,7 +46,7 @@ export default function Portfolios() {
       {status === 'loading' && <SkeletonGrid variant="author" count={6} />}
 
       {status === 'ready' && people.length === 0 && (
-        <p className="empty-state">Nobody's published anything yet.</p>
+        <p className="empty-state">Nobody's claimed this yet. Could be you.</p>
       )}
 
       {status === 'ready' && people.length > 0 && (

@@ -42,7 +42,7 @@ export default function Register() {
     <div className="auth-page">
       <form onSubmit={handleSubmit} className="auth-card">
         <p className="kicker">Account</p>
-        <h1>Create an account</h1>
+        <h1>Claim your page</h1>
         <p className="auth-subtitle">
           Choose how you'd like to publish. The site admin can change this
           later, including promoting you to admin.

@@ -9,7 +9,7 @@ import { useEffect } from 'react';
 // needed. Flagging that honestly rather than overpromising here.
 export default function usePageMeta(title, description) {
   useEffect(() => {
-    const fullTitle = title ? `${title} — Franklin Nchukwi` : 'Franklin Nchukwi';
+    const fullTitle = title ? `${title} — Nchukwi` : 'Nchukwi';
     document.title = fullTitle;
 
     if (description) {
@@ -23,7 +23,7 @@ export default function usePageMeta(title, description) {
     }
 
     return () => {
-      document.title = 'Franklin Nchukwi';
+      document.title = 'Nchukwi';
     };
   }, [title, description]);
 }

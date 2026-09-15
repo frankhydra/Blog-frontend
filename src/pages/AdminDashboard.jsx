@@ -147,6 +147,7 @@ export default function AdminDashboard() {
     <div className="settings-page">
       <p className="kicker">Admin</p>
       <h1>Dashboard</h1>
+      <p className="post-meta">Everything that needs your eye, in one glance.</p>
 
       <div className="settings-layout">
         <nav className="settings-tabs" aria-label="Admin sections">
@@ -240,7 +241,7 @@ export default function AdminDashboard() {
                     {' '}· <Link to="/my-posts">See all your posts</Link>
                   </p>
                   {myPosts.length === 0 ? (
-                    <p className="empty-state">You haven't written anything yet.</p>
+                    <p className="empty-state">Nothing published yet — but you're not the one this page is really for. Check the queues above.</p>
                   ) : (
                     <ul className="post-list">
                       {myPosts.slice(0, 5).map((post) => (

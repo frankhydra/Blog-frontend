@@ -78,6 +78,7 @@ export default function AuthorDashboard() {
         <div>
           <p className="settings-card-eyebrow">Author</p>
           <h1>Welcome back, {user.name}</h1>
+          <p className="settings-card-eyebrow">Your desk. Your posts, your letters, your numbers — all in one place.</p>
           <p className="post-meta">
             <Link to="/write/post">Write a new post</Link>
             {' '}· <Link to="/write/letter">Write a new letter</Link>
@@ -115,7 +116,7 @@ export default function AuthorDashboard() {
             </div>
             {posts.length === 0 ? (
               <p className="empty-state">
-                You haven't written a post yet. <Link to="/write/post">Write your first one</Link>.
+                Nothing published yet. Your next post is one click away. <Link to="/write/post">Write your first one</Link>.
               </p>
             ) : (
               <ul className="post-list">
@@ -147,7 +148,7 @@ export default function AuthorDashboard() {
             </div>
             {letters.length === 0 ? (
               <p className="empty-state">
-                You haven't written a letter yet. <Link to="/write/letter">Write your first one</Link>.
+                Your list is waiting. Write your first letter. <Link to="/write/letter">Write your first one</Link>.
               </p>
             ) : (
               <ul className="post-list">
@@ -178,7 +179,7 @@ export default function AuthorDashboard() {
             </div>
             {campaigns.length === 0 ? (
               <p className="empty-state">
-                No requests yet. <Link to="/request-campaign">Request a spotlight</Link>.
+                No requests yet. Ready to get featured on the homepage? <Link to="/request-campaign">Request a spotlight</Link>.
               </p>
             ) : (
               <ul className="moderation-list">

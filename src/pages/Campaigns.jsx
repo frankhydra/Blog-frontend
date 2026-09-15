@@ -12,7 +12,7 @@ export default function Campaigns() {
   const [campaigns, setCampaigns] = useState(null);
   const [status, setStatus] = useState('loading');
 
-  usePageMeta('Campaigns', 'Upcoming launches, events, and spotlights from everyone writing here.');
+  usePageMeta('Campaigns', 'Spotlights for launches, drops, and events from everyone building here.');
 
   useEffect(() => {
     apiClient
@@ -30,7 +30,7 @@ export default function Campaigns() {
   return (
     <div>
       <p className="kicker">Coming up</p>
-      <h1>Launches, events & spotlights</h1>
+      <h1>Get seen. Spotlights for launches, drops, and events</h1>
       <p className="post-meta">
         Anything the site owner or an author is highlighting right now, with
         a countdown to launch day.

@@ -109,11 +109,12 @@ export default function Join({ asGate = false, onContinue = null, onSkip = null 
         <h1>
           {asGate
             ? "Most people never find pages like this one. You just did."
-            : "Most readers just scroll past. You're still here."}
+            : "Your name deserves more than a rented profile."}
         </h1>
         <p className="hero-sub">
-          Join the list and get new posts, letters, and books the moment
-          they're published - not whenever an algorithm decides to show you.
+          {asGate
+            ? "Join the list and get new posts, letters, and books the moment they're published - not whenever an algorithm decides to show you."
+            : "Get a page you own — write, publish a newsletter, launch a book, and keep what it earns you. Free to start, yours for good."}
         </p>
       </section>
 
@@ -146,7 +147,7 @@ export default function Join({ asGate = false, onContinue = null, onSkip = null 
               maxLength={255}
             />
             <button type="submit" className="join-submit-button" disabled={status === 'submitting'}>
-              {status === 'submitting' ? 'Joining…' : asGate ? 'Find your way in' : 'Join the list'}
+              {status === 'submitting' ? 'Joining…' : asGate ? 'Find your way in' : 'Claim your spot'}
               <span aria-hidden="true">&rarr;</span>
             </button>
             {error && <p className="form-error">{error}</p>}
