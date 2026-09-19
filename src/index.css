@@ -1024,6 +1024,25 @@ p.kicker {
   flex-direction: column;
 }
 
+/* Register carries meaningfully more content than Login - name, email,
+   two password fields, plus a two-column role-choice grid - inside the
+   same fixed 400px card that's comfortable for Login's two fields. That's
+   what read as "compressed and choked up": the role-choice cards in
+   particular were being squeezed to roughly 160px each. Widened via a
+   modifier rather than changing .auth-card directly, so Login's card
+   (which wasn't reported as a problem) stays exactly as it was. */
+.auth-card-wide {
+  max-width: 480px;
+  padding: 2.25rem 2.5rem;
+}
+
+@media (max-width: 560px) {
+  .auth-card-wide {
+    max-width: 400px;
+    padding: 2.25rem 2rem;
+  }
+}
+
 .auth-card h1 {
   margin: 0 0 0.5rem;
   font-size: 1.6rem;
@@ -1385,6 +1404,7 @@ p.kicker {
 
 .moderation-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
@@ -2540,10 +2560,16 @@ p.kicker {
 }
 
 /* ---------- Landing page (Home) ---------- */
-.landing {
-  max-width: 960px;
-  margin: 0 auto;
-}
+/* .landing's max-width was intentionally removed here - it used to cap
+   the homepage at 960px while every other content page (About/
+   Portfolios/HowMoneyMoves via the no-op .about-page class, and Books/
+   Letters/CommunityBlogs with no page-level class at all) renders at
+   the full ~1260px width the shared .site-main wrapper already provides.
+   A narrower centered column on a wide screen reads as extra empty
+   space on either side - that's the "home page has more margin than
+   other pages" mismatch. Home.jsx still carries className="landing" for
+   the section-scoped rules below (.landing-section, .landing-book-card,
+   etc.) - just no top-level width rule of its own anymore. */
 
 .hero {
   padding: 3.5rem 0 3rem;
@@ -2766,6 +2792,12 @@ p.kicker {
 .status-pill-rejected {
   color: var(--muted);
   border: 1px solid var(--border);
+}
+
+.status-pill-withdrawn {
+  color: var(--muted);
+  border: 1px solid var(--border);
+  font-style: italic;
 }
 
 /* Responsive polish - phone/small tablet breakpoint */

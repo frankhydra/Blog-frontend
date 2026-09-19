@@ -156,6 +156,7 @@ export default function Layout() {
                         {user.role !== 'admin' && (
                           <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
                         )}
+                        <Link to="/my/subscribers" onClick={() => setMenuOpen(false)}>My subscribers</Link>
                         <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
                         <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {user.role === 'admin' && (
@@ -269,6 +270,7 @@ export default function Layout() {
                   {user.role !== 'admin' && (
                     <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
                   )}
+                  <Link to="/my/subscribers" onClick={closeMobileMenu}>My subscribers</Link>
                   <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
                   <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
                   {user.role === 'admin' && (
@@ -283,7 +285,7 @@ export default function Layout() {
               ) : (
                 <div className="mobile-menu-account">
                   <Link to="/login" onClick={closeMobileMenu}>Log in</Link>
-                  <Link to="/register" onClick={closeMobileMenu}>Create an account</Link>
+                  <Link to="/register" onClick={closeMobileMenu}>Claim your page</Link>
                 </div>
               )}
             </div>

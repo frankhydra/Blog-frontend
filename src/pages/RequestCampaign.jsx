@@ -10,6 +10,7 @@ const STATUS_LABEL = {
   pending: 'Awaiting review',
   approved: 'Live on the home page',
   rejected: 'Not approved',
+  withdrawn: 'Withdrawn',
 };
 
 // Any logged-in author or contributor can ask for a spot in the home page
@@ -23,6 +24,7 @@ export default function RequestCampaign() {
   const [myBooks, setMyBooks] = useState([]);
   const [status, setStatus] = useState('loading');
   const [form, setForm] = useState(BLANK);
+  const [editingId, setEditingId] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -77,20 +79,76 @@ export default function RequestCampaign() {
         launch_date: form.launch_date || null,
         book_id: form.book_id || null,
       };
-      await apiClient.post('/campaigns', payload);
+      if (editingId) {
+        await apiClient.put(`/campaigns/${editingId}`, payload);
+        setEditingId(null);
+      } else {
+        await apiClient.post('/campaigns', payload);
+      }
       setForm(BLANK);
       load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong submitting your request.');
+      setError(err.response?.data?.message || 'Something went wrong saving your request.');
     } finally {
       setSubmitting(false);
     }
   }
 
+  function handleEditClick(campaign) {
+    setError('');
+    setEditingId(campaign.id);
+    setForm({
+      title: campaign.title || '',
+      description: campaign.description || '',
+      link_url: campaign.link_url || '',
+      image_url: campaign.image_url || '',
+      launch_date: campaign.launch_date || '',
+      book_id: campaign.book_id ? String(campaign.book_id) : '',
+    });
+    // The form is above the list this button lives in - scroll it into
+    // view so it's obvious something happened, since the fields filling
+    // in isn't itself very visible if the form is off-screen below.
+    document.getElementById('campaign-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleCancelEdit() {
+    setEditingId(null);
+    setForm(BLANK);
+    setError('');
+  }
+
   async function handleWithdraw(campaign) {
-    if (!confirm(`Withdraw your request "${campaign.title}"?`)) return;
-    await apiClient.delete(`/campaigns/${campaign.id}`);
-    load();
+    const verb = campaign.status === 'approved' ? 'Take down' : campaign.status === 'rejected' ? 'Remove' : 'Withdraw';
+    if (!confirm(`${verb} "${campaign.title}"? It'll stay here so you can resubmit it or delete it for good later.`)) return;
+    setError('');
+    try {
+      await apiClient.post(`/campaigns/${campaign.id}/withdraw`);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong with that request.');
+    }
+  }
+
+  async function handleResubmit(campaign) {
+    if (!confirm(`Resubmit "${campaign.title}" for a fresh admin review?`)) return;
+    setError('');
+    try {
+      await apiClient.post(`/campaigns/${campaign.id}/resubmit`);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong resubmitting that request.');
+    }
+  }
+
+  async function handleDeletePermanently(campaign) {
+    if (!confirm(`Permanently delete "${campaign.title}"? This can't be undone.`)) return;
+    setError('');
+    try {
+      await apiClient.delete(`/campaigns/${campaign.id}`);
+      load();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong deleting that request.');
+    }
   }
 
   if (authLoading) return <p>Loading…</p>;
@@ -120,8 +178,15 @@ export default function RequestCampaign() {
 
       {error && <p className="form-error">{error}</p>}
 
-      <form onSubmit={handleSubmit} className="post-form">
-        <h2>New request</h2>
+      <form id="campaign-form" onSubmit={handleSubmit} className="post-form">
+        <h2>{editingId ? 'Edit request' : 'New request'}</h2>
+        {editingId && ['approved', 'rejected'].includes(campaigns.find((c) => c.id === editingId)?.status) && (
+          <p className="post-meta">
+            {campaigns.find((c) => c.id === editingId)?.status === 'approved'
+              ? "This is currently live. Saving will pull it off the home page and send it back for a fresh admin review."
+              : 'Saving will resend this for a fresh admin review.'}
+          </p>
+        )}
 
         {myBooks.length > 0 && (
           <>
@@ -183,12 +248,20 @@ export default function RequestCampaign() {
           onChange={(e) => setForm({ ...form, launch_date: e.target.value })}
         />
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? 'Submitting…' : 'Send request'}
-        </button>
+        <div className="post-form-actions">
+          <button type="submit" disabled={submitting}>
+            {submitting ? 'Saving…' : editingId ? 'Save changes' : 'Send request'}
+          </button>
+          {editingId && (
+            <button type="button" onClick={handleCancelEdit} className="queue-secondary-button">
+              Cancel edit
+            </button>
+          )}
+        </div>
       </form>
 
       <h2>Your requests</h2>
+      {error && <p className="form-error">{error}</p>}
       {status === 'loading' && <p>Loading…</p>}
       {status === 'error' && <p>Couldn't load your requests.</p>}
       {status === 'ready' && campaigns.length === 0 && <p>You haven't requested a spotlight yet.</p>}
@@ -203,9 +276,19 @@ export default function RequestCampaign() {
             {c.status === 'rejected' && c.admin_note && (
               <p className="post-meta">Admin note: {c.admin_note}</p>
             )}
-            {c.status === 'pending' && (
+            {(c.status === 'pending' || c.status === 'approved' || c.status === 'rejected') && (
               <div className="moderation-actions">
-                <button onClick={() => handleWithdraw(c)} className="reject-button">Withdraw</button>
+                <button type="button" onClick={() => handleEditClick(c)}>Edit</button>
+                <button onClick={() => handleWithdraw(c)} className="reject-button">
+                  {c.status === 'approved' ? 'Take down' : c.status === 'rejected' ? 'Remove' : 'Withdraw'}
+                </button>
+              </div>
+            )}
+            {c.status === 'withdrawn' && (
+              <div className="moderation-actions">
+                <button type="button" onClick={() => handleEditClick(c)}>Edit</button>
+                <button onClick={() => handleResubmit(c)}>Resubmit for review</button>
+                <button onClick={() => handleDeletePermanently(c)} className="reject-button">Delete permanently</button>
               </div>
             )}
           </li>

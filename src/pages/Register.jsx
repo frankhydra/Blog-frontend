@@ -40,7 +40,7 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <form onSubmit={handleSubmit} className="auth-card">
+      <form onSubmit={handleSubmit} className="auth-card auth-card-wide">
         <p className="kicker">Account</p>
         <h1>Claim your page</h1>
         <p className="auth-subtitle">
@@ -129,7 +129,7 @@ export default function Register() {
         {error && <p className="form-error">{error}</p>}
 
         <button type="submit" className="auth-submit" disabled={submitting}>
-          {submitting ? 'Creating account…' : 'Create account'}
+          {submitting ? 'Creating account…' : 'Claim your page'}
         </button>
 
         <p className="auth-switch">
