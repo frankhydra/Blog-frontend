@@ -27,6 +27,8 @@ const MySubscribers = lazy(() => import('./pages/MySubscribers'));
 const NewPost = lazy(() => import('./pages/NewPost'));
 const EditPost = lazy(() => import('./pages/EditPost'));
 const MyPosts = lazy(() => import('./pages/MyPosts'));
+const MyBooks = lazy(() => import('./pages/MyBooks'));
+const MyLetters = lazy(() => import('./pages/MyLetters'));
 const Letters = lazy(() => import('./pages/Letters'));
 const LetterDetail = lazy(() => import('./pages/LetterDetail'));
 const NewLetter = lazy(() => import('./pages/NewLetter'));
@@ -64,6 +66,8 @@ export default function App() {
         <Route path="write" element={<Write />} />
         <Route path="write/post" element={<NewPost />} />
         <Route path="my-posts" element={<MyPosts />} />
+        <Route path="my-books" element={<MyBooks />} />
+        <Route path="my-letters" element={<MyLetters />} />
         <Route path="letters" element={<Letters />} />
         <Route path="letters/:slug" element={<LetterDetail />} />
         <Route path="letters/:slug/edit" element={<EditLetter />} />

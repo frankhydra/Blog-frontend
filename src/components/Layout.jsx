@@ -18,21 +18,20 @@ const ICON_CLOSE = (
   </svg>
 );
 
-// Replaces the old sun/moon toggle now that there are six themes instead
-// of a light/dark binary - a palette reads as "pick a theme" rather than
-// implying just one more state to flip through.
-const ICON_PALETTE = (
+// Sun icon, same shape as the original light/dark toggle before six
+// themes replaced the binary - kept as the trigger for the theme picker,
+// tinted to the active theme's own accent color (see the button below)
+// so it still gives a visual cue about which theme is active, not just
+// "click here to change it."
+const ICON_SUN = (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
     <path
-      d="M12 3.5c-4.7 0-8.5 3.6-8.5 8 0 3.3 2.5 4.2 4.2 4.2.7 0 1-.4 1-.9 0-.4-.2-.6-.4-.9-.3-.4-.6-.8-.6-1.5 0-1.1 1-2 2.2-2h2.4c2.5 0 4.7-1.7 4.7-4.4 0-3.5-3.5-6.5-9-6.5Z"
+      d="M12 2.5v2.4M12 19.1v2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.9 19.1l1.7-1.7M17.4 6.6l1.7-1.7"
       stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinejoin="round"
+      strokeWidth="1.8"
+      strokeLinecap="round"
     />
-    <circle cx="7.8" cy="11" r="1" fill="currentColor" />
-    <circle cx="9.3" cy="7.3" r="1" fill="currentColor" />
-    <circle cx="13.4" cy="6.6" r="1" fill="currentColor" />
-    <circle cx="16.4" cy="9.3" r="1" fill="currentColor" />
   </svg>
 );
 
@@ -152,12 +151,26 @@ export default function Layout() {
                         {user.role === 'contributor' && (
                           <Link to="/contributor/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
                         )}
-                        <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
-                        {user.role !== 'admin' && (
-                          <Link to="/request-campaign" onClick={() => setMenuOpen(false)}>Request a campaign</Link>
+                        {/* Both Contributor's and Author's dashboards now have these
+                            as tabs (Overview/My posts/My letters [author-only]/My books/
+                            Spotlight requests/Subscribers/Messages - see
+                            ContributorDashboard.jsx and AuthorDashboard.jsx), so keeping
+                            them here too was pure duplication - kept only for admin, whose
+                            dashboard doesn't have a personal-posts/personal-messages tab
+                            (its Subscribers tab is the platform-wide oversight view, a
+                            separate thing - see Q8). Request a campaign is dropped
+                            entirely: author/contributor now reach it via their dashboard's
+                            Spotlight requests tab, and admin is blocked from requesting one
+                            at all (CampaignController::store()). */}
+                        {user.role === 'admin' && (
+                          <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
                         )}
-                        <Link to="/my/subscribers" onClick={() => setMenuOpen(false)}>My subscribers</Link>
-                        <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
+                        {user.role === 'admin' && (
+                          <Link to="/my/subscribers" onClick={() => setMenuOpen(false)}>My subscribers</Link>
+                        )}
+                        {user.role === 'admin' && (
+                          <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
+                        )}
                         <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {user.role === 'admin' && (
                           <>
@@ -191,8 +204,9 @@ export default function Layout() {
                 aria-expanded={themeMenuOpen}
                 aria-label={`Change theme (current: ${activeTheme.label})`}
                 title={`Change theme (current: ${activeTheme.label})`}
+                style={{ color: activeTheme.swatch[1] }}
               >
-                {ICON_PALETTE}
+                {ICON_SUN}
               </button>
 
               {themeMenuOpen && (
@@ -266,12 +280,15 @@ export default function Layout() {
                   {user.role === 'contributor' && (
                     <Link to="/contributor/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
                   )}
-                  <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
-                  {user.role !== 'admin' && (
-                    <Link to="/request-campaign" onClick={closeMobileMenu}>Request a campaign</Link>
+                  {user.role === 'admin' && (
+                    <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
                   )}
-                  <Link to="/my/subscribers" onClick={closeMobileMenu}>My subscribers</Link>
-                  <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
+                  {user.role === 'admin' && (
+                    <Link to="/my/subscribers" onClick={closeMobileMenu}>My subscribers</Link>
+                  )}
+                  {user.role === 'admin' && (
+                    <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
+                  )}
                   <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
                   {user.role === 'admin' && (
                     <>

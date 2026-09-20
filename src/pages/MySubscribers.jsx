@@ -14,7 +14,7 @@ const ICON_SUBSCRIBERS = (
 // 4.8 - self-service: your own list only, never anyone else's. Anyone
 // with a public profile (admin, author, or contributor - see
 // SubscriberController::mine()) can reach this from their own dashboard.
-export default function MySubscribers() {
+export default function MySubscribers({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [data, setData] = useState(null);
   const [status, setStatus] = useState('loading');
@@ -44,21 +44,8 @@ export default function MySubscribers() {
   if (authLoading) return <Loading fullPage />;
   if (!user) return <p className="empty-state">You need to log in to see this page.</p>;
 
-  return (
-    <div className="admin-page">
-      <section className="admin-page-head">
-        <span className="settings-card-icon admin-page-icon">{ICON_SUBSCRIBERS}</span>
-        <div>
-          <p className="settings-card-eyebrow">Your list</p>
-          <h1>My subscribers</h1>
-          <p className="post-meta">
-            Everyone who chose to subscribe to you specifically from your
-            public profile. Nobody else's list, and not the platform-wide
-            list - just yours.
-          </p>
-        </div>
-      </section>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load your subscribers.</p>}
 
@@ -98,6 +85,27 @@ export default function MySubscribers() {
           )}
         </div>
       )}
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div className="admin-page">
+      <section className="admin-page-head">
+        <span className="settings-card-icon admin-page-icon">{ICON_SUBSCRIBERS}</span>
+        <div>
+          <p className="settings-card-eyebrow">Your list</p>
+          <h1>My subscribers</h1>
+          <p className="post-meta">
+            Everyone who chose to subscribe to you specifically from your
+            public profile. Nobody else's list, and not the platform-wide
+            list - just yours.
+          </p>
+        </div>
+      </section>
+
+      {content}
     </div>
   );
 }

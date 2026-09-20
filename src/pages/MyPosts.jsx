@@ -21,7 +21,7 @@ function statusClass(post) {
   return 'status-pill status-pill-draft';
 }
 
-export default function MyPosts() {
+export default function MyPosts({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -58,13 +58,8 @@ export default function MyPosts() {
   if (authLoading) return <Loading fullPage />;
   if (!user) return <p className="empty-state">You need to log in to see your posts.</p>;
 
-  return (
-    <div>
-      <h1>My posts</h1>
-      <p>
-        <Link to="/write/post">Write a new post</Link>
-      </p>
-
+  const content = (
+    <>
       {status === 'loading' && <Loading />}
       {status === 'error' && <p className="empty-state">Couldn't load your posts.</p>}
       {status === 'ready' && posts.length === 0 && (
@@ -101,6 +96,19 @@ export default function MyPosts() {
           </li>
         ))}
       </ul>
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div>
+      <h1>My posts</h1>
+      <p>
+        <Link to="/write/post">Write a new post</Link>
+      </p>
+
+      {content}
     </div>
   );
 }

@@ -408,16 +408,30 @@ p.kicker {
   color: var(--chrome-text);
   cursor: pointer;
   flex-shrink: 0;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: border-color 0.15s ease, color 0.3s ease;
 }
 
 .theme-toggle svg {
   width: 20px;
   height: 20px;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .theme-toggle:hover {
   border-color: rgba(var(--chrome-text-rgb), 0.45);
+}
+
+.theme-toggle:hover svg {
+  transform: rotate(50deg);
+}
+
+/* Takes priority over the hover rotation above when both could apply
+   (mouse still over the button right as the picker opens) - open state
+   is the more meaningful one to show, so it's declared second. Reuses
+   aria-expanded, already set on the button for accessibility, rather
+   than adding a second way to track the same state. */
+.theme-toggle[aria-expanded="true"] svg {
+  transform: rotate(90deg);
 }
 
 /* Theme picker dropdown - same shape as .account-menu/.account-dropdown
@@ -1348,6 +1362,39 @@ p.kicker {
   border-left: 2px solid var(--border);
 }
 
+/* .comment-replies nests recursively via CommentNode (top-level > reply >
+   reply-to-reply), so a 3rd level automatically compounds to 3rem of
+   indent with its own border-left - no extra rule needed per depth. */
+
+.comment-author-badge {
+  display: inline-block;
+  margin-left: 0.4rem;
+  padding: 0.05rem 0.5rem;
+  font-size: 0.68rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  vertical-align: middle;
+}
+
+.comment-reply-toggle {
+  margin-top: 0.4rem;
+  padding: 0;
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.8rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.comment-reply-form {
+  max-width: 420px;
+  margin: 0.75rem 0 0.5rem;
+}
+
 .comment-form {
   display: flex;
   flex-direction: column;
@@ -1420,6 +1467,17 @@ p.kicker {
 
 .moderation-actions .reject-button {
   background: var(--wax);
+}
+
+/* .moderation-actions button's own background/color would otherwise win
+   over .queue-secondary-button's transparent/outline style, since a
+   class+element selector beats a single class regardless of source
+   order - same fix as .reject-button above, needed again wherever a
+   neutral secondary action (e.g. "Cancel") sits inside .moderation-actions
+   next to a primary one. */
+.moderation-actions .queue-secondary-button {
+  background: transparent;
+  color: var(--ink);
 }
 
 .author-bio {
@@ -4146,6 +4204,7 @@ select:focus-visible {
 }
 
 .contact-form input,
+.contact-form select,
 .contact-form textarea {
   font-family: inherit;
   font-size: 0.95rem;

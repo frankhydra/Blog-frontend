@@ -88,7 +88,7 @@ export default function AdminCampaigns({ embedded = false }) {
                   <p className="queue-card-meta">
                     <strong>{c.title}</strong> requested by {c.user?.name}
                     {c.book && <> · about <em>{c.book.title}</em></>}
-                    {c.launch_date && <> · launching {new Date(c.launch_date).toLocaleDateString()}</>}
+                    {c.launch_date && <> · launching {new Date(c.launch_date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}</>}
                   </p>
                   <p className="queue-card-body">{c.description}</p>
                   {c.link_url && (

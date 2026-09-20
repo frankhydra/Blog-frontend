@@ -323,7 +323,7 @@ export default function PortfolioOnePager({
         {showContact && !previewMode && (
           <section className="one-pager-section">
             <h2>Get in touch</h2>
-            <ContactAuthorForm authorId={person.id} authorName={person.name} />
+            <ContactAuthorForm authorId={person.id} authorName={person.name} posts={posts} />
           </section>
         )}
 

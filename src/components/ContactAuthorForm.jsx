@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import apiClient from '../api/client';
 
-export default function ContactAuthorForm({ authorId, authorName }) {
+export default function ContactAuthorForm({ authorId, authorName, posts = [] }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
+  const [postId, setPostId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
@@ -18,11 +19,13 @@ export default function ContactAuthorForm({ authorId, authorName }) {
         sender_name: name,
         sender_email: email,
         message,
+        post_id: postId || null,
       });
       setSent(true);
       setName('');
       setEmail('');
       setMessage('');
+      setPostId('');
     } catch {
       setError('Something went wrong sending your message. Please try again.');
     } finally {
@@ -50,6 +53,18 @@ export default function ContactAuthorForm({ authorId, authorName }) {
           <input id="contact-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
       </div>
+
+      {posts.length > 0 && (
+        <>
+          <label htmlFor="contact-post">What's this about? (optional)</label>
+          <select id="contact-post" value={postId} onChange={(e) => setPostId(e.target.value)}>
+            <option value="">Just saying hi / something else</option>
+            {posts.map((post) => (
+              <option key={post.id} value={post.id}>{post.title}</option>
+            ))}
+          </select>
+        </>
+      )}
 
       <label htmlFor="contact-message">Message</label>
       <textarea

@@ -6,6 +6,20 @@ import usePageMeta from '../hooks/usePageMeta';
 
 const BLANK = { title: '', description: '', link_url: '', image_url: '', launch_date: '', book_id: '' };
 
+// <input type="datetime-local"> requires "YYYY-MM-DDTHH:mm" - no
+// trailing Z, no seconds/microseconds - but the API now returns
+// launch_date as a full ISO string since it's cast to datetime.
+// Converts using the browser's local time so what's shown in the field
+// matches what the picker's clock face actually displayed when it was
+// set.
+function toDatetimeLocalValue(isoString) {
+  if (!isoString) return '';
+  const d = new Date(isoString);
+  if (Number.isNaN(d.getTime())) return '';
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 const STATUS_LABEL = {
   pending: 'Awaiting review',
   approved: 'Live on the home page',
@@ -18,7 +32,7 @@ const STATUS_LABEL = {
 // the front of the site. Requests start pending and only go public once an
 // admin approves them from /admin/campaigns. Admins don't request one here
 // - they already control the spotlight directly (see the guard below).
-export default function RequestCampaign() {
+export default function RequestCampaign({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [campaigns, setCampaigns] = useState([]);
   const [myBooks, setMyBooks] = useState([]);
@@ -28,7 +42,12 @@ export default function RequestCampaign() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
 
-  usePageMeta('Request a campaign', 'Ask to have a book launch or announcement featured on the home page.');
+  // Skipped when embedded - the dashboard tab that renders this sets its
+  // own page title; calling this here too would just fight it.
+  usePageMeta(
+    embedded ? undefined : 'Request a campaign',
+    embedded ? undefined : 'Ask to have a book launch or announcement featured on the home page.'
+  );
 
   useEffect(() => {
     if (authLoading) return;
@@ -102,7 +121,7 @@ export default function RequestCampaign() {
       description: campaign.description || '',
       link_url: campaign.link_url || '',
       image_url: campaign.image_url || '',
-      launch_date: campaign.launch_date || '',
+      launch_date: toDatetimeLocalValue(campaign.launch_date),
       book_id: campaign.book_id ? String(campaign.book_id) : '',
     });
     // The form is above the list this button lives in - scroll it into
@@ -163,19 +182,8 @@ export default function RequestCampaign() {
     );
   }
 
-  return (
-    <div>
-      <div className="my-portfolio-head">
-        <div>
-          <h1>Request a campaign</h1>
-          <p className="post-meta">
-            Have a book launch, an event, or an announcement worth putting
-            in front of every visitor? Ask for a spot in the home page
-            spotlight. An admin reviews every request before it goes live.
-          </p>
-        </div>
-      </div>
-
+  const content = (
+    <>
       {error && <p className="form-error">{error}</p>}
 
       <form id="campaign-form" onSubmit={handleSubmit} className="post-form">
@@ -240,13 +248,14 @@ export default function RequestCampaign() {
           onChange={(e) => setForm({ ...form, image_url: e.target.value })}
         />
 
-        <label htmlFor="launch_date">Launch / event date (optional)</label>
+        <label htmlFor="launch_date">Launch / event date &amp; time (optional)</label>
         <input
           id="launch_date"
-          type="date"
+          type="datetime-local"
           value={form.launch_date}
           onChange={(e) => setForm({ ...form, launch_date: e.target.value })}
         />
+        <p className="post-meta">Leave off if it's not tied to a specific date - it'll show as an ongoing/evergreen spotlight instead.</p>
 
         <div className="post-form-actions">
           <button type="submit" disabled={submitting}>
@@ -294,6 +303,25 @@ export default function RequestCampaign() {
           </li>
         ))}
       </ul>
+    </>
+  );
+
+  if (embedded) return content;
+
+  return (
+    <div>
+      <div className="my-portfolio-head">
+        <div>
+          <h1>Request a campaign</h1>
+          <p className="post-meta">
+            Have a book launch, an event, or an announcement worth putting
+            in front of every visitor? Ask for a spot in the home page
+            spotlight. An admin reviews every request before it goes live.
+          </p>
+        </div>
+      </div>
+
+      {content}
     </div>
   );
 }

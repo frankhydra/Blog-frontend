@@ -10,9 +10,14 @@ const ICON_COMMENT = (
   </svg>
 );
 
-// Card-based to match the design system already defined for this page in
-// index.css (.admin-page / .queue-card) - this component just hadn't been
-// updated to actually use it yet, unlike MyContactMessages.jsx which has.
+// Phase 3 (Issues Log 5.4) - this used to be an admin-only page. It's now
+// self-service moderation: CommentController::moderationQueue() scopes
+// itself to comments on the requesting user's OWN posts, so this
+// component works identically for admin, author, and contributor alike -
+// each just sees comments on what they personally wrote. No role check
+// needed here anymore; a reader with no posts simply gets an empty queue.
+// Still embeddable (AdminDashboard.jsx's "Moderate comments" tab, and now
+// also ContributorDashboard.jsx/AuthorDashboard.jsx's).
 export default function AdminComments({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [comments, setComments] = useState([]);
@@ -20,8 +25,7 @@ export default function AdminComments({ embedded = false }) {
   const [actioningId, setActioningId] = useState(null);
 
   useEffect(() => {
-    if (authLoading) return;
-    if (!user || user.role !== 'admin') return;
+    if (authLoading || !user) return;
     loadQueue();
   }, [authLoading, user]);
 
@@ -39,21 +43,26 @@ export default function AdminComments({ embedded = false }) {
   async function act(comment, action) {
     setActioningId(comment.id);
     try {
-      await apiClient.post(`/comments/${comment.id}/${action}`);
+      if (action === 'delete') {
+        if (!confirm('Delete this comment? This can\'t be undone.')) {
+          setActioningId(null);
+          return;
+        }
+        await apiClient.delete(`/comments/${comment.id}`);
+      } else {
+        await apiClient.post(`/comments/${comment.id}/${action}`);
+      }
       // Remove it from the local list immediately - it's no longer pending
       setComments((prev) => prev.filter((c) => c.id !== comment.id));
     } catch {
-      // If it fails, leave it in the list so the admin can try again
+      // If it fails, leave it in the list so they can try again
     } finally {
       setActioningId(null);
     }
   }
 
   if (authLoading) return <Loading fullPage />;
-
-  if (!user || user.role !== 'admin') {
-    return <p className="empty-state">You don't have access to this page.</p>;
-  }
+  if (!user) return <p className="empty-state">You need to log in to see this.</p>;
 
   const content = (
     <>
@@ -87,6 +96,13 @@ export default function AdminComments({ embedded = false }) {
                 >
                   Reject
                 </button>
+                <button
+                  onClick={() => act(comment, 'delete')}
+                  disabled={actioningId === comment.id}
+                  className="queue-secondary-button"
+                >
+                  Delete
+                </button>
               </div>
             </article>
           ))}
@@ -103,7 +119,7 @@ export default function AdminComments({ embedded = false }) {
         <span className="settings-card-icon admin-page-icon">{ICON_COMMENT}</span>
         <div>
           <p className="settings-card-eyebrow">Moderation queue</p>
-          <h1>Pending comments</h1>
+          <h1>Comments on your posts</h1>
           <p className="post-meta">
             Approved comments appear publicly under their post right away.
             Rejecting one is final - the commenter can always post again.

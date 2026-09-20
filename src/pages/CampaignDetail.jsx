@@ -33,7 +33,7 @@ export default function CampaignDetail() {
       <h1>{campaign.title}</h1>
       <p className="post-meta">
         By <Link to={`/authors/${campaign.user?.id}`}>{campaign.user?.name}</Link>
-        {campaign.launch_date && ` · Launching ${new Date(campaign.launch_date).toLocaleDateString()}`}
+        {campaign.launch_date && ` · Launching ${new Date(campaign.launch_date).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}`}
       </p>
 
       <CountdownTimer launchDate={campaign.launch_date} />
