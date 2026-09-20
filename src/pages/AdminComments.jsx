@@ -10,29 +10,47 @@ const ICON_COMMENT = (
   </svg>
 );
 
-// Phase 3 (Issues Log 5.4) - this used to be an admin-only page. It's now
-// self-service moderation: CommentController::moderationQueue() scopes
-// itself to comments on the requesting user's OWN posts, so this
-// component works identically for admin, author, and contributor alike -
-// each just sees comments on what they personally wrote. No role check
-// needed here anymore; a reader with no posts simply gets an empty queue.
-// Still embeddable (AdminDashboard.jsx's "Moderate comments" tab, and now
-// also ContributorDashboard.jsx/AuthorDashboard.jsx's).
+const FILTERS = [
+  { id: 'pending', label: 'Pending' },
+  { id: 'approved', label: 'Approved' },
+  { id: 'all', label: 'All' },
+];
+
+function snippet(body, max = 60) {
+  if (!body) return '';
+  return body.length > max ? `${body.slice(0, max).trim()}…` : body;
+}
+
+// Phase 3 (Issues Log 5.4) - self-service moderation: CommentController::
+// moderationQueue() scopes to comments on the requesting user's OWN posts,
+// so this works identically for admin/author/contributor. Grew past the
+// original pending-only queue once real use surfaced the actual gap: an
+// approved comment was only ever repliable from the live post page, so a
+// blog owner could easily miss one. Now the filter has three states
+// (Pending/Approved/All) and every comment - not just pending ones - gets
+// a Reply action right here. A reply from this view is always posted by
+// the post's owner (or admin), which CommentController::store() now
+// auto-approves, so it shows up immediately instead of landing back in
+// this same queue waiting on its own author to approve it.
 export default function AdminComments({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [comments, setComments] = useState([]);
+  const [filter, setFilter] = useState('pending');
   const [status, setStatus] = useState('loading');
   const [actioningId, setActioningId] = useState(null);
+  const [replyingId, setReplyingId] = useState(null);
+  const [replyBody, setReplyBody] = useState('');
+  const [replyError, setReplyError] = useState(null);
 
   useEffect(() => {
     if (authLoading || !user) return;
     loadQueue();
-  }, [authLoading, user]);
+  }, [authLoading, user, filter]);
 
   function loadQueue() {
     setStatus('loading');
     apiClient
-      .get('/admin/comments', { params: { status: 'pending' } })
+      .get('/admin/comments', { params: { status: filter } })
       .then((res) => {
         setComments(res.data);
         setStatus('ready');
@@ -52,10 +70,37 @@ export default function AdminComments({ embedded = false }) {
       } else {
         await apiClient.post(`/comments/${comment.id}/${action}`);
       }
-      // Remove it from the local list immediately - it's no longer pending
       setComments((prev) => prev.filter((c) => c.id !== comment.id));
     } catch {
       // If it fails, leave it in the list so they can try again
+    } finally {
+      setActioningId(null);
+    }
+  }
+
+  function startReply(comment) {
+    setReplyingId(comment.id);
+    setReplyBody('');
+    setReplyError(null);
+  }
+
+  async function submitReply(comment) {
+    if (!replyBody.trim()) return;
+    setActioningId(comment.id);
+    setReplyError(null);
+    try {
+      await apiClient.post(`/posts/${comment.post.slug}/comments`, {
+        body: replyBody.trim(),
+        parent_id: comment.id,
+      });
+      setReplyingId(null);
+      setReplyBody('');
+      // The reply auto-approves (it's posted by the post's owner/admin),
+      // so a re-fetch is the simplest way to reflect it - whether it
+      // belongs in the current filter or not.
+      loadQueue();
+    } catch {
+      setReplyError("Couldn't post that reply - try again.");
     } finally {
       setActioningId(null);
     }
@@ -66,10 +111,25 @@ export default function AdminComments({ embedded = false }) {
 
   const content = (
     <>
+      <div className="queue-filter-tabs">
+        {FILTERS.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            className={`queue-filter-tab ${filter === f.id ? 'queue-filter-tab-active' : ''}`}
+            onClick={() => setFilter(f.id)}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       {status === 'loading' && <Loading />}
-      {status === 'error' && <p className="empty-state">Couldn't load the moderation queue.</p>}
+      {status === 'error' && <p className="empty-state">Couldn't load comments.</p>}
       {status === 'ready' && comments.length === 0 && (
-        <p className="empty-state">Nothing waiting for review.</p>
+        <p className="empty-state">
+          {filter === 'pending' ? 'Nothing waiting for review.' : 'Nothing here yet.'}
+        </p>
       )}
 
       {comments.length > 0 && (
@@ -79,22 +139,40 @@ export default function AdminComments({ embedded = false }) {
               <p className="queue-card-meta">
                 <strong>{comment.display_name}</strong> on{' '}
                 <Link to={`/posts/${comment.post.slug}`}>{comment.post.title}</Link>
+                {' '}
+                <span className={`status-pill status-pill-${comment.status}`}>{comment.status}</span>
               </p>
+              {comment.parent && (
+                <p className="queue-card-reply-context">
+                  ↳ Replying to <strong>{comment.parent.display_name}</strong>: "{snippet(comment.parent.body)}"
+                </p>
+              )}
               <p className="queue-card-body">{comment.body}</p>
               <div className="queue-card-actions">
+                {comment.status === 'pending' && (
+                  <>
+                    <button
+                      onClick={() => act(comment, 'approve')}
+                      disabled={actioningId === comment.id}
+                      className="queue-approve-button"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => act(comment, 'reject')}
+                      disabled={actioningId === comment.id}
+                      className="queue-reject-button"
+                    >
+                      Reject
+                    </button>
+                  </>
+                )}
                 <button
-                  onClick={() => act(comment, 'approve')}
+                  onClick={() => startReply(comment)}
                   disabled={actioningId === comment.id}
-                  className="queue-approve-button"
+                  className="queue-secondary-button"
                 >
-                  Approve
-                </button>
-                <button
-                  onClick={() => act(comment, 'reject')}
-                  disabled={actioningId === comment.id}
-                  className="queue-reject-button"
-                >
-                  Reject
+                  Reply
                 </button>
                 <button
                   onClick={() => act(comment, 'delete')}
@@ -104,6 +182,35 @@ export default function AdminComments({ embedded = false }) {
                   Delete
                 </button>
               </div>
+
+              {replyingId === comment.id && (
+                <div className="queue-reply-form">
+                  <textarea
+                    value={replyBody}
+                    onChange={(e) => setReplyBody(e.target.value)}
+                    placeholder="Write your reply…"
+                    rows={3}
+                  />
+                  {replyError && <p className="form-error">{replyError}</p>}
+                  <div className="queue-card-actions">
+                    <button
+                      type="button"
+                      onClick={() => submitReply(comment)}
+                      disabled={actioningId === comment.id || !replyBody.trim()}
+                      className="queue-approve-button"
+                    >
+                      Send reply
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setReplyingId(null)}
+                      className="queue-secondary-button"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
             </article>
           ))}
         </div>
@@ -123,6 +230,7 @@ export default function AdminComments({ embedded = false }) {
           <p className="post-meta">
             Approved comments appear publicly under their post right away.
             Rejecting one is final - the commenter can always post again.
+            Reply to any comment directly from here - your reply posts immediately.
           </p>
         </div>
       </section>
