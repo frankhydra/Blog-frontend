@@ -80,9 +80,7 @@ export default function AdminDashboard() {
   const activeTab = TABS.some((t) => t.id === requestedTab) ? requestedTab : 'overview';
 
   const [summary, setSummary] = useState(null);
-  const [subscriberNews, setSubscriberNews] = useState({ platform: 0, mine: 0 });
-  const [myPosts, setMyPosts] = useState([]);
-  const [status, setStatus] = useState('loading');
+  const [subscriberNews, setSubscriberNews] = useState({ platform: 0 });
 
   // Summary drives the sidebar badges, so it loads regardless of which
   // tab is active - otherwise switching straight to a non-Overview tab
@@ -97,38 +95,17 @@ export default function AdminDashboard() {
       .then((res) => setSummary(res.data))
       .catch(() => {});
 
-    // 4.9's "new since last checked" badges - deliberately the
-    // lightweight /new-count endpoints, not the full Subscribers tab or
-    // My Subscribers page, which reset the count as a side effect of
-    // loading them (see SubscriberController::adminIndex()/mine() vs
-    // adminNewCount()/newCount()).
-    Promise.all([
-      apiClient.get('/admin/subscribers/new-count'),
-      apiClient.get('/my/subscribers/new-count'),
-    ])
-      .then(([platformRes, mineRes]) => {
-        setSubscriberNews({
-          platform: platformRes.data.new_since_last_check,
-          mine: mineRes.data.new_since_last_check,
-        });
-      })
+    // 4.9's "new since last checked" badge - deliberately the lightweight
+    // /new-count endpoint, not the full Subscribers tab, which resets the
+    // count as a side effect of loading it (see
+    // SubscriberController::adminIndex() vs adminNewCount()). Admin's own
+    // personal subscriber count/badge now lives on MyDashboard.jsx (Q10),
+    // not here - this page only tracks the platform-wide number.
+    apiClient
+      .get('/admin/subscribers/new-count')
+      .then((res) => setSubscriberNews({ platform: res.data.new_since_last_check }))
       .catch(() => {});
   }, [authLoading, user]);
-
-  useEffect(() => {
-    if (authLoading) return;
-    if (!user || user.role !== 'admin') return;
-    if (activeTab !== 'overview') return;
-
-    setStatus('loading');
-    apiClient
-      .get('/my/posts')
-      .then((res) => {
-        setMyPosts(res.data);
-        setStatus('ready');
-      })
-      .catch(() => setStatus('error'));
-  }, [authLoading, user, activeTab]);
 
   function setTab(id) {
     setSearchParams(id === 'overview' ? {} : { tab: id });
@@ -147,7 +124,10 @@ export default function AdminDashboard() {
     <div className="settings-page">
       <p className="kicker">Admin</p>
       <h1>Dashboard</h1>
-      <p className="post-meta">Everything that needs your eye, in one glance.</p>
+      <p className="post-meta">
+        Everything that needs your eye, in one glance. Looking for your own posts, letters, or books
+        instead? <Link to="/my/dashboard">Go to your dashboard</Link>.
+      </p>
 
       <div className="settings-layout">
         <nav className="settings-tabs" aria-label="Admin sections">
@@ -202,19 +182,6 @@ export default function AdminDashboard() {
                       <span className="dashboard-summary-count">{summary.pending_campaigns}</span>
                       <span>Campaign{summary.pending_campaigns === 1 ? '' : 's'} pending</span>
                     </button>
-                    <Link to="/my/contact-messages" className="dashboard-summary-tile">
-                      <span className="dashboard-summary-count">{summary.unread_messages}</span>
-                      <span>Unread message{summary.unread_messages === 1 ? '' : 's'}</span>
-                    </Link>
-                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
-                      <span className="dashboard-summary-count">
-                        {summary.my_subscribers}
-                        {subscriberNews.mine > 0 && (
-                          <span className="dashboard-summary-new">+{subscriberNews.mine} new</span>
-                        )}
-                      </span>
-                      <span>Your subscribers</span>
-                    </button>
                     <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
                       <span className="dashboard-summary-count">
                         {summary.platform_subscribers}
@@ -225,44 +192,6 @@ export default function AdminDashboard() {
                       <span>Platform list subscribers</span>
                     </button>
                   </div>
-                </div>
-              )}
-
-              {status === 'loading' && <Loading />}
-              {status === 'error' && <p className="empty-state">Couldn't load your posts.</p>}
-
-              {status === 'ready' && (
-                <div className="settings-card">
-                  <div className="settings-card-header">
-                    <h2>Your posts</h2>
-                  </div>
-                  <p className="post-meta">
-                    <Link to="/write/post">Write a new post</Link>
-                    {' '}· <Link to="/my-posts">See all your posts</Link>
-                  </p>
-                  {myPosts.length === 0 ? (
-                    <p className="empty-state">Nothing published yet — but you're not the one this page is really for. Check the queues above.</p>
-                  ) : (
-                    <ul className="post-list">
-                      {myPosts.slice(0, 5).map((post) => (
-                        <li key={post.id} className="post-list-item">
-                          <h2>
-                            {post.status === 'published' ? (
-                              <Link to={`/posts/${post.slug}`}>{post.title}</Link>
-                            ) : (
-                              post.title
-                            )}
-                          </h2>
-                          <p className="post-meta">
-                            <span className={`status-pill status-pill-${post.status}`}>
-                              {post.status === 'published' ? 'Published' : 'Draft'}
-                            </span>
-                            {' '}· <Link to={`/posts/${post.slug}/edit`}>Edit</Link>
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
                 </div>
               )}
             </>

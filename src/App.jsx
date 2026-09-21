@@ -48,6 +48,7 @@ const AdminPosts = lazy(() => import('./pages/AdminPosts'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 const AuthorDashboard = lazy(() => import('./pages/AuthorDashboard'));
 const ContributorDashboard = lazy(() => import('./pages/ContributorDashboard'));
+const MyDashboard = lazy(() => import('./pages/MyDashboard'));
 const Campaigns = lazy(() => import('./pages/Campaigns'));
 const CampaignDetail = lazy(() => import('./pages/CampaignDetail'));
 
@@ -102,6 +103,7 @@ export default function App() {
         <Route path="admin/dashboard" element={<AdminDashboard />} />
         <Route path="author/dashboard" element={<AuthorDashboard />} />
         <Route path="contributor/dashboard" element={<ContributorDashboard />} />
+        <Route path="my/dashboard" element={<MyDashboard />} />
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="campaigns/:id" element={<CampaignDetail />} />
       </Route>

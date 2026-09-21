@@ -151,6 +151,16 @@ export default function Layout() {
                         {user.role === 'contributor' && (
                           <Link to="/contributor/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
                         )}
+                        {/* Q10 - admin gets a personal Dashboard link here too now,
+                            same slot as author/contributor's, pointing at the new
+                            MyDashboard.jsx (My posts/My letters/My books/Subscribers/
+                            Messages) - deliberately a SEPARATE page from "Admin
+                            dashboard" below, not folded into it, per Kali's explicit
+                            call: mixing personal content into the moderation tools is
+                            what made it feel cluttered in the first place. */}
+                        {user.role === 'admin' && (
+                          <Link to="/my/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
+                        )}
                         {/* Both Contributor's and Author's dashboards have these as
                             tabs (Overview/My posts/My letters [author-only]/My books/
                             Spotlight requests/Subscribers/Messages), and it turns out
@@ -276,6 +286,9 @@ export default function Layout() {
                   {user.role === 'contributor' && (
                     <Link to="/contributor/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
                   )}
+                  {user.role === 'admin' && (
+                    <Link to="/my/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
+                  )}
                   <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
                   {user.role === 'admin' && (
                     <>
@@ -351,6 +364,9 @@ export default function Layout() {
                       )}
                       {user.role === 'contributor' && (
                         <Link to="/contributor/dashboard">Dashboard</Link>
+                      )}
+                      {user.role === 'admin' && (
+                        <Link to="/my/dashboard">Dashboard</Link>
                       )}
                       <Link to="/write">Write</Link>
                       <Link to="/settings">Settings</Link>
