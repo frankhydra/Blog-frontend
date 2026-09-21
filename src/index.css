@@ -4863,30 +4863,6 @@ select:focus-visible {
   margin: 1rem 0 2rem;
 }
 
-/* Q3 - shared search input on Books.jsx/CommunityBlogs.jsx/Letters.jsx
-   (SearchBar.jsx). Kept plain and narrow - a filter tool sitting above a
-   list, not a hero search box. */
-.content-search-bar {
-  margin: 0 0 1.5rem;
-}
-
-.content-search-bar input {
-  width: 100%;
-  max-width: 360px;
-  padding: 0.55rem 0.9rem;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  background: var(--paper);
-  color: var(--ink);
-  font: inherit;
-  font-size: 0.9rem;
-}
-
-.content-search-bar input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
 /* ---------- /join landing page ---------- */
 .join-page {
   max-width: 640px;
@@ -5172,3 +5148,127 @@ select:focus-visible {
   margin-top: 1.5rem;
   text-align: center;
 }
+
+/* ====================================================================
+   Merged Sep 21 - three parallel feature deliveries (Account Directory
+   2.12, Comment moderation filter/reply 3.4-3.6, Content Search 2.6/2.6a)
+   each shipped their own full index.css independently. Combined here so
+   none of the three get silently dropped by the others - see the reply
+   this was delivered with for why the comment filter buttons went
+   unstyled. ==================================================================== */
+
+/* 2.12 - role-grouped account directory on AdminUsers.jsx. Three stacked
+   .admin-table-card sections (Admins/Authors/Contributors) instead of one
+   flat table, each with its own count next to the heading. */
+.account-directory {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.account-directory-heading {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin: 0 0 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.account-directory-count {
+  font-family: inherit;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--paper);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+}
+
+
+/* Pending/Approved/All filter on AdminComments.jsx - added once "reply
+   only reachable from the live post" turned out to be a real bottleneck;
+   the pending-only queue simply never showed anything that already had a
+   reply option elsewhere. Plain tab-underline style, not full .queue-card
+   treatment, so it reads as a filter and not another moderation card. */
+.queue-filter-tabs {
+  display: flex;
+  gap: 1.25rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.queue-filter-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.5rem 0.1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.queue-filter-tab-active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+/* Shown above a reply's own body when moderationQueue()'s `parent` eager
+   load is present - without this a reply looked identical to a top-level
+   comment, with no way to tell what it was actually replying to. */
+.queue-card-reply-context {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 0.6rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border);
+}
+
+.queue-reply-form {
+  margin-top: 0.85rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--border);
+}
+
+.queue-reply-form textarea {
+  width: 100%;
+  max-width: 520px;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  font: inherit;
+  font-size: 0.9rem;
+  margin-bottom: 0.6rem;
+  resize: vertical;
+  display: block;
+}
+
+
+/* Q3 - shared search input on Books.jsx/CommunityBlogs.jsx/Letters.jsx
+   (SearchBar.jsx). Kept plain and narrow - a filter tool sitting above a
+   list, not a hero search box. */
+.content-search-bar {
+  margin: 0 0 1.5rem;
+}
+
+.content-search-bar input {
+  width: 100%;
+  max-width: 360px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.content-search-bar input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+

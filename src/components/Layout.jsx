@@ -151,26 +151,22 @@ export default function Layout() {
                         {user.role === 'contributor' && (
                           <Link to="/contributor/dashboard" onClick={() => setMenuOpen(false)}>Dashboard</Link>
                         )}
-                        {/* Both Contributor's and Author's dashboards now have these
-                            as tabs (Overview/My posts/My letters [author-only]/My books/
-                            Spotlight requests/Subscribers/Messages - see
-                            ContributorDashboard.jsx and AuthorDashboard.jsx), so keeping
-                            them here too was pure duplication - kept only for admin, whose
-                            dashboard doesn't have a personal-posts/personal-messages tab
-                            (its Subscribers tab is the platform-wide oversight view, a
-                            separate thing - see Q8). Request a campaign is dropped
-                            entirely: author/contributor now reach it via their dashboard's
-                            Spotlight requests tab, and admin is blocked from requesting one
-                            at all (CampaignController::store()). */}
-                        {user.role === 'admin' && (
-                          <Link to="/my-posts" onClick={() => setMenuOpen(false)}>My posts</Link>
-                        )}
-                        {user.role === 'admin' && (
-                          <Link to="/my/subscribers" onClick={() => setMenuOpen(false)}>My subscribers</Link>
-                        )}
-                        {user.role === 'admin' && (
-                          <Link to="/my/contact-messages" onClick={() => setMenuOpen(false)}>Contact messages</Link>
-                        )}
+                        {/* Both Contributor's and Author's dashboards have these as
+                            tabs (Overview/My posts/My letters [author-only]/My books/
+                            Spotlight requests/Subscribers/Messages), and it turns out
+                            admin's dashboard already covers the same ground too, just
+                            through different UI: AdminDashboard.jsx's Overview tab links
+                            straight to /my-posts ("See all your posts") and
+                            /my/contact-messages ("Unread messages"), and its Subscribers
+                            tab's "By author" table includes admin's own row with its own
+                            Download CSV button - the platform-wide oversight view (Q8)
+                            and admin's own personal count aren't actually two separate
+                            things in that tab. So these three are dropped from the
+                            dropdown for every role now, not just author/contributor.
+                            Request a campaign is dropped entirely too: author/contributor
+                            reach it via their dashboard's Spotlight requests tab, and
+                            admin is blocked from requesting one at all
+                            (CampaignController::store()). */}
                         <Link to="/settings" onClick={() => setMenuOpen(false)}>Settings</Link>
                         {user.role === 'admin' && (
                           <>
@@ -280,15 +276,6 @@ export default function Layout() {
                   {user.role === 'contributor' && (
                     <Link to="/contributor/dashboard" onClick={closeMobileMenu}>Dashboard</Link>
                   )}
-                  {user.role === 'admin' && (
-                    <Link to="/my-posts" onClick={closeMobileMenu}>My posts</Link>
-                  )}
-                  {user.role === 'admin' && (
-                    <Link to="/my/subscribers" onClick={closeMobileMenu}>My subscribers</Link>
-                  )}
-                  {user.role === 'admin' && (
-                    <Link to="/my/contact-messages" onClick={closeMobileMenu}>Contact messages</Link>
-                  )}
                   <Link to="/settings" onClick={closeMobileMenu}>Settings</Link>
                   {user.role === 'admin' && (
                     <>
@@ -350,12 +337,26 @@ export default function Layout() {
                   <p className="footer-col-title">Account</p>
                   {user ? (
                     <>
-                      <Link to="/write">Write</Link>
-                      <Link to="/my-posts">My posts</Link>
-                      {user.role !== 'admin' && (
-                        <Link to="/request-campaign">Request a campaign</Link>
+                      {/* 2.4a - same duplication 2.4 fixed in the dropdown, found
+                          here too after that fix shipped. My posts/Request a
+                          campaign are dropped the same way (My posts kept for
+                          admin only, Request a campaign dropped for everyone -
+                          see the dropdown's own comment above for why). Also
+                          adding a Dashboard link, which the footer never had at
+                          all - without it, an author/contributor logged-in
+                          footer would otherwise only offer Write and Settings,
+                          no path back to their own dashboard. */}
+                      {user.role === 'author' && (
+                        <Link to="/author/dashboard">Dashboard</Link>
                       )}
+                      {user.role === 'contributor' && (
+                        <Link to="/contributor/dashboard">Dashboard</Link>
+                      )}
+                      <Link to="/write">Write</Link>
                       <Link to="/settings">Settings</Link>
+                      {user.role === 'admin' && (
+                        <Link to="/admin/dashboard">Admin dashboard</Link>
+                      )}
                     </>
                   ) : (
                     <>
