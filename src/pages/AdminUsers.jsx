@@ -3,7 +3,9 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
 
-const ROLES = ['contributor', 'author', 'admin'];
+const ROLES = ['admin', 'author', 'contributor'];
+const ROLE_LABELS = { admin: 'Admins', author: 'Authors', contributor: 'Contributors' };
+const ROLE_OPTIONS = ['contributor', 'author', 'admin'];
 
 const ICON_USERS = (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,9 +15,17 @@ const ICON_USERS = (
   </svg>
 );
 
-// Card header matches the other Admin pages (Comments/Campaigns/Posts);
-// the table itself keeps its own .admin-table-card/.user-table styling,
-// already defined in index.css but previously unused here.
+// 2.12 (Issues Log 5.11) - "a role-based account directory (all admins, all
+// authors, all contributors as account records), grouped by role." This
+// isn't subscriber data (that's AdminSubscribers.jsx, unchanged per Q8) -
+// it's the same /admin/users account list this page already had, just
+// grouped into three sections with a count per role instead of one flat
+// table. No backend change - GET /admin/users already returns every
+// account; grouping happens client-side from the same response. Role
+// changes still work exactly as before (the <select> per row) - since
+// grouping is derived fresh from `users` on every render, moving someone's
+// role via the dropdown moves their row into the correct section
+// automatically, no extra logic needed.
 export default function AdminUsers({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [users, setUsers] = useState([]);
@@ -56,6 +66,12 @@ export default function AdminUsers({ embedded = false }) {
   if (authLoading) return <Loading fullPage />;
   if (!user || user.role !== 'admin') return <p className="empty-state">You don't have access to this page.</p>;
 
+  const grouped = ROLES.map((role) => ({
+    role,
+    label: ROLE_LABELS[role],
+    accounts: users.filter((u) => u.role === role),
+  }));
+
   const content = (
     <>
       {status === 'loading' && <Loading />}
@@ -63,37 +79,49 @@ export default function AdminUsers({ embedded = false }) {
       {error && <p className="form-error">{error}</p>}
 
       {status === 'ready' && (
-        <div className="settings-card admin-table-card">
-          <table className="user-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((u) => (
-                <tr key={u.id}>
-                  <td>{u.name}</td>
-                  <td>{u.email}</td>
-                  <td>
-                    <select
-                      value={u.role}
-                      disabled={savingId === u.id}
-                      onChange={(e) => changeRole(u, e.target.value)}
-                    >
-                      {ROLES.map((role) => (
-                        <option key={role} value={role}>
-                          {role}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="account-directory">
+          {grouped.map(({ role, label, accounts }) => (
+            <div key={role} className="settings-card admin-table-card account-directory-group">
+              <h2 className="account-directory-heading">
+                {label} <span className="account-directory-count">{accounts.length}</span>
+              </h2>
+
+              {accounts.length === 0 ? (
+                <p className="empty-state">No {label.toLowerCase()} yet.</p>
+              ) : (
+                <table className="user-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {accounts.map((u) => (
+                      <tr key={u.id}>
+                        <td>{u.name}</td>
+                        <td>{u.email}</td>
+                        <td>
+                          <select
+                            value={u.role}
+                            disabled={savingId === u.id}
+                            onChange={(e) => changeRole(u, e.target.value)}
+                          >
+                            {ROLE_OPTIONS.map((r) => (
+                              <option key={r} value={r}>
+                                {r}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </>
@@ -107,10 +135,11 @@ export default function AdminUsers({ embedded = false }) {
         <span className="settings-card-icon admin-page-icon">{ICON_USERS}</span>
         <div>
           <p className="settings-card-eyebrow">User management</p>
-          <h1>Manage authors</h1>
+          <h1>Accounts</h1>
           <p className="post-meta">
-            Promote a contributor to author once you're ready for them to
-            publish publicly and appear in the community blogs section.
+            Every account on the platform, grouped by role. Promote a
+            contributor to author once you're ready for them to publish
+            publicly and appear in the community blogs section.
           </p>
         </div>
       </section>

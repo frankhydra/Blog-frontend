@@ -6,27 +6,34 @@ import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
 import SkeletonGrid from '../components/SkeletonGrid';
+import SearchBar from '../components/SearchBar';
 
 // Every post from everyone writing here - the owner, authors, and
 // contributors alike, all in one shared feed. Each post carries a small
 // color flag next to the byline instead of an "Owner"/"Community" label,
 // so identity is personal rather than a two-tier split.
+//
+// Q3 - search added: PostController::index() already accepted filter
+// params (category/tag/author/scope), so ?q= slots into that same
+// pattern, matched against title/excerpt.
 export default function CommunityBlogs() {
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [status, setStatus] = useState('loading');
+  const [query, setQuery] = useState('');
 
   usePageMeta('Community Blogs', 'Every post from everyone building here, all in one shared feed.');
 
   useEffect(() => {
+    setStatus('loading');
     apiClient
-      .get('/posts')
+      .get('/posts', { params: query ? { q: query } : {} })
       .then((res) => {
         setPosts(res.data.data);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
-  }, []);
+  }, [query]);
 
   if (status === 'error') return <p>Couldn't load posts.</p>;
 
@@ -40,9 +47,15 @@ export default function CommunityBlogs() {
         {user && <Link to="/write/post" className="text-link">Write a new post</Link>}
       </div>
 
+      <SearchBar placeholder="Search posts by title…" onSearch={setQuery} />
+
       {status === 'loading' && <SkeletonGrid variant="entry" count={6} />}
-      {status === 'ready' && posts.length === 0 && <p className="empty-state">Nothing published yet. This page fills up the moment someone writes.</p>}
-      {status === 'ready' && (
+      {status === 'ready' && posts.length === 0 && (
+        <p className="empty-state">
+          {query ? `No posts match "${query}".` : 'Nothing published yet. This page fills up the moment someone writes.'}
+        </p>
+      )}
+      {status === 'ready' && posts.length > 0 && (
         <ul className="entries">
           {posts.map((post) => {
           const { day, month } = formatPostmark(post.published_at);

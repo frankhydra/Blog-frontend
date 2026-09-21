@@ -6,23 +6,28 @@ import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import { getAuthorFlag } from '../utils/authorFlag';
 import SkeletonGrid from '../components/SkeletonGrid';
+import SearchBar from '../components/SearchBar';
 
+// Q3 - search added: LetterController::index() now accepts ?q=, matched
+// against title/excerpt, same pattern as Books/CommunityBlogs.
 export default function Letters() {
   const { user } = useAuth();
   const [letters, setLetters] = useState([]);
   const [status, setStatus] = useState('loading');
+  const [query, setQuery] = useState('');
 
   usePageMeta('Letters', 'Newsletters worth subscribing to, from everyone building on Nchukwi.');
 
   useEffect(() => {
+    setStatus('loading');
     apiClient
-      .get('/letters')
+      .get('/letters', { params: query ? { q: query } : {} })
       .then((res) => {
         setLetters(res.data.data);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
-  }, []);
+  }, [query]);
 
   return (
     <div>
@@ -35,9 +40,13 @@ export default function Letters() {
         </p>
       )}
 
+      <SearchBar placeholder="Search letters by title…" onSearch={setQuery} />
+
       {status === 'loading' && <SkeletonGrid variant="entry" count={4} />}
       {status === 'error' && <p>Couldn't load letters.</p>}
-      {status === 'ready' && letters.length === 0 && <p>No letters published yet.</p>}
+      {status === 'ready' && letters.length === 0 && (
+        <p>{query ? `No letters match "${query}".` : 'No letters published yet.'}</p>
+      )}
 
       {status === 'ready' && (
         <ul className="entries">

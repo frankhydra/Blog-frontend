@@ -4,14 +4,21 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 import SkeletonGrid from '../components/SkeletonGrid';
+import SearchBar from '../components/SearchBar';
 
 // The public Portfolio page - a community directory of every blogger on
 // the platform, ranked by how often they actually post, paginated rather
 // than a single person's one-pager dominating the top of the page. Click
 // through to /authors/:id for someone's full profile/one-pager.
+//
+// Q3 follow-up - search added: PortfolioController::directory() now
+// accepts ?q=, matched against name/bio. Typing a new search term resets
+// back to page 1, same as any filter changing the result set out from
+// under an existing page number.
 export default function Portfolios() {
   const { user } = useAuth();
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
   const [pageData, setPageData] = useState(null);
   const [status, setStatus] = useState('loading');
 
@@ -20,14 +27,19 @@ export default function Portfolios() {
   useEffect(() => {
     setStatus('loading');
     apiClient
-      .get('/portfolios', { params: { page } })
+      .get('/portfolios', { params: { page, ...(query ? { q: query } : {}) } })
       .then((res) => {
         setPageData(res.data);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [page]);
+  }, [page, query]);
+
+  function handleSearch(term) {
+    setPage(1);
+    setQuery(term);
+  }
 
   if (status === 'error') return <p>Couldn't load this page.</p>;
 
@@ -43,10 +55,14 @@ export default function Portfolios() {
         Fellow writers publishing here — click through for their full profile and portfolio.
       </p>
 
+      <SearchBar placeholder="Search by name or bio…" onSearch={handleSearch} />
+
       {status === 'loading' && <SkeletonGrid variant="author" count={6} />}
 
       {status === 'ready' && people.length === 0 && (
-        <p className="empty-state">Nobody's claimed this yet. Could be you.</p>
+        <p className="empty-state">
+          {query ? `Nobody matches "${query}".` : "Nobody's claimed this yet. Could be you."}
+        </p>
       )}
 
       {status === 'ready' && people.length > 0 && (

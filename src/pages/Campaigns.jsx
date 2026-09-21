@@ -3,28 +3,33 @@ import { Link, useNavigate } from 'react-router-dom';
 import apiClient from '../api/client';
 import usePageMeta from '../hooks/usePageMeta';
 import CountdownTimer from '../components/CountdownTimer';
+import SearchBar from '../components/SearchBar';
 
 // Every approved campaign, not just the handful teased on Home - launches,
 // book drops, events, anything an author or the site owner has asked to
 // spotlight. Soonest launch first (see CampaignController::index).
+//
+// Q3 follow-up - search added: CampaignController::index() now accepts
+// ?q=, matched against title/description.
 export default function Campaigns() {
   const navigate = useNavigate();
   const [campaigns, setCampaigns] = useState(null);
   const [status, setStatus] = useState('loading');
+  const [query, setQuery] = useState('');
 
   usePageMeta('Campaigns', 'Spotlights for launches, drops, and events from everyone building here.');
 
   useEffect(() => {
+    setStatus('loading');
     apiClient
-      .get('/campaigns', { params: { limit: 50 } })
+      .get('/campaigns', { params: { limit: 50, ...(query ? { q: query } : {}) } })
       .then((res) => {
         setCampaigns(res.data);
         setStatus('ready');
       })
       .catch(() => setStatus('error'));
-  }, []);
+  }, [query]);
 
-  if (status === 'loading') return <p>Loading…</p>;
   if (status === 'error') return <p>Couldn't load campaigns.</p>;
 
   return (
@@ -36,33 +41,41 @@ export default function Campaigns() {
         a countdown to launch day.
       </p>
 
-      {campaigns.length === 0 && <p>Nothing on the calendar yet.</p>}
+      <SearchBar placeholder="Search campaigns by title…" onSearch={setQuery} />
 
-      <div className="campaign-grid">
-        {campaigns.map((c) => (
-          <div
-            key={c.id}
-            className="campaign-card"
-            role="link"
-            tabIndex={0}
-            onClick={() => navigate(`/campaigns/${c.id}`)}
-            onKeyDown={(e) => e.key === 'Enter' && navigate(`/campaigns/${c.id}`)}
-          >
-            {c.image_url && <img src={c.image_url} alt="" className="campaign-card-image" loading="lazy" />}
-            <div className="campaign-card-body">
-              <h3>{c.title}</h3>
-              <p>{c.description}</p>
-              <p className="post-meta">
-                By{' '}
-                <Link to={`/authors/${c.user?.id}`} onClick={(e) => e.stopPropagation()}>
-                  {c.user?.name}
-                </Link>
-              </p>
-              <CountdownTimer launchDate={c.launch_date} compact />
+      {status === 'loading' && <p>Loading…</p>}
+
+      {status === 'ready' && campaigns.length === 0 && (
+        <p>{query ? `No campaigns match "${query}".` : 'Nothing on the calendar yet.'}</p>
+      )}
+
+      {status === 'ready' && campaigns.length > 0 && (
+        <div className="campaign-grid">
+          {campaigns.map((c) => (
+            <div
+              key={c.id}
+              className="campaign-card"
+              role="link"
+              tabIndex={0}
+              onClick={() => navigate(`/campaigns/${c.id}`)}
+              onKeyDown={(e) => e.key === 'Enter' && navigate(`/campaigns/${c.id}`)}
+            >
+              {c.image_url && <img src={c.image_url} alt="" className="campaign-card-image" loading="lazy" />}
+              <div className="campaign-card-body">
+                <h3>{c.title}</h3>
+                <p>{c.description}</p>
+                <p className="post-meta">
+                  By{' '}
+                  <Link to={`/authors/${c.user?.id}`} onClick={(e) => e.stopPropagation()}>
+                    {c.user?.name}
+                  </Link>
+                </p>
+                <CountdownTimer launchDate={c.launch_date} compact />
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
