@@ -80,20 +80,40 @@ export default function AdminDashboard() {
   const activeTab = TABS.some((t) => t.id === requestedTab) ? requestedTab : 'overview';
 
   const [summary, setSummary] = useState(null);
+  const [summaryStatus, setSummaryStatus] = useState('loading');
+  const [activity, setActivity] = useState([]);
+  const [activityStatus, setActivityStatus] = useState('loading');
   const [subscriberNews, setSubscriberNews] = useState({ platform: 0 });
 
   // Summary drives the sidebar badges, so it loads regardless of which
   // tab is active - otherwise switching straight to a non-Overview tab
   // via a bookmarked URL would show no badges until Overview was visited
-  // once.
+  // once. summaryStatus (new) fixes a real bug: the Overview tab used to
+  // render nothing at all - not a spinner, not an error, just blank -
+  // for as long as `summary` was null, whether that was normal loading
+  // or the request actually failing. Now there's always something on
+  // screen to look at.
   useEffect(() => {
     if (authLoading) return;
     if (!user || user.role !== 'admin') return;
 
+    setSummaryStatus('loading');
     apiClient
       .get('/admin/dashboard-summary')
-      .then((res) => setSummary(res.data))
-      .catch(() => {});
+      .then((res) => {
+        setSummary(res.data);
+        setSummaryStatus('ready');
+      })
+      .catch(() => setSummaryStatus('error'));
+
+    setActivityStatus('loading');
+    apiClient
+      .get('/admin/recent-activity')
+      .then((res) => {
+        setActivity(res.data);
+        setActivityStatus('ready');
+      })
+      .catch(() => setActivityStatus('error'));
 
     // 4.9's "new since last checked" badge - deliberately the lightweight
     // /new-count endpoint, not the full Subscribers tab, which resets the
@@ -159,41 +179,123 @@ export default function AdminDashboard() {
         <div className="settings-panel">
           {activeTab === 'overview' && (
             <>
-              {summary && (
-                <div className="settings-card">
-                  <div className="settings-card-header">
-                    <h2>
-                      {totalPending === 0
-                        ? 'Nothing waiting for you'
-                        : `${totalPending} thing${totalPending === 1 ? '' : 's'} waiting for review`}
-                    </h2>
+              {summaryStatus === 'loading' && <Loading />}
+              {summaryStatus === 'error' && (
+                <p className="empty-state">Couldn't load the dashboard summary. Try refreshing.</p>
+              )}
+
+              {summaryStatus === 'ready' && summary && (
+                <>
+                  <div className="settings-card">
+                    <div className="settings-card-header">
+                      <h2>
+                        {totalPending === 0
+                          ? 'Nothing waiting for you'
+                          : `${totalPending} thing${totalPending === 1 ? '' : 's'} waiting for review`}
+                      </h2>
+                    </div>
+
+                    <div className="dashboard-summary-grid">
+                      <button type="button" className="dashboard-summary-tile" onClick={() => setTab('posts')}>
+                        <span className="dashboard-summary-count">{summary.pending_posts}</span>
+                        <span>Post{summary.pending_posts === 1 ? '' : 's'} awaiting review</span>
+                      </button>
+                      <button type="button" className="dashboard-summary-tile" onClick={() => setTab('comments')}>
+                        <span className="dashboard-summary-count">{summary.pending_comments}</span>
+                        <span>Comment{summary.pending_comments === 1 ? '' : 's'} pending</span>
+                      </button>
+                      <button type="button" className="dashboard-summary-tile" onClick={() => setTab('campaigns')}>
+                        <span className="dashboard-summary-count">{summary.pending_campaigns}</span>
+                        <span>Campaign{summary.pending_campaigns === 1 ? '' : 's'} pending</span>
+                      </button>
+                      <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
+                        <span className="dashboard-summary-count">
+                          {summary.platform_subscribers}
+                          {subscriberNews.platform > 0 && (
+                            <span className="dashboard-summary-new">+{subscriberNews.platform} new</span>
+                          )}
+                        </span>
+                        <span>Platform list subscribers</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="dashboard-summary-grid">
-                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('posts')}>
-                      <span className="dashboard-summary-count">{summary.pending_posts}</span>
-                      <span>Post{summary.pending_posts === 1 ? '' : 's'} awaiting review</span>
-                    </button>
-                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('comments')}>
-                      <span className="dashboard-summary-count">{summary.pending_comments}</span>
-                      <span>Comment{summary.pending_comments === 1 ? '' : 's'} pending</span>
-                    </button>
-                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('campaigns')}>
-                      <span className="dashboard-summary-count">{summary.pending_campaigns}</span>
-                      <span>Campaign{summary.pending_campaigns === 1 ? '' : 's'} pending</span>
-                    </button>
-                    <button type="button" className="dashboard-summary-tile" onClick={() => setTab('subscribers')}>
-                      <span className="dashboard-summary-count">
-                        {summary.platform_subscribers}
-                        {subscriberNews.platform > 0 && (
-                          <span className="dashboard-summary-new">+{subscriberNews.platform} new</span>
-                        )}
-                      </span>
-                      <span>Platform list subscribers</span>
-                    </button>
+                  {/* Platform analytics - the actual ask this round: the
+                      pending-queue tiles above tell an admin what needs
+                      action, but nothing on this page said anything about
+                      how the platform is actually doing. Reuses Q6's
+                      views/likes/comments columns, just summed across
+                      every post/letter/book instead of one person's own
+                      (see ActivitySummaryController for the per-user
+                      version this mirrors). */}
+                  <div className="settings-card">
+                    <div className="settings-card-header">
+                      <h2>Platform at a glance</h2>
+                    </div>
+                    <div className="portfolio-stats-grid">
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{summary.platform_published_posts}</span>
+                        <span className="portfolio-stat-label">Posts</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{summary.platform_published_letters}</span>
+                        <span className="portfolio-stat-label">Letters</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{summary.platform_published_books}</span>
+                        <span className="portfolio-stat-label">Books</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{summary.platform_total_views}</span>
+                        <span className="portfolio-stat-label">Views</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-wax">{summary.platform_total_likes}</span>
+                        <span className="portfolio-stat-label">Likes</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-forest">{summary.platform_total_comments}</span>
+                        <span className="portfolio-stat-label">Comments</span>
+                      </div>
+                    </div>
+                    <p className="post-meta">
+                      {summary.platform_users_by_role.admin} admin
+                      {summary.platform_users_by_role.admin === 1 ? '' : 's'} ·{' '}
+                      {summary.platform_users_by_role.author} author
+                      {summary.platform_users_by_role.author === 1 ? '' : 's'} ·{' '}
+                      {summary.platform_users_by_role.contributor} contributor
+                      {summary.platform_users_by_role.contributor === 1 ? '' : 's'}
+                    </p>
                   </div>
-                </div>
+                </>
               )}
+
+              <div className="settings-card">
+                <div className="settings-card-header">
+                  <h2>Recent activity</h2>
+                </div>
+                {activityStatus === 'loading' && <Loading />}
+                {activityStatus === 'error' && (
+                  <p className="empty-state">Couldn't load recent activity.</p>
+                )}
+                {activityStatus === 'ready' && activity.length === 0 && (
+                  <p className="empty-state">Nothing's happened on the platform yet.</p>
+                )}
+                {activityStatus === 'ready' && activity.length > 0 && (
+                  <ul className="post-list">
+                    {activity.map((item, i) => (
+                      <li key={i} className="post-list-item">
+                        <h2>
+                          <span className="queue-card-content-type">{item.type}</span>
+                          {' '}
+                          {item.url ? <Link to={item.url}>{item.title}</Link> : item.title}
+                        </h2>
+                        <p className="post-meta">{item.subtitle}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </>
           )}
 
