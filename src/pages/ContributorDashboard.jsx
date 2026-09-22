@@ -108,6 +108,7 @@ export default function ContributorDashboard() {
   const [campaigns, setCampaigns] = useState([]);
   const [extras, setExtras] = useState({ unread_messages: 0, subscribers: 0, subscribers_new: 0 });
   const [pendingComments, setPendingComments] = useState(0);
+  const [activity, setActivity] = useState({ total_views: 0, total_likes: 0, total_comments: 0 });
   const [status, setStatus] = useState('loading');
 
   // Loads regardless of which tab is active, same reasoning as
@@ -146,14 +147,19 @@ export default function ContributorDashboard() {
       // count, same as how pendingCampaigns is derived below from the
       // full campaigns array rather than a separate count endpoint.
       apiClient.get('/admin/comments', { params: { status: 'pending' } }),
+      // Q6 - "your content activity": total likes/comments/views across
+      // everything this user owns (posts+letters+books), one aggregate
+      // call rather than summing three separate lists client-side.
+      apiClient.get('/my/activity-summary'),
     ])
-      .then(([unreadRes, subsRes, commentsRes]) => {
+      .then(([unreadRes, subsRes, commentsRes, activityRes]) => {
         setExtras({
           unread_messages: unreadRes.data.unread_messages,
           subscribers: subsRes.data.count,
           subscribers_new: subsRes.data.new_since_last_check,
         });
         setPendingComments(commentsRes.data.length);
+        setActivity(activityRes.data);
       })
       .catch(() => {});
   }, [authLoading, user]);
@@ -290,6 +296,29 @@ export default function ContributorDashboard() {
                       </div>
                     </div>
                     <p className="post-meta"><Link to="/settings?tab=portfolio">Manage your portfolio</Link></p>
+                  </div>
+
+                  <div className="settings-card">
+                    <div className="settings-card-header">
+                      <h2>Your content activity</h2>
+                    </div>
+                    <p className="post-meta">
+                      Across every post, letter, and book you've published.
+                    </p>
+                    <div className="portfolio-stats-grid">
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{activity.total_views}</span>
+                        <span className="portfolio-stat-label">Views</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-wax">{activity.total_likes}</span>
+                        <span className="portfolio-stat-label">Likes</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-forest">{activity.total_comments}</span>
+                        <span className="portfolio-stat-label">Comments</span>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}

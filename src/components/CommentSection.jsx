@@ -110,7 +110,10 @@ function CommentNode({ comment, depth, repliesFor, authorId, replyState, onStart
   );
 }
 
-export default function CommentSection({ post }) {
+// Q6 - was post-only (props: { post }, hardcoded /posts/{slug}/comments).
+// Comments now work on letters and books too, so this takes contentType
+// ('posts'|'letters'|'books') plus the content object instead.
+export default function CommentSection({ contentType, content }) {
   const { user } = useAuth();
   const [comments, setComments] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -133,12 +136,13 @@ export default function CommentSection({ post }) {
 
   useEffect(() => {
     loadComments();
-  }, [post.slug]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [contentType, content.slug]);
 
   function loadComments() {
     setStatus('loading');
     apiClient
-      .get(`/posts/${post.slug}/comments`)
+      .get(`/${contentType}/${content.slug}/comments`)
       .then((res) => {
         setComments(res.data);
         setStatus('ready');
@@ -158,14 +162,16 @@ export default function CommentSection({ post }) {
         payload.guest_email = guestEmail || undefined;
       }
 
-      const res = await apiClient.post(`/posts/${post.slug}/comments`, payload);
+      const res = await apiClient.post(`/${contentType}/${content.slug}/comments`, payload);
       setFeedback(res.data.message);
       setBody('');
       setGuestName('');
       setGuestEmail('');
       // Not reloading the list here on purpose - the new comment is
       // 'pending' and won't show up until an admin approves it, so
-      // reloading would look like nothing happened.
+      // reloading would look like nothing happened. (An owner's own
+      // comment auto-approves server-side, but keeping this simple and
+      // consistent rather than branching on who's posting.)
     } catch {
       setFeedback('Something went wrong submitting your comment. Please try again.');
     } finally {
@@ -197,7 +203,7 @@ export default function CommentSection({ post }) {
         payload.guest_email = replyGuestEmail || undefined;
       }
 
-      const res = await apiClient.post(`/posts/${post.slug}/comments`, payload);
+      const res = await apiClient.post(`/${contentType}/${content.slug}/comments`, payload);
       setReplyFeedback(res.data.message);
       setReplyBody('');
       // Same as the top-level form - a reply starts 'pending' too, so the
@@ -212,7 +218,7 @@ export default function CommentSection({ post }) {
 
   const topLevel = comments.filter((c) => !c.parent_id);
   const repliesFor = (id) => comments.filter((c) => c.parent_id === id);
-  const authorId = post.author?.id ?? null;
+  const authorId = content.author?.id ?? content.owner?.id ?? null;
 
   const replyState = {
     parentId: replyParentId,

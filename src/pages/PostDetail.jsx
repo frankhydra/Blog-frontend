@@ -5,6 +5,7 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import ReactionButtons from '../components/ReactionButtons';
 import CommentSection from '../components/CommentSection';
+import ContentStats from '../components/ContentStats';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
 import Loading from '../components/Loading';
@@ -78,6 +79,7 @@ export default function PostDetail() {
               </>
             )}
           </p>
+          <ContentStats content={post} />
         </div>
       </div>
 
@@ -110,8 +112,8 @@ export default function PostDetail() {
         </div>
       )}
 
-      <ReactionButtons post={post} />
-      <CommentSection post={post} />
+      <ReactionButtons contentType="posts" content={post} />
+      <CommentSection contentType="posts" content={post} />
     </article>
   );
 }

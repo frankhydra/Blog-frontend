@@ -22,16 +22,18 @@ function snippet(body, max = 60) {
 }
 
 // Phase 3 (Issues Log 5.4) - self-service moderation: CommentController::
-// moderationQueue() scopes to comments on the requesting user's OWN posts,
-// so this works identically for admin/author/contributor. Grew past the
-// original pending-only queue once real use surfaced the actual gap: an
-// approved comment was only ever repliable from the live post page, so a
-// blog owner could easily miss one. Now the filter has three states
-// (Pending/Approved/All) and every comment - not just pending ones - gets
-// a Reply action right here. A reply from this view is always posted by
-// the post's owner (or admin), which CommentController::store() now
-// auto-approves, so it shows up immediately instead of landing back in
-// this same queue waiting on its own author to approve it.
+// moderationQueue() scopes to comments on the requesting user's OWN
+// content, so this works identically for admin/author/contributor. Grew
+// past the original pending-only queue once real use surfaced the actual
+// gap: an approved comment was only ever repliable from the live post
+// page, so a blog owner could easily miss one. Now the filter has three
+// states (Pending/Approved/All) and every comment - not just pending ones
+// - gets a Reply action right here. A reply from this view is always
+// posted by the content's owner (or admin), which CommentController::
+// store() now auto-approves, so it shows up immediately instead of
+// landing back in this same queue waiting on its own author to approve
+// it. Q6 follow-up - "content" here means posts, letters, AND books now
+// (comment.commentable/comment.content_type), not just posts.
 export default function AdminComments({ embedded = false }) {
   const { user, loading: authLoading } = useAuth();
   const [comments, setComments] = useState([]);
@@ -89,7 +91,10 @@ export default function AdminComments({ embedded = false }) {
     setActioningId(comment.id);
     setReplyError(null);
     try {
-      await apiClient.post(`/posts/${comment.post.slug}/comments`, {
+      // Q6 - a comment's parent content is now Post/Letter/Book, not just
+      // Post - content_type ('post'|'letter'|'book', from the Comment
+      // model's accessor) tells us which route prefix to reply through.
+      await apiClient.post(`/${comment.content_type}s/${comment.commentable.slug}/comments`, {
         body: replyBody.trim(),
         parent_id: comment.id,
       });
@@ -138,7 +143,11 @@ export default function AdminComments({ embedded = false }) {
             <article key={comment.id} className="settings-card queue-card">
               <p className="queue-card-meta">
                 <strong>{comment.display_name}</strong> on{' '}
-                <Link to={`/posts/${comment.post.slug}`}>{comment.post.title}</Link>
+                <Link to={`/${comment.content_type}s/${comment.commentable.slug}`}>
+                  {comment.commentable.title}
+                </Link>
+                {' '}
+                <span className="queue-card-content-type">({comment.content_type})</span>
                 {' '}
                 <span className={`status-pill status-pill-${comment.status}`}>{comment.status}</span>
               </p>

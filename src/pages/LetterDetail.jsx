@@ -5,6 +5,9 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
 import { formatPostmark } from '../utils/postmark';
+import ReactionButtons from '../components/ReactionButtons';
+import CommentSection from '../components/CommentSection';
+import ContentStats from '../components/ContentStats';
 
 export default function LetterDetail() {
   const { slug } = useParams();
@@ -62,6 +65,7 @@ export default function LetterDetail() {
               </button>
             </p>
           )}
+          <ContentStats content={letter} />
         </div>
       </div>
 
@@ -76,6 +80,9 @@ export default function LetterDetail() {
           }),
         }}
       />
+
+      <ReactionButtons contentType="letters" content={letter} />
+      <CommentSection contentType="letters" content={letter} />
     </article>
   );
 }

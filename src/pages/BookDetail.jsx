@@ -3,6 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import usePageMeta from '../hooks/usePageMeta';
+import ReactionButtons from '../components/ReactionButtons';
+import CommentSection from '../components/CommentSection';
+import ContentStats from '../components/ContentStats';
 
 export default function BookDetail() {
   const { slug } = useParams();
@@ -66,6 +69,7 @@ export default function BookDetail() {
               </>
             )}
           </p>
+          <ContentStats content={book} />
           {book.description && <p>{book.description}</p>}
 
           {book.file_url && (
@@ -82,6 +86,9 @@ export default function BookDetail() {
           </p>
         </div>
       </div>
+
+      <ReactionButtons contentType="books" content={book} />
+      <CommentSection contentType="books" content={book} />
     </article>
   );
 }

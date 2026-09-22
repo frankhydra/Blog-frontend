@@ -5272,3 +5272,32 @@ select:focus-visible {
   border-color: var(--accent);
 }
 
+
+/* Q6 - small label next to a comment's title link in the moderation
+   queue, showing which content type it's on (post/letter/book) now that
+   comments span all three instead of just posts. */
+.queue-card-content-type {
+  font-size: 0.75rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Q6 - read-only stats strip (ContentStats.jsx) shown near the top of
+   PostDetail/LetterDetail/BookDetail, right under the byline - "how
+   social media does this," a glance at popularity before scrolling to
+   the interactive like button or the comment thread. */
+.content-stats {
+  display: flex;
+  gap: 1.1rem;
+  margin: 0.4rem 0 1.2rem;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.content-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}

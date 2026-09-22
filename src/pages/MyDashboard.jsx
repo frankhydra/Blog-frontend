@@ -97,6 +97,7 @@ export default function MyDashboard() {
   const [posts, setPosts] = useState([]);
   const [letters, setLetters] = useState([]);
   const [extras, setExtras] = useState({ unread_messages: 0, subscribers: 0, subscribers_new: 0 });
+  const [activity, setActivity] = useState({ total_views: 0, total_likes: 0, total_comments: 0 });
   const [status, setStatus] = useState('loading');
 
   useEffect(() => {
@@ -117,13 +118,19 @@ export default function MyDashboard() {
     Promise.all([
       apiClient.get('/my/contact-messages/unread-count'),
       apiClient.get('/my/subscribers/new-count'),
+      // Q6 - "your content activity": total likes/comments/views across
+      // everything this admin owns (posts+letters+books), same aggregate
+      // call Author/Contributor dashboards already use - this page just
+      // didn't exist yet when Q6 was originally built.
+      apiClient.get('/my/activity-summary'),
     ])
-      .then(([unreadRes, subsRes]) => {
+      .then(([unreadRes, subsRes, activityRes]) => {
         setExtras({
           unread_messages: unreadRes.data.unread_messages,
           subscribers: subsRes.data.count,
           subscribers_new: subsRes.data.new_since_last_check,
         });
+        setActivity(activityRes.data);
       })
       .catch(() => {});
   }, [authLoading, user]);
@@ -273,6 +280,29 @@ export default function MyDashboard() {
                         </button>
                       </p>
                     )}
+                  </div>
+
+                  <div className="settings-card">
+                    <div className="settings-card-header">
+                      <h2>Your content activity</h2>
+                    </div>
+                    <p className="post-meta">
+                      Across every post, letter, and book you've published.
+                    </p>
+                    <div className="portfolio-stats-grid">
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num">{activity.total_views}</span>
+                        <span className="portfolio-stat-label">Views</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-wax">{activity.total_likes}</span>
+                        <span className="portfolio-stat-label">Likes</span>
+                      </div>
+                      <div className="portfolio-stat-card">
+                        <span className="portfolio-stat-num portfolio-stat-num-forest">{activity.total_comments}</span>
+                        <span className="portfolio-stat-label">Comments</span>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
